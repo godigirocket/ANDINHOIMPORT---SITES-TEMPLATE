@@ -1,12 +1,33 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useEffect } from 'react';
+import { Header } from '@/components/site/Header';
+import { HeroSection } from '@/components/site/HeroSection';
+import { ProductsSection } from '@/components/site/ProductsSection';
+import { FeaturesSection } from '@/components/site/FeaturesSection';
+import { CTASection } from '@/components/site/CTASection';
+import { Footer } from '@/components/site/Footer';
+import { FloatingWhatsApp } from '@/components/site/FloatingWhatsApp';
+import { useContentStore } from '@/lib/stores/contentStore';
+import { clientConfig } from '@/config/client';
 
 const Index = () => {
+  const { fetchContent } = useContentStore();
+
+  useEffect(() => {
+    fetchContent();
+    document.title = clientConfig.seo.title;
+  }, [fetchContent]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        <HeroSection />
+        <ProductsSection />
+        <FeaturesSection />
+        <CTASection />
+      </main>
+      <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 };
