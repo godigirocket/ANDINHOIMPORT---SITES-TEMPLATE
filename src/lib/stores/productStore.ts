@@ -102,6 +102,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const { data, error } = await supabase
       .from('products')
       .select('*')
+      .eq('client_id', clientConfig.id)
       .order('sort_order', { ascending: true });
 
     if (error) {
@@ -139,6 +140,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       category: data.category ?? null, featured: data.featured ?? false,
       status: data.status, badge: data.badge ?? null,
       installments: data.installments, sort_order,
+      client_id: clientConfig.id,
     }).select();
     if (error) return { error: error.message };
     if (!rows?.length) return { error: 'Produto não criado' };
