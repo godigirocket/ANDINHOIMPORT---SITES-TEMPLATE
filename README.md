@@ -1,73 +1,61 @@
-# Welcome to your Lovable project
+# Andinho Import — Landing Page + Painel Admin
 
-## Project info
+Desenvolvido por **DigiRocket Developers** · [@GODIGIROCKET](https://www.instagram.com/GODIGIROCKET)
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## Stack
 
-There are several ways of editing your application.
+- React 18 + TypeScript + Vite
+- Tailwind CSS + Framer Motion
+- Supabase (Database + Storage + RLS)
+- Zustand (State Management)
+- Zod (Validação)
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 1. Clone o repositório
+git clone https://github.com/godigirocket/ANDINHOIMPORT.git
+cd ANDINHOIMPORT
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Instale as dependências
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Configure o Supabase
+# Copie .env.example para .env e preencha com suas credenciais
+cp .env.example .env
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Execute o SQL no Supabase SQL Editor
+# Cole o conteúdo de supabase/migrations/001_initial_schema.sql
+
+# 5. Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Deploy
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+npm run build
+```
 
-**Use GitHub Codespaces**
+O build gera a pasta `dist/` pronta para deploy em Vercel, Netlify ou qualquer hosting estático.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Arquivos de configuração incluídos:
+- `vercel.json` — rewrites para SPA
+- `public/_redirects` — fallback para Netlify
 
-## What technologies are used for this project?
+## Painel Admin
 
-This project is built with:
+Acesse `/admin/login` com as credenciais configuradas em `src/config/client.ts`.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Personalização para novo cliente
 
-## How can I deploy this project?
+1. Duplique o projeto
+2. Edite `src/config/client.ts` — nome, cores, logo, contato
+3. Execute o SQL no Supabase do novo projeto
+4. Deploy
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+© 2025 DigiRocket Developers · Todos os direitos reservados
