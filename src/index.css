@@ -6,175 +6,170 @@
 
 @layer base {
   :root {
-    /* Core Colors - Dark Luxury Theme */
-    --background: 222 47% 3%;
-    --foreground: 210 40% 98%;
-    
-    --card: 222 47% 6%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 222 47% 6%;
-    --popover-foreground: 210 40% 98%;
-    
-    /* Primary - Purple */
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
-    --primary-dark: 262 83% 48%;
-    --primary-light: 262 83% 70%;
-    
-    /* Secondary - Dark Surface */
-    --secondary: 222 47% 8%;
-    --secondary-foreground: 210 40% 98%;
-    
-    /* Accent - Green */
-    --accent: 142 71% 45%;
-    --accent-foreground: 210 40% 98%;
-    
-    --muted: 222 30% 15%;
-    --muted-foreground: 215 20% 65%;
-    
+    /* ── ANDINHO IMPORT — Futuristic Dark Gold ── */
+    --background: 220 20% 4%;
+    --foreground: 45 20% 96%;
+    --card: 220 20% 7%;
+    --card-foreground: 45 20% 96%;
+    --popover: 220 20% 7%;
+    --popover-foreground: 45 20% 96%;
+    --primary: 43 96% 52%;
+    --primary-foreground: 220 20% 4%;
+    --primary-dark: 38 92% 42%;
+    --primary-light: 48 100% 65%;
+    --secondary: 220 20% 10%;
+    --secondary-foreground: 45 20% 96%;
+    --accent: 43 96% 52%;
+    --accent-foreground: 220 20% 4%;
+    --muted: 220 15% 14%;
+    --muted-foreground: 220 10% 55%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 222 30% 15%;
-    --input: 222 30% 15%;
-    --ring: 262 83% 58%;
-    
+    --destructive-foreground: 45 20% 96%;
+    --border: 220 15% 14%;
+    --input: 220 15% 12%;
+    --ring: 43 96% 52%;
     --radius: 0.75rem;
-    
-    /* Surface Colors */
-    --surface: 222 47% 6%;
-    --surface-hover: 222 30% 12%;
-    
-    /* Glass Effect */
-    --glass: 222 47% 6%;
-    --glass-border: 215 20% 25%;
-    
-    /* Text Colors */
-    --text-primary: 210 40% 98%;
-    --text-secondary: 215 20% 65%;
-    
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(330, 81%, 60%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(142, 71%, 45%) 0%, hsl(160, 84%, 39%) 100%);
-    --gradient-hero: radial-gradient(ellipse at top right, hsla(262, 83%, 58%, 0.15), transparent 50%);
-    --gradient-card: linear-gradient(135deg, hsla(262, 83%, 58%, 0.1), hsla(142, 71%, 45%, 0.05));
-    --gradient-cta: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(142, 71%, 45%) 100%);
-    
-    /* Shadows */
-    --shadow-glow: 0 0 60px hsla(262, 83%, 58%, 0.3);
-    --shadow-accent: 0 0 40px hsla(142, 71%, 45%, 0.3);
-    --shadow-card: 0 25px 50px -12px hsla(0, 0%, 0%, 0.5);
-    
-    /* Sidebar */
-    --sidebar-background: 222 47% 4%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 262 83% 58%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 222 30% 12%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 30% 15%;
-    --sidebar-ring: 262 83% 58%;
-  }
-
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262 83% 58%;
-    --surface: 210 40% 98%;
-    --surface-hover: 210 40% 94%;
+    --surface: 220 20% 7%;
+    --surface-hover: 220 15% 12%;
+    --glass: 220 20% 7%;
+    --glass-border: 220 15% 20%;
+    --gradient-primary: linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(38,92%,42%) 100%);
+    --gradient-accent:  linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(48,100%,65%) 100%);
+    --shadow-glow:   0 0 40px hsla(43,96%,52%,0.3), 0 0 80px hsla(43,96%,52%,0.1);
+    --shadow-accent: 0 0 30px hsla(43,96%,52%,0.35);
+    --shadow-card:   0 20px 60px -10px hsla(0,0%,0%,0.7);
+    --shadow-neon:   0 0 20px hsla(200,100%,60%,0.4), 0 0 60px hsla(200,100%,60%,0.15);
+    --sidebar-background: 220 20% 3%;
+    --sidebar-foreground: 45 20% 96%;
+    --sidebar-primary: 43 96% 52%;
+    --sidebar-primary-foreground: 220 20% 4%;
+    --sidebar-accent: 220 15% 10%;
+    --sidebar-accent-foreground: 45 20% 96%;
+    --sidebar-border: 220 15% 12%;
+    --sidebar-ring: 43 96% 52%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  
-  html {
-    scroll-behavior: smooth;
-  }
-  
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    background-color: hsl(220,20%,4%);
   }
+  img { -webkit-user-drag: none; user-select: none; }
+  ::selection { background: hsla(43,96%,52%,0.3); color: white; }
 }
 
 @layer components {
   .glass {
-    @apply backdrop-blur-xl bg-glass/70 border border-glass-border/30;
+    @apply backdrop-blur-xl border;
+    background: hsla(220,20%,7%,0.7);
+    border-color: hsla(220,15%,20%,0.4);
   }
-  
   .glass-card {
-    @apply backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl;
+    @apply backdrop-blur-xl rounded-2xl border;
+    background: hsla(220,20%,7%,0.8);
+    border-color: hsla(220,15%,20%,0.5);
   }
-  
+  /* Futuristic neon card */
+  .neon-card {
+    @apply rounded-2xl border relative overflow-hidden;
+    background: linear-gradient(135deg, hsla(220,20%,8%,0.9) 0%, hsla(220,20%,6%,0.95) 100%);
+    border-color: hsla(43,96%,52%,0.15);
+    box-shadow: 0 0 0 1px hsla(43,96%,52%,0.08), inset 0 1px 0 hsla(255,255%,255%,0.05);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .neon-card:hover {
+    border-color: hsla(43,96%,52%,0.35);
+    box-shadow: 0 0 0 1px hsla(43,96%,52%,0.2), 0 0 30px hsla(43,96%,52%,0.1), inset 0 1px 0 hsla(255,255%,255%,0.08);
+    transform: translateY(-2px);
+  }
+  /* Pill glow button */
+  .btn-gold {
+    @apply font-bold rounded-full px-7 py-3 transition-all focus:outline-none;
+    background: linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(38,92%,44%) 100%);
+    color: hsl(220,20%,4%);
+    box-shadow: 0 0 20px hsla(43,96%,52%,0.4), 0 4px 15px hsla(43,96%,52%,0.2);
+  }
+  .btn-gold:hover {
+    box-shadow: 0 0 35px hsla(43,96%,52%,0.6), 0 4px 20px hsla(43,96%,52%,0.3);
+    transform: translateY(-1px) scale(1.02);
+  }
+  .btn-gold:active { transform: scale(0.98); }
+  /* Gradient text */
   .gradient-text {
     @apply bg-clip-text text-transparent;
     background-image: var(--gradient-primary);
   }
-  
-  .gradient-primary {
-    background: var(--gradient-primary);
-  }
-  
-  .gradient-accent {
-    background: var(--gradient-accent);
-  }
-  
-  .gradient-cta {
-    background: var(--gradient-cta);
-  }
-  
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
-  }
-  
-  .shadow-accent-glow {
-    box-shadow: var(--shadow-accent);
-  }
-  
-  .hover-lift {
-    @apply transition-all duration-300;
-  }
-  
-  .hover-lift:hover {
-    @apply -translate-y-1;
-    box-shadow: var(--shadow-card);
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-accent  { background: var(--gradient-accent); }
+  .shadow-glow      { box-shadow: var(--shadow-glow); }
+  .shadow-neon      { box-shadow: var(--shadow-neon); }
+  .hover-lift { @apply transition-all duration-300; }
+  .hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
+  /* Scan line effect */
+  .scan-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 0%, hsla(43,96%,52%,0.03) 50%, transparent 100%);
+    background-size: 100% 4px;
+    pointer-events: none;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .animation-delay-150 {
-    animation-delay: 150ms;
-  }
-  
-  .animation-delay-300 {
-    animation-delay: 300ms;
-  }
-  
-  .animation-delay-500 {
-    animation-delay: 500ms;
-  }
+  .text-balance { text-wrap: balance; }
+  .animation-delay-150  { animation-delay: 150ms; }
+  .animation-delay-300  { animation-delay: 300ms; }
+  .animation-delay-500  { animation-delay: 500ms; }
+  .animation-delay-700  { animation-delay: 700ms; }
+  .animation-delay-1000 { animation-delay: 1000ms; }
 }
+
+/* ── Premium keyframes ── */
+@keyframes glow-pulse {
+  0%,100% { box-shadow: 0 0 20px hsla(43,96%,52%,0.3); }
+  50%      { box-shadow: 0 0 50px hsla(43,96%,52%,0.6), 0 0 80px hsla(43,96%,52%,0.2); }
+}
+@keyframes float-y {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(300%) skewX(-15deg); }
+}
+@keyframes border-glow {
+  0%,100% { border-color: hsla(43,96%,52%,0.2); }
+  50%      { border-color: hsla(43,96%,52%,0.6); }
+}
+@keyframes ambient-drift {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%      { transform: translate(30px,-20px) scale(1.05); }
+  66%      { transform: translate(-20px,15px) scale(0.98); }
+}
+@keyframes particle-rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+}
+@keyframes scan-h {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-glow-pulse    { animation: glow-pulse 2.5s ease-in-out infinite; }
+.animate-float-y       { animation: float-y 4s ease-in-out infinite; }
+.animate-ambient-drift { animation: ambient-drift 12s ease-in-out infinite; }
+.animate-rotate-slow   { animation: rotate-slow 20s linear infinite; }

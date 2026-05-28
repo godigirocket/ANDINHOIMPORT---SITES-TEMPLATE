@@ -1,20 +1,5 @@
 // Tipos TypeScript centralizados
 
-export interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  installments: number;
-  image: string;
-  status: 'active' | 'inactive';
-  category?: string;
-  badge?: string;
-  specifications?: Record<string, string>;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface User {
   id: string;
   email: string;
@@ -27,45 +12,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  lockoutRemaining?: number;
 }
 
-export interface SiteContent {
-  hero: {
-    badge: string;
-    headline: string;
-    subheadline: string;
-    ctaPrimary: { text: string; icon: string };
-    ctaSecondary: { text: string; icon: string };
-    socialProof: string[];
-  };
-  features: Array<{
-    id: string;
-    title: string;
-    description: string;
-    icon: string;
-  }>;
-  products: {
-    title: string;
-    emptyState: {
-      title: string;
-      description: string;
-      cta: string;
-    };
-  };
-  socialProof: {
-    title: string;
-    instagramPosts: string[];
-  };
-  cta: {
-    headline: string;
-    subheadline: string;
-    buttonText: string;
-  };
-}
-
-export interface DashboardStats {
-  activeProducts: number;
-  totalProducts: number;
-  instagramFollowers: string;
-  monthlySales: string;
-}
+// Re-export Product from productStore for backwards compatibility
+export type { Product } from '@/lib/stores/productStore';
