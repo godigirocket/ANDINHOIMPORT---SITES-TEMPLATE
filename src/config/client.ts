@@ -50,7 +50,7 @@ export const clientConfig: ClientConfig = {
     // Logo real da Andinho Import — URL hospedada
     logoUrl: 'https://i.ibb.co/WCSDy8H/logo.jpg',
     logoAlt: 'Andinho Import',
-    // Imagens reais enviadas pelo cliente
+    // Imagens de alta qualidade
     heroBgImages: [
       'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1600&q=85&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1600&q=85&auto=format&fit=crop',

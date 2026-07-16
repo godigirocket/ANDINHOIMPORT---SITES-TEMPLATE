@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Search, Edit, Trash2, MoreVertical, Eye, EyeOff, Loader2, Star, GripVertical, ImageIcon, ChevronDown } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, MoreVertical, Eye, EyeOff, Loader2, Star, GripVertical, ImageIcon, ChevronDown, Flame, Sparkles, Gift, Tag, Gem, Target, Rocket, DollarSign, Lock, PackageCheck, Award, Zap } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,16 +7,31 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useProductStore, type ProductFormData, productSchema, type Product } from '@/lib/stores/productStore';
+import { getNicheConfig } from '@/config/niche';
 import { uploadImage, compressImage, deleteImage, replaceImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 import { clientConfig } from '@/config/client';
 import AdminLayout from '@/components/admin/AdminLayout';
 
-const BADGE_PRESETS = [
-  '🔥 50% OFF','⚡ LANÇAMENTO','🏷️ PROMOÇÃO','✨ NOVO',
-  '💎 EXCLUSIVO','🎯 DESTAQUE','🚀 MAIS VENDIDO','💰 MELHOR PREÇO',
-  '🔒 LACRADO','📦 PRONTA ENTREGA','⭐ TOP','🎁 OFERTA',
-];
+// Pega badges do nicho configurado
+const nicheConfig = getNicheConfig();
+const BADGE_PRESETS = nicheConfig.badges;
+
+// Mapeamento de badges para ícones (mesmo do ProductsSection)
+const BADGE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  '50% OFF': Tag,
+  'LANÇAMENTO': Zap,
+  'PROMOÇÃO': Tag,
+  'NOVO': Sparkles,
+  'EXCLUSIVO': Gem,
+  'DESTAQUE': Target,
+  'MAIS VENDIDO': Rocket,
+  'MELHOR PREÇO': DollarSign,
+  'LACRADO': Lock,
+  'PRONTA ENTREGA': PackageCheck,
+  'TOP': Award,
+  'OFERTA': Gift,
+};
 
 const emptyForm = (): ProductFormData => ({
   title:'', description:'', price:0, old_price:null,
@@ -24,23 +39,83 @@ const emptyForm = (): ProductFormData => ({
   status:'active', category:'', badge:'', featured:false,
 });
 
+function ImagePreview({ src }: { src: string }) {
+  const [error, setError] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const prevSrc = useRef(src);
+
+  // Reset quando src muda
+  if (prevSrc.current !== src) {
+    prevSrc.current = src;
+    if (error) setError(false);
+    if (loaded) setLoaded(false);
+  }
+
+  if (!src) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2"
+        style={{ background: 'linear-gradient(135deg,hsla(220,20%,11%,1),hsla(220,20%,8%,1))' }}>
+        <ImageIcon className="w-10 h-10" style={{ color: 'hsla(43,96%,52%,0.3)' }} />
+        <p className="text-xs" style={{ color: 'hsla(45,20%,96%,0.4)' }}>Sem imagem</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4"
+        style={{ background: 'linear-gradient(135deg,hsla(220,20%,11%,1),hsla(220,20%,8%,1))' }}>
+        <ImageIcon className="w-10 h-10" style={{ color: 'hsla(43,96%,52%,0.3)' }} />
+        <p className="text-xs font-semibold" style={{ color: 'hsla(45,20%,96%,0.5)' }}>Não carregou</p>
+        {!src.startsWith('data:') && (
+          <a href={src} target="_blank" rel="noopener noreferrer"
+            className="text-[10px] underline" style={{ color: 'hsl(43,96%,52%)' }}>
+            Testar URL →
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg,hsla(220,20%,11%,1),hsla(220,20%,8%,1))' }}>
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
+        </div>
+      )}
+      <img
+        key={src}
+        src={src}
+        alt="Preview"
+        className={`w-full h-full object-cover transition-opacity ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+      />
+    </>
+  );
+}
+
 function ProductImageUpload({ value, onChange }: { value: string | null; onChange: (url: string | null) => void }) {
   const [uploading, setUploading] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
-  const handleFile = async (file: File, oldUrl?: string | null) => {
+  const handleFile = async (file: File, _oldUrl?: string | null) => {
     if (!file.type.startsWith('image/')) { toast.error('Apenas imagens'); return; }
     setUploading(true);
     try {
-      const compressed = await compressImage(file, 1200, 0.88);
-      const url = (oldUrl && oldUrl.includes('supabase.co'))
-        ? await replaceImage('products', compressed, oldUrl)
-        : await uploadImage('products', compressed);
-      onChange(url);
-      toast.success('Imagem enviada com sucesso');
+      // Converte direto pra base64 — funciona sempre, sem depender de servidor
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      onChange(base64);
+      toast.success('Imagem adicionada');
     } catch {
-      onChange(URL.createObjectURL(file));
-      toast.warning('Preview local — configure Supabase Storage para persistir');
+      toast.error('Erro ao processar imagem');
     } finally { setUploading(false); }
   };
 
@@ -57,7 +132,7 @@ function ProductImageUpload({ value, onChange }: { value: string | null; onChang
       {value ? (
         <div className="relative w-full aspect-video rounded-xl overflow-hidden group"
           style={{ border: '1px solid hsla(43,96%,52%,0.25)' }}>
-          <img src={value} alt="Preview" className="w-full h-full object-cover" />
+          <ImagePreview src={value} />
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <button type="button"
               onClick={() => ref.current?.click()}
@@ -103,7 +178,7 @@ function BadgeSelector({ value, onChange }: { value: string; onChange: (v: strin
     <div className="space-y-1.5">
       <Label className="text-xs">Badge / Etiqueta</Label>
       <div className="flex gap-2">
-        <Input placeholder="Ex: 🔥 50% OFF" value={value}
+        <Input placeholder="Ex: 50% OFF" value={value}
           onChange={e => onChange(e.target.value)} className="text-xs flex-1" />
         <button type="button" onClick={() => setOpen(!open)}
           className="px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1 flex-shrink-0"
@@ -114,17 +189,21 @@ function BadgeSelector({ value, onChange }: { value: string; onChange: (v: strin
       {open && (
         <div className="grid grid-cols-2 gap-1.5 p-3 rounded-xl"
           style={{ background: 'hsla(220,20%,9%,0.95)', border: '1px solid hsla(43,96%,52%,0.15)' }}>
-          {BADGE_PRESETS.map(b => (
-            <button key={b} type="button" onClick={() => { onChange(b); setOpen(false); }}
-              className="text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{
-                background: value === b ? 'hsla(43,96%,52%,0.2)' : 'hsla(220,20%,12%,0.8)',
-                border: `1px solid ${value === b ? 'hsla(43,96%,52%,0.5)' : 'hsla(255,255%,255%,0.06)'}`,
-                color: value === b ? 'hsl(43,96%,52%)' : 'hsla(45,20%,96%,0.7)',
-              }}>
-              {b}
-            </button>
-          ))}
+          {BADGE_PRESETS.map(b => {
+            const Icon = BADGE_ICON_MAP[b];
+            return (
+              <button key={b} type="button" onClick={() => { onChange(b); setOpen(false); }}
+                className="text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
+                style={{
+                  background: value === b ? 'hsla(43,96%,52%,0.2)' : 'hsla(220,20%,12%,0.8)',
+                  border: `1px solid ${value === b ? 'hsla(43,96%,52%,0.5)' : 'hsla(255,255%,255%,0.06)'}`,
+                  color: value === b ? 'hsl(43,96%,52%)' : 'hsla(45,20%,96%,0.7)',
+                }}>
+                {Icon && <Icon className="w-3 h-3 flex-shrink-0" />}
+                {b}
+              </button>
+            );
+          })}
           <button type="button" onClick={() => { onChange(''); setOpen(false); }}
             className="col-span-2 text-center px-2.5 py-1.5 rounded-lg text-xs"
             style={{ background: 'hsla(0,84%,60%,0.1)', border: '1px solid hsla(0,84%,60%,0.2)', color: 'hsl(0,84%,60%)' }}>
@@ -160,7 +239,7 @@ export default function AdminProducts() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selected, setSelected] = useState<Product | null>(null);
-  const [form, setForm] = useState<ProductFormData>(emptyForm());
+  const [form, setForm] = useState<ProductFormData & Record<string, unknown>>(emptyForm());
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -184,7 +263,30 @@ export default function AdminProducts() {
   const openModal = (product?: Product) => {
     if (product) {
       setSelected(product);
-      setForm({ title: product.title, description: product.description ?? '', price: product.price, old_price: product.old_price ?? null, installments: product.installments, image_url: product.image_url ?? null, affiliate_link: product.affiliate_link ?? null, status: product.status, category: product.category ?? '', badge: product.badge ?? '', featured: product.featured });
+      setForm({ 
+        title: product.title, 
+        description: product.description ?? '', 
+        price: product.price, 
+        old_price: product.old_price ?? null, 
+        installments: product.installments, 
+        image_url: product.image_url ?? null, 
+        affiliate_link: product.affiliate_link ?? null, 
+        status: product.status, 
+        category: product.category ?? '', 
+        badge: product.badge ?? '', 
+        featured: product.featured,
+        // Campos do nicho
+        size: product.size ?? '',
+        color: product.color ?? '',
+        weight: product.weight ?? '',
+        volume: product.volume ?? '',
+        flavor: product.flavor ?? '',
+        brand: product.brand ?? '',
+        model: product.model ?? '',
+        expiration: product.expiration ?? '',
+        ingredients: product.ingredients ?? '',
+        nutritional_info: product.nutritional_info ?? '',
+      } as ProductFormData & Record<string, unknown>);
     } else { setSelected(null); setForm(emptyForm()); }
     setFormErrors({});
     setIsModalOpen(true);
@@ -200,11 +302,22 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      toast.error('Erro de validação', {
+        description: 'Por favor, corrija os erros no formulário destacados em vermelho.'
+      });
+      return;
+    }
     setIsSaving(true);
     const { error } = selected ? await updateProduct(selected.id, form) : await createProduct(form);
     setIsSaving(false);
-    if (error) { toast.error('Erro ao salvar', { description: error }); return; }
+    if (error) {
+      toast.error('Erro ao salvar o produto', {
+        description: error,
+        duration: 6000,
+      });
+      return;
+    }
     toast.success(selected ? 'Produto atualizado' : 'Produto criado');
     setIsModalOpen(false);
   };
@@ -289,6 +402,7 @@ export default function AdminProducts() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 mt-2">
             <ProductImageUpload value={form.image_url ?? null} onChange={url => setForm(p => ({ ...p, image_url: url }))} />
+            {formErrors.image_url && <p className="text-xs text-destructive mt-1">{formErrors.image_url}</p>}
             <div className="space-y-1.5">
               <Label className="text-xs">Nome *</Label>
               <Input placeholder="iPhone 15 Pro Max 256GB" {...f('title')} />
@@ -297,6 +411,7 @@ export default function AdminProducts() {
             <div className="space-y-1.5">
               <Label className="text-xs">Descrição</Label>
               <Textarea placeholder="256GB — Titânio Natural, novo lacrado" rows={2} {...f('description')} />
+              {formErrors.description && <p className="text-xs text-destructive">{formErrors.description}</p>}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -309,24 +424,106 @@ export default function AdminProducts() {
               <div className="space-y-1.5">
                 <Label className="text-xs">Preço Antigo (R$)</Label>
                 <Input type="number" step="0.01" min="0" placeholder="6299.00"
-                  value={form.old_price ?? ''} onChange={e => { const v = parseFloat(e.target.value); setForm(p => ({ ...p, old_price: isNaN(v) ? null : v })); }} className="text-sm" />
+                  value={form.old_price ?? ''} onChange={e => { const v = parseFloat(e.target.value); setForm(p => ({ ...p, old_price: isNaN(v) ? null : v })); }}
+                  className={`text-sm ${formErrors.old_price ? 'border-destructive' : ''}`} />
+                {formErrors.old_price && <p className="text-xs text-destructive">{formErrors.old_price}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Parcelas (até {clientConfig.features.maxInstallments}x)</Label>
                 <Input type="number" min="1" max={clientConfig.features.maxInstallments}
-                  value={form.installments} onChange={e => setForm(p => ({ ...p, installments: parseInt(e.target.value) || 1 }))} className="text-sm" />
+                  value={form.installments} onChange={e => setForm(p => ({ ...p, installments: parseInt(e.target.value) || 1 }))}
+                  className={`text-sm ${formErrors.installments ? 'border-destructive' : ''}`} />
+                {formErrors.installments && <p className="text-xs text-destructive">{formErrors.installments}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Categoria</Label>
                 <Input placeholder="apple, xiaomi..." {...f('category')} />
+                {formErrors.category && <p className="text-xs text-destructive">{formErrors.category}</p>}
               </div>
             </div>
+
+            {/* Campos Dinâmicos por Nicho */}
+            {(nicheConfig.productFields.size || nicheConfig.productFields.color || nicheConfig.productFields.brand || nicheConfig.productFields.model) && (
+              <div className="grid grid-cols-2 gap-3">
+                {nicheConfig.productFields.size && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Tamanho</Label>
+                    <Input placeholder="P, M, G, GG..." value={form.size ?? ''} onChange={e => setForm(p => ({ ...p, size: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+                {nicheConfig.productFields.color && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Cor</Label>
+                    <Input placeholder="Preto, Branco..." value={form.color ?? ''} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+                {nicheConfig.productFields.brand && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Marca</Label>
+                    <Input placeholder="Apple, Samsung..." value={form.brand ?? ''} onChange={e => setForm(p => ({ ...p, brand: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+                {nicheConfig.productFields.model && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Modelo</Label>
+                    <Input placeholder="iPhone 15 Pro..." value={form.model ?? ''} onChange={e => setForm(p => ({ ...p, model: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {(nicheConfig.productFields.weight || nicheConfig.productFields.volume || nicheConfig.productFields.flavor) && (
+              <div className="grid grid-cols-2 gap-3">
+                {nicheConfig.productFields.weight && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Peso</Label>
+                    <Input placeholder="1kg, 500g..." value={form.weight ?? ''} onChange={e => setForm(p => ({ ...p, weight: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+                {nicheConfig.productFields.volume && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Volume</Label>
+                    <Input placeholder="1L, 500ml..." value={form.volume ?? ''} onChange={e => setForm(p => ({ ...p, volume: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+                {nicheConfig.productFields.flavor && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Sabor</Label>
+                    <Input placeholder="Chocolate, Morango..." value={form.flavor ?? ''} onChange={e => setForm(p => ({ ...p, flavor: e.target.value }))} className="text-sm" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {nicheConfig.productFields.expiration && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Validade</Label>
+                <Input type="date" value={form.expiration ?? ''} onChange={e => setForm(p => ({ ...p, expiration: e.target.value }))} className="text-sm" />
+              </div>
+            )}
+
+            {nicheConfig.productFields.ingredients && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Ingredientes</Label>
+                <Textarea placeholder="Lista de ingredientes..." value={form.ingredients ?? ''} onChange={e => setForm(p => ({ ...p, ingredients: e.target.value }))} className="text-sm resize-none" rows={3} />
+              </div>
+            )}
+
+            {nicheConfig.productFields.nutritionalInfo && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Informação Nutricional</Label>
+                <Textarea placeholder="Calorias, proteínas, carboidratos..." value={form.nutritional_info ?? ''} onChange={e => setForm(p => ({ ...p, nutritional_info: e.target.value }))} className="text-sm resize-none" rows={3} />
+              </div>
+            )}
+
             <BadgeSelector value={form.badge ?? ''} onChange={v => setForm(p => ({ ...p, badge: v }))} />
+            {formErrors.badge && <p className="text-xs text-destructive">{formErrors.badge}</p>}
             <div className="space-y-1.5">
               <Label className="text-xs">Link Afiliado (opcional)</Label>
               <Input type="url" placeholder="https://..." {...f('affiliate_link')} />
+              {formErrors.affiliate_link && <p className="text-xs text-destructive">{formErrors.affiliate_link}</p>}
             </div>
             <div className="space-y-3 p-4 rounded-xl" style={{ background: 'hsla(220,20%,9%,0.8)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
               <div className="flex items-center justify-between">
@@ -374,6 +571,25 @@ export default function AdminProducts() {
   );
 }
 
+function AdminProductImage({ src, alt }: { src: string; alt: string }) {
+  const [error, setError] = useState(false);
+  if (error) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+        <ImageIcon className="w-10 h-10" style={{ color: 'hsla(43,96%,52%,0.2)' }} />
+        <span className="text-[10px]" style={{ color: 'hsla(45,20%,96%,0.25)' }}>Erro ao carregar</span>
+      </div>
+    );
+  }
+  return (
+    <img src={src} alt={alt}
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      referrerPolicy="no-referrer"
+      onError={() => setError(true)}
+    />
+  );
+}
+
 function ProductCard({ product, fmt, showDrag, onEdit, onDelete, onToggle }: {
   product: Product; fmt: (p: number) => string; showDrag?: boolean;
   onEdit: () => void; onDelete: () => void; onToggle: () => void;
@@ -394,8 +610,7 @@ function ProductCard({ product, fmt, showDrag, onEdit, onDelete, onToggle }: {
       <div className="relative aspect-square overflow-hidden"
         style={{ background: 'linear-gradient(135deg,hsla(220,20%,11%,1),hsla(220,20%,8%,1))' }}>
         {product.image_url ? (
-          <img src={product.image_url} alt={product.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <AdminProductImage src={product.image_url} alt={product.title} />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
             <ImageIcon className="w-10 h-10" style={{ color: 'hsla(43,96%,52%,0.2)' }} />

@@ -8,12 +8,36 @@ interface Testimonial {
 }
 
 const DEFAULT: Testimonial[] = [
-  { id:'1', name:'Carlos M.',    rating:5, avatar_url:null, text:'Produto chegou rápido, embalado perfeitamente. iPhone 15 Pro Max impecável, exatamente como descrito. Super recomendo!' },
-  { id:'2', name:'Ana Paula S.', rating:5, avatar_url:null, text:'Atendimento incrível! Tirou todas as minhas dúvidas antes da compra. Xiaomi 14 Ultra chegou em 2 dias. Nota 10!' },
-  { id:'3', name:'Rafael T.',    rating:5, avatar_url:null, text:'Já é a terceira vez que compro aqui. Sempre produtos originais, preço justo e entrega rápida. Não compro em outro lugar.' },
-  { id:'4', name:'Juliana K.',   rating:5, avatar_url:null, text:'Fiz o parcelamento em 18x sem juros, foi muito fácil. Apple Watch Series 9 chegou lacrado com nota fiscal. Perfeito!' },
-  { id:'5', name:'Pedro H.',     rating:5, avatar_url:null, text:'Melhor loja de importados da região Sul. Produto original, garantia real e suporte pós-venda excelente. Recomendo demais!' },
-  { id:'6', name:'Fernanda L.',  rating:5, avatar_url:null, text:'Comprei o iPhone 14 seminovo e estava impecável. Honestidade total na descrição do produto. Voltarei a comprar com certeza!' },
+  {
+    id: '1', name: 'Carlos Mendes', rating: 5,
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80&auto=format&fit=crop&crop=faces',
+    text: 'Comprei o iPhone 15 Pro Max e chegou em 2 dias úteis, lacrado e com nota. Atendimento via WhatsApp foi muito atencioso, tirou todas minhas dúvidas. Recomendo demais!',
+  },
+  {
+    id: '2', name: 'Ana Paula Silva', rating: 5,
+    avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80&auto=format&fit=crop&crop=faces',
+    text: 'Atendimento incrível! Consegui parcelar em 18x sem juros no cartão. Xiaomi 14 Ultra chegou perfeito, exatamente como descrito. Já indiquei pra família toda.',
+  },
+  {
+    id: '3', name: 'Rafael Tavares', rating: 5,
+    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80&auto=format&fit=crop&crop=faces',
+    text: 'Já é a terceira vez que compro aqui. Sempre produtos originais, preço justo e entrega rápida. Confiança total. Não compro celular em outro lugar.',
+  },
+  {
+    id: '4', name: 'Juliana Krause', rating: 5,
+    avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80&auto=format&fit=crop&crop=faces',
+    text: 'Apple Watch Series 9 chegou lacrado com nota fiscal. Pulseira extra que pedi veio junto. Pagamento via Pix com 5% de desconto, super tranquilo. Recomendo!',
+  },
+  {
+    id: '5', name: 'Pedro Henrique', rating: 5,
+    avatar_url: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&q=80&auto=format&fit=crop&crop=faces',
+    text: 'Melhor loja de importados da região Sul. Produto original, garantia real e suporte pós-venda excelente. Já fechei 2 vendas pra amigos depois da minha experiência.',
+  },
+  {
+    id: '6', name: 'Fernanda Lima', rating: 5,
+    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80&auto=format&fit=crop&crop=faces',
+    text: 'Comprei o iPhone 14 seminovo e estava impecável, sem nenhum risco. Honestidade total na descrição. Veio com carregador original e película já aplicada. Voltarei a comprar!',
+  },
 ];
 
 const isSupabaseOk = () => {

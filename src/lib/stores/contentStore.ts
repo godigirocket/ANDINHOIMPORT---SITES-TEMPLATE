@@ -10,6 +10,7 @@ export interface SiteContentData {
   cta_secondary_text: string;
   whatsapp_link: string;
   instagram_link: string;
+  instagram_enabled: boolean; // Toggle para mostrar/ocultar seção Instagram
   support_text: string;
   contact_phone: string;
   contact_email: string;
@@ -20,9 +21,12 @@ export interface SiteContentData {
   ga_id: string;
   meta_pixel: string;
   tiktok_pixel: string;
+  google_search_console_token: string;
   // URLs das imagens de fundo do hero — editáveis pelo painel
   hero_bg_1: string;
   hero_bg_2: string;
+  // Toggle para mostrar/ocultar seção Instagram
+  instagram_enabled: boolean;
 }
 
 const defaultContent: SiteContentData = {
@@ -33,6 +37,7 @@ const defaultContent: SiteContentData = {
   cta_secondary_text: clientConfig.initialContent.hero.ctaSecondary,
   whatsapp_link:      `https://wa.me/${clientConfig.company.contact.whatsappNumber}`,
   instagram_link:     clientConfig.company.social.instagram,
+  instagram_enabled:  true, // Seção Instagram ativada por padrão
   support_text:       clientConfig.initialContent.cta.subheadline,
   contact_phone:      clientConfig.company.contact.phone,
   contact_email:      clientConfig.company.contact.email,
@@ -43,9 +48,11 @@ const defaultContent: SiteContentData = {
   ga_id:              '',
   meta_pixel:         '',
   tiktok_pixel:       '',
+  google_search_console_token: '',
   // Imagens padrão de alta qualidade (Unsplash — sem bloqueio)
   hero_bg_1: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1920&q=95&auto=format&fit=crop',
   hero_bg_2: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1920&q=95&auto=format&fit=crop',
+  instagram_enabled: true,
 };
 
 const LOCAL_KEY = `${clientConfig.id}_content_v4`;
@@ -103,6 +110,7 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         cta_secondary_text: d.cta_secondary_text  ?? defaultContent.cta_secondary_text,
         whatsapp_link:      d.whatsapp_link        ?? defaultContent.whatsapp_link,
         instagram_link:     d.instagram_link       ?? defaultContent.instagram_link,
+        instagram_enabled:  d.instagram_enabled    ?? defaultContent.instagram_enabled,
         support_text:       d.support_text         ?? defaultContent.support_text,
         contact_phone:      d.contact_phone        ?? defaultContent.contact_phone,
         contact_email:      d.contact_email        ?? defaultContent.contact_email,
@@ -113,8 +121,10 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         ga_id:              d.ga_id                ?? '',
         meta_pixel:         d.meta_pixel           ?? '',
         tiktok_pixel:       d.tiktok_pixel         ?? '',
+        google_search_console_token: d.google_search_console_token ?? '',
         hero_bg_1:          d.hero_bg_1            ?? defaultContent.hero_bg_1,
         hero_bg_2:          d.hero_bg_2            ?? defaultContent.hero_bg_2,
+        instagram_enabled:  d.instagram_enabled    ?? defaultContent.instagram_enabled,
       };
       saveLocal(content);
       set({ content, isLoading: false });

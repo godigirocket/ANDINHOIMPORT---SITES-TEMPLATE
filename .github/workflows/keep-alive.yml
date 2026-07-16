@@ -1,17 +1,54 @@
-name: Keep Supabase Alive
+name: Keep Supabase Alive (Multi-Project)
 
 on:
   schedule:
-    # Roda a cada 5 dias às 3h da manhã (UTC)
-    - cron: '0 3 */5 * *'
-  workflow_dispatch: # permite rodar manualmente
+    # Roda a cada 3 dias às 3h da manhã UTC
+    - cron: '0 3 */3 * *'
+  workflow_dispatch: # rodar manualmente quando quiser
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - name: "Andinho Import"
+            url_secret: "SUPABASE_URL_ANDINHO"
+            key_secret: "SUPABASE_KEY_ANDINHO"
+          # Adicione mais projetos aqui:
+          # - name: "Loja Fashion"
+          #   url_secret: "SUPABASE_URL_FASHION"
+          #   key_secret: "SUPABASE_KEY_FASHION"
+          # - name: "Fit Suplementos"
+          #   url_secret: "SUPABASE_URL_FIT"
+          #   key_secret: "SUPABASE_KEY_FIT"
+
     steps:
-      - name: Ping Supabase
+      - name: Ping ${{ matrix.project.name }}
+        env:
+          PROJECT_URL: ${{ secrets[matrix.project.url_secret] }}
+          PROJECT_KEY: ${{ secrets[matrix.project.key_secret] }}
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/products?select=id&limit=1"
+          echo "🔄 [${{ matrix.project.name }}] Ping — $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          
+          if [ -z "$PROJECT_URL" ] || [ -z "$PROJECT_KEY" ]; then
+            echo "⚠️ Secrets não configurados para ${{ matrix.project.name }} — pulando"
+            exit 0
+          fi
+          
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $PROJECT_KEY" \
+            -H "Content-Type: application/json" \
+            "$PROJECT_URL/rest/v1/?limit=1" \
+            --max-time 15)
+          
+          echo "📡 HTTP Status: $STATUS"
+          
+          if [ "$STATUS" -eq 200 ]; then
+            echo "✅ ${{ matrix.project.name }} — ativo"
+          elif [ "$STATUS" -eq 401 ]; then
+            echo "⚠️ ${{ matrix.project.name }} — 401 (key pode estar errada)"
+          else
+            echo "❌ ${{ matrix.project.name }} — status $STATUS (pode estar pausado)"
+            echo "   → Reative em https://supabase.com/dashboard"
+          fi

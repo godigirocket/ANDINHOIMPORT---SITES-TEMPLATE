@@ -2,6 +2,19 @@ import { create } from 'zustand';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase/client';
 import { clientConfig } from '@/config/client';
+import { generateUUID } from '@/lib/utils/uuid';
+
+const lenientUrl = z.string().refine(val => {
+  if (!val) return true;
+  if (val.startsWith('blob:') || val.startsWith('data:') || val.startsWith('/')) return true;
+  try {
+    const withProto = val.includes('://') ? val : `http://${val}`;
+    new URL(withProto);
+    return true;
+  } catch {
+    return false;
+  }
+}, 'URL inválida');
 
 export const productSchema = z.object({
   title:          z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
@@ -9,8 +22,8 @@ export const productSchema = z.object({
   price:          z.number().positive('Preço deve ser maior que zero'),
   old_price:      z.number().positive().optional().nullable(),
   installments:   z.number().min(1).max(clientConfig.features.maxInstallments),
-  image_url:      z.string().url('URL inválida').optional().or(z.literal('')).nullable(),
-  affiliate_link: z.string().url('URL inválida').optional().or(z.literal('')).nullable(),
+  image_url:      lenientUrl.optional().or(z.literal('')).nullable(),
+  affiliate_link: lenientUrl.optional().or(z.literal('')).nullable(),
   status:         z.enum(['active', 'inactive']),
   category:       z.string().optional(),
   badge:          z.string().optional(),
@@ -35,6 +48,18 @@ export interface Product {
   sort_order:     number;
   created_at:     string;
   updated_at:     string;
+  
+  // Campos específicos por nicho
+  size?:          string | null;
+  color?:         string | null;
+  weight?:        string | null;
+  volume?:        string | null;
+  flavor?:        string | null;
+  brand?:         string | null;
+  model?:         string | null;
+  expiration?:    string | null;
+  ingredients?:   string | null;
+  nutritional_info?: string | null;
 }
 
 interface ProductStore {
@@ -56,7 +81,7 @@ interface ProductStore {
 const LOCAL_KEY = `${clientConfig.id}_products_v3`;
 
 const mk = (overrides: Partial<Product> & { title: string; price: number }): Product => ({
-  id: crypto.randomUUID(), description: null, old_price: null, image_url: null,
+  id: generateUUID(), description: null, old_price: null, image_url: null,
   affiliate_link: null, category: null, featured: false, status: 'active',
   badge: null, installments: 12, sort_order: 0,
   created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
@@ -64,21 +89,73 @@ const mk = (overrides: Partial<Product> & { title: string; price: number }): Pro
 });
 
 const initialProducts: Product[] = [
-  mk({ title: 'iPhone 15 Pro Max 256GB', description: 'Titânio Natural — Novo, lacrado com nota fiscal', price: 7499, old_price: 8299, category: 'apple', featured: true, badge: 'LANÇAMENTO', installments: 18, sort_order: 0 }),
-  mk({ title: 'iPhone 14 128GB',         description: 'Azul — Seminovo impecável com garantia',          price: 4299, old_price: 4999, category: 'apple', badge: 'PROMOÇÃO', installments: 12, sort_order: 1 }),
-  mk({ title: 'Xiaomi 14 Ultra 512GB',   description: 'Preto — Câmera Leica, novo lacrado',              price: 5999, category: 'xiaomi', featured: true, installments: 18, sort_order: 2 }),
-  mk({ title: 'Apple Watch Series 9 45mm', description: 'GPS + Celular — Meia-noite',                    price: 3499, category: 'smartwatch', badge: 'NOVO', sort_order: 3 }),
+  mk({
+    title: 'iPhone 15 Pro Max 256GB',
+    description: 'Titânio Natural — Novo, lacrado com nota fiscal e garantia Apple',
+    price: 7499, old_price: 8299,
+    image_url: 'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=800&q=85&auto=format&fit=crop',
+    category: 'apple', featured: true, badge: 'LANÇAMENTO', installments: 18, sort_order: 0,
+  }),
+  mk({
+    title: 'iPhone 14 128GB',
+    description: 'Azul — Seminovo impecável com garantia de 90 dias',
+    price: 4299, old_price: 4999,
+    image_url: 'https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?w=800&q=85&auto=format&fit=crop',
+    category: 'apple', badge: '🏷️ PROMOÇÃO', installments: 12, sort_order: 1,
+  }),
+  mk({
+    title: 'Xiaomi 14 Ultra 512GB',
+    description: 'Preto — Câmera Leica, novo lacrado, dual sim',
+    price: 5999,
+    image_url: 'https://images.unsplash.com/photo-1707498389796-bbe57212bd9b?w=800&q=85&auto=format&fit=crop',
+    category: 'xiaomi', featured: true, badge: '⭐ TOP', installments: 18, sort_order: 2,
+  }),
+  mk({
+    title: 'Apple Watch Series 9 45mm',
+    description: 'GPS + Celular — Meia-noite, pulseira esportiva inclusa',
+    price: 3499,
+    image_url: 'https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=800&q=85&auto=format&fit=crop',
+    category: 'smartwatch', badge: 'NOVO', installments: 12, sort_order: 3,
+  }),
+  mk({
+    title: 'iPhone 15 128GB',
+    description: 'Rosa — Novo, lacrado com garantia oficial Apple Brasil',
+    price: 5299, old_price: 5999,
+    image_url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=85&auto=format&fit=crop',
+    category: 'apple', installments: 18, sort_order: 4,
+  }),
+  mk({
+    title: 'Xiaomi Redmi Note 13 Pro 256GB',
+    description: 'Verde — Câmera de 200MP, tela AMOLED 120Hz',
+    price: 1899, old_price: 2299,
+    image_url: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&q=85&auto=format&fit=crop',
+    category: 'xiaomi', badge: '💰 MELHOR PREÇO', installments: 12, sort_order: 5,
+  }),
+  mk({
+    title: 'AirPods Pro 2ª Geração',
+    description: 'Cancelamento ativo de ruído com case MagSafe',
+    price: 1599, old_price: 1999,
+    image_url: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=800&q=85&auto=format&fit=crop',
+    category: 'apple', badge: 'OFERTA', installments: 10, sort_order: 6,
+  }),
+  mk({
+    title: 'iPad Air 11" M2 128GB',
+    description: 'Azul — Wi-Fi, novo lacrado com Apple Pencil compatível',
+    price: 5499,
+    image_url: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=85&auto=format&fit=crop',
+    category: 'apple', featured: true, badge: '🔒 LACRADO', installments: 18, sort_order: 7,
+  }),
 ];
 
-function loadLocal(): Product[] {
+function loadCache(): Product[] {
   try {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return initialProducts;
+    if (!raw) return [];
     const p = JSON.parse(raw);
-    return Array.isArray(p) && p.length > 0 ? p : initialProducts;
-  } catch { return initialProducts; }
+    return Array.isArray(p) ? p : [];
+  } catch { return []; }
 }
-function saveLocal(p: Product[]) {
+function saveCache(p: Product[]) {
   try { localStorage.setItem(LOCAL_KEY, JSON.stringify(p)); } catch {}
 }
 
@@ -88,17 +165,21 @@ const isSupabaseConfigured = () => {
 };
 
 export const useProductStore = create<ProductStore>((set, get) => ({
-  products:    loadLocal(),
+  // Carrega CACHE para exibição imediata, fetchProducts busca a verdade do Supabase
+  products:    loadCache().length > 0 ? loadCache() : initialProducts,
   isLoading:   false,
   error:       null,
   hasSupabase: isSupabaseConfigured(),
 
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
+
     if (!isSupabaseConfigured()) {
-      set({ products: loadLocal(), isLoading: false, hasSupabase: false });
+      console.warn('[Products] ⚠️ Supabase NÃO configurado. Usando dados locais (não persistentes entre dispositivos).');
+      set({ products: initialProducts, isLoading: false, hasSupabase: false });
       return;
     }
+
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -106,33 +187,39 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('[Products]', error.message);
-      set({ products: loadLocal(), isLoading: false, error: null, hasSupabase: true });
+      console.error('[Products] ❌ Erro ao buscar do Supabase:', error.message);
+      console.error('[Products] Possíveis causas: projeto pausado, RLS bloqueando, env vars incorretas.');
+      // Mantém cache se tiver, mas mostra o erro
+      const cached = loadCache();
+      set({ 
+        products: cached.length > 0 ? cached : initialProducts, 
+        isLoading: false, 
+        error: `Falha ao conectar com banco de dados: ${error.message}`,
+        hasSupabase: true 
+      });
       return;
     }
+
     const products = (data ?? []) as Product[];
-    saveLocal(products);
-    set({ products, isLoading: false, hasSupabase: true });
+    
+    // Se banco está vazio e cache tem dados, pode ser que o cliente nunca rodou a migration
+    if (products.length === 0) {
+      console.warn('[Products] ⚠️ Tabela products vazia no Supabase. Verifique se a migration SQL foi executada.');
+    }
+
+    saveCache(products);
+    set({ products: products.length > 0 ? products : initialProducts, isLoading: false, hasSupabase: true, error: null });
   },
 
   getProduct: (id) => get().products.find(p => p.id === id),
 
   createProduct: async (data) => {
     const sort_order = get().products.length;
+
     if (!isSupabaseConfigured()) {
-      const p: Product = {
-        id: crypto.randomUUID(), sort_order,
-        title: data.title, description: data.description ?? null,
-        price: data.price, old_price: data.old_price ?? null,
-        image_url: data.image_url ?? null, affiliate_link: data.affiliate_link ?? null,
-        category: data.category ?? null, featured: data.featured ?? false,
-        status: data.status, badge: data.badge ?? null, installments: data.installments,
-        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-      };
-      const updated = [...get().products, p];
-      saveLocal(updated); set({ products: updated });
-      return { error: null };
+      return { error: '⚠️ Supabase não configurado. Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env para salvar dados permanentemente.' };
     }
+
     const { data: rows, error } = await supabase.from('products').insert({
       title: data.title, description: data.description ?? null,
       price: data.price, old_price: data.old_price ?? null,
@@ -142,43 +229,57 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       installments: data.installments, sort_order,
       client_id: clientConfig.id,
     }).select();
-    if (error) return { error: error.message };
-    if (!rows?.length) return { error: 'Produto não criado' };
+
+    if (error) {
+      console.error('[Products] ❌ Erro ao criar produto:', error.message);
+      return { error: `Não foi possível salvar no banco: ${error.message}. Verifique as políticas RLS no Supabase.` };
+    }
+    if (!rows?.length) return { error: 'Produto não criado — resposta vazia do banco.' };
+
     const updated = [...get().products, rows[0] as Product];
-    saveLocal(updated); set({ products: updated });
+    saveCache(updated);
+    set({ products: updated });
     return { error: null };
   },
 
   updateProduct: async (id, data) => {
     if (!isSupabaseConfigured()) {
-      const updated = get().products.map(p =>
-        p.id === id ? { ...p, ...data, updated_at: new Date().toISOString() } : p
-      );
-      saveLocal(updated); set({ products: updated });
-      return { error: null };
+      return { error: '⚠️ Supabase não configurado. Dados não serão persistidos.' };
     }
+
     const { data: rows, error } = await supabase
       .from('products').update({ ...data, updated_at: new Date().toISOString() })
       .eq('id', id).select();
-    if (error) return { error: error.message };
-    const row = rows?.[0] as Product | undefined;
-    const updated = get().products.map(p =>
-      p.id === id ? (row ?? { ...p, ...data, updated_at: new Date().toISOString() }) : p
-    );
-    saveLocal(updated); set({ products: updated });
+
+    if (error) {
+      console.error('[Products] ❌ Erro ao atualizar produto:', error.message);
+      return { error: `Não foi possível salvar: ${error.message}` };
+    }
+    if (!rows || rows.length === 0) {
+      return { error: 'Produto não encontrado ou sem permissão (verifique as políticas RLS no Supabase).' };
+    }
+
+    const row = rows[0] as Product;
+    const updated = get().products.map(p => p.id === id ? row : p);
+    saveCache(updated);
+    set({ products: updated });
     return { error: null };
   },
 
   deleteProduct: async (id) => {
     if (!isSupabaseConfigured()) {
-      const updated = get().products.filter(p => p.id !== id);
-      saveLocal(updated); set({ products: updated });
-      return { error: null };
+      return { error: '⚠️ Supabase não configurado.' };
     }
+
     const { error } = await supabase.from('products').delete().eq('id', id);
-    if (error) return { error: error.message };
+    if (error) {
+      console.error('[Products] ❌ Erro ao deletar produto:', error.message);
+      return { error: `Não foi possível excluir: ${error.message}` };
+    }
+
     const updated = get().products.filter(p => p.id !== id);
-    saveLocal(updated); set({ products: updated });
+    saveCache(updated);
+    set({ products: updated });
     return { error: null };
   },
 
@@ -188,7 +289,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     await get().updateProduct(id, { status: p.status === 'active' ? 'inactive' : 'active' });
   },
 
-  // Drag & drop — reordena localmente e persiste no Supabase
   reorderProducts: async (orderedIds) => {
     const current = get().products;
     const reordered = orderedIds
@@ -198,17 +298,20 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       })
       .filter(Boolean) as Product[];
 
-    saveLocal(reordered);
+    saveCache(reordered);
     set({ products: reordered });
 
     if (!isSupabaseConfigured()) return;
 
-    // Atualiza sort_order no Supabase em paralelo
-    await Promise.all(
+    const results = await Promise.all(
       reordered.map(p =>
         supabase.from('products').update({ sort_order: p.sort_order }).eq('id', p.id)
       )
     );
+    const failed = results.filter(r => r.error);
+    if (failed.length > 0) {
+      console.error('[Products] ❌ Erro ao reordenar:', failed[0].error?.message);
+    }
   },
 
   getActiveProducts: () => {

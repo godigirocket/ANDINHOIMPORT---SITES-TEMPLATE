@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { generateUUID } from '@/lib/utils/uuid';
 
 interface Testimonial {
   id: string; name: string; text: string;
@@ -51,7 +52,7 @@ export default function AdminTestimonials() {
       const updated = [data![0] as Testimonial, ...items];
       setItems(updated); save(updated);
     } else {
-      const updated = [{ id: crypto.randomUUID(), ...form, created_at: new Date().toISOString() }, ...items];
+      const updated = [{ id: generateUUID(), ...form, created_at: new Date().toISOString() }, ...items];
       setItems(updated); save(updated); setSaving(false);
     }
     toast.success('Depoimento criado');

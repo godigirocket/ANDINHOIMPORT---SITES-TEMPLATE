@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Save, Loader2, RefreshCw, Info, ImageIcon, Upload, X } from 'lucide-react';
+import { Save, Loader2, RefreshCw, Info, ImageIcon, Upload, X, Instagram } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { useContentStore, type SiteContentData } from '@/lib/stores/contentStore';
 import { uploadImage, compressImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
@@ -255,6 +256,23 @@ export default function AdminContent() {
                 <div className="space-y-1.5">
                   <Label>Instagram</Label>
                   <Input type="url" placeholder="https://instagram.com/andinhoimport" value={form.instagram_link} onChange={set('instagram_link')} />
+                </div>
+
+                {/* Toggle Instagram Section */}
+                <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-surface/30">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Instagram className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">Seção Instagram no Site</p>
+                      <p className="text-xs text-muted-foreground">Mostrar galeria de fotos do Instagram na landing page</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={form.instagram_enabled}
+                    onCheckedChange={(checked) => setForm(prev => ({ ...prev, instagram_enabled: checked }))}
+                  />
                 </div>
               </CardContent>
             </Card>

@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client';
 import { uploadImage, compressImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { generateUUID } from '@/lib/utils/uuid';
 
 interface Banner {
   id: string; image_url: string; title: string | null;
@@ -97,7 +98,7 @@ export default function AdminBanners() {
       const updated = [...banners, data![0] as Banner];
       setBanners(updated); save(updated);
     } else {
-      const updated = [...banners, { id: crypto.randomUUID(), image_url: form.image_url, title: form.title || null, active: form.active, sort_order: banners.length, created_at: new Date().toISOString() }];
+      const updated = [...banners, { id: generateUUID(), image_url: form.image_url, title: form.title || null, active: form.active, sort_order: banners.length, created_at: new Date().toISOString() }];
       setBanners(updated); save(updated); setSaving(false);
     }
     toast.success('Banner criado');

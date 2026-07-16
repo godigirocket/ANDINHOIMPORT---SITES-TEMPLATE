@@ -17,6 +17,10 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Private files (white label docs, copies, etc)
+.private/
+*.private.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

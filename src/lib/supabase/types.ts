@@ -76,6 +76,7 @@ export interface Database {
           ga_id: string | null;
           meta_pixel: string | null;
           tiktok_pixel: string | null;
+          google_search_console_token: string | null;
           updated_at: string;
         };
         Insert: {
@@ -95,6 +96,7 @@ export interface Database {
           ga_id?: string | null;
           meta_pixel?: string | null;
           tiktok_pixel?: string | null;
+          google_search_console_token?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -112,6 +114,7 @@ export interface Database {
           ga_id?: string | null;
           meta_pixel?: string | null;
           tiktok_pixel?: string | null;
+          google_search_console_token?: string | null;
           updated_at?: string;
         };
       };
@@ -164,6 +167,45 @@ export interface Database {
           avatar_url?: string | null;
           rating?: number;
           active?: boolean;
+        };
+      };
+      orders: {
+        Row: {
+          id: string;
+          client_id: string;
+          customer_name: string;
+          customer_email: string | null;
+          customer_phone: string;
+          customer_cpf: string | null;
+          items: Json;
+          total: number;
+          method: string;
+          status: 'pending_confirmation' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+          utms: Json | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          client_id: string;
+          customer_name: string;
+          customer_email?: string | null;
+          customer_phone: string;
+          customer_cpf?: string | null;
+          items: Json;
+          total: number;
+          method: string;
+          status?: 'pending_confirmation' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+          utms?: Json | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          status?: 'pending_confirmation' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+          notes?: string | null;
+          updated_at?: string;
         };
       };
     };

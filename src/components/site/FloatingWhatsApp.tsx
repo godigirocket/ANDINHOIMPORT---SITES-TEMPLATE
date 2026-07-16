@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
+import { trackEvent } from '@/lib/analytics/track';
 
 export function FloatingWhatsApp() {
   const { content } = useContentStore();
@@ -12,6 +13,10 @@ export function FloatingWhatsApp() {
       href={`${whatsappUrl}?text=${msg}`}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent('whatsapp_click', { source: 'floating_button' });
+        trackEvent('generate_lead', { source: 'floating_whatsapp' });
+      }}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 1.5, type: 'spring', stiffness: 200 }}

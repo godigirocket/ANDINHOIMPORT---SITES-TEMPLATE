@@ -2,19 +2,42 @@ import { motion } from 'framer-motion';
 import { Instagram, ExternalLink } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
+import { useState, useEffect } from 'react';
 
-const POSTS = [
-  { id:'1', url:'https://www.instagram.com/p/DObPY6cjlKo/', img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80&auto=format&fit=crop', caption:'iPhone 15 Pro Max disponível! 🔥' },
-  { id:'2', url:'https://www.instagram.com/p/C1pzytvPSdT/', img:'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80&auto=format&fit=crop', caption:'Xiaomi 14 Ultra chegou! 📱' },
-  { id:'3', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80&auto=format&fit=crop', caption:'Apple Watch Series 9 ⌚' },
-  { id:'4', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&q=80&auto=format&fit=crop', caption:'Parcelamento em até 18x 💳' },
-  { id:'5', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=400&q=80&auto=format&fit=crop', caption:'Produtos originais garantidos ✅' },
-  { id:'6', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=400&q=80&auto=format&fit=crop', caption:'Entrega rápida para todo Brasil 🚀' },
+interface InstagramPost {
+  id: string;
+  url: string;
+  img: string;
+  caption: string;
+}
+
+const LOCAL_KEY = `${clientConfig.id}_instagram_posts`;
+
+const DEFAULT_POSTS: InstagramPost[] = [
+  { id:'1', url:'https://www.instagram.com/p/DObPY6cjlKo/', img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80&auto=format&fit=crop', caption:'iPhone 15 Pro Max disponível!' },
+  { id:'2', url:'https://www.instagram.com/p/C1pzytvPSdT/', img:'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80&auto=format&fit=crop', caption:'Xiaomi 14 Ultra chegou!' },
+  { id:'3', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80&auto=format&fit=crop', caption:'Apple Watch Series 9' },
+  { id:'4', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&q=80&auto=format&fit=crop', caption:'Parcelamento em até 18x' },
+  { id:'5', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=400&q=80&auto=format&fit=crop', caption:'Produtos originais garantidos' },
+  { id:'6', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=400&q=80&auto=format&fit=crop', caption:'Entrega rápida para todo Brasil' },
 ];
+
+function loadPosts(): InstagramPost[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (!raw) return DEFAULT_POSTS;
+    return JSON.parse(raw);
+  } catch { return DEFAULT_POSTS; }
+}
 
 export function InstagramSection() {
   const { content } = useContentStore();
+  const [posts, setPosts] = useState<InstagramPost[]>(DEFAULT_POSTS);
   const instagramUrl = content.instagram_link || clientConfig.company.social.instagram;
+
+  useEffect(() => {
+    setPosts(loadPosts());
+  }, []);
 
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">
@@ -62,7 +85,7 @@ export function InstagramSection() {
 
         {/* Grid de posts */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-8">
-          {POSTS.map((post, i) => (
+          {posts.map((post, i) => (
             <motion.a key={post.id} href={post.url} target="_blank" rel="noopener noreferrer"
               initial={{ opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }} transition={{ delay: i * 0.07 }}

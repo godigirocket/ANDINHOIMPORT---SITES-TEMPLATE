@@ -14,6 +14,12 @@ import {
   BarChart3,
   Image,
   MessageSquare,
+  MessageCircle,
+  CreditCard,
+  ShoppingBag,
+  Search,
+  Instagram,
+  Palette,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { clientConfig } from '@/config/client';
@@ -26,10 +32,16 @@ interface AdminLayoutProps {
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
   { label: 'Produtos', icon: Package, path: '/admin/products' },
+  { label: 'Pedidos', icon: ShoppingBag, path: '/admin/orders' },
   { label: 'Conteúdo', icon: FileText, path: '/admin/content' },
   { label: 'Banners', icon: Image, path: '/admin/banners' },
   { label: 'Depoimentos', icon: MessageSquare, path: '/admin/testimonials' },
-  { label: 'Analytics & SEO', icon: BarChart3, path: '/admin/analytics' },
+  { label: 'Instagram', icon: Instagram, path: '/admin/instagram' },
+  { label: 'Chatbot', icon: MessageCircle, path: '/admin/chatbot' },
+  { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
+  { label: 'SEO & Google', icon: Search, path: '/admin/seo' },
+  { label: 'Analytics & Pixels', icon: BarChart3, path: '/admin/analytics' },
+  { label: 'Editor de Tema', icon: Palette, path: '/admin/theme' },
   { label: 'Configurações', icon: Settings, path: '/admin/settings' },
 ];
 
@@ -38,6 +50,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Change favicon to admin version
+  useEffect(() => {
+    const favicon = document.querySelector('link[rel="icon"][type="image/svg+xml"]') as HTMLLinkElement;
+    if (favicon) {
+      const originalHref = favicon.href;
+      favicon.href = '/favicon-admin.svg';
+      
+      // Restore original favicon on unmount
+      return () => {
+        favicon.href = originalHref;
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

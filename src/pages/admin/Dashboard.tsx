@@ -1,39 +1,77 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Package, PackageCheck, ArrowRight, Plus, ExternalLink, AlertCircle, TrendingUp, Users } from 'lucide-react';
+import { Package, PackageCheck, ArrowRight, Plus, ExternalLink, AlertCircle, TrendingUp, Users, ShoppingCart, DollarSign, Eye, Clock, Zap, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProductStore } from '@/lib/stores/productStore';
 import { useNavigate } from 'react-router-dom';
 import { clientConfig } from '@/config/client';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { OnboardingChecklist } from '@/components/admin/OnboardingChecklist';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { products, fetchProducts, getActiveProducts, hasSupabase } = useProductStore();
+  const [time, setTime] = useState(new Date());
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  
+  // Relógio em tempo real
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const activeProducts = getActiveProducts();
   const fmt = (p: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p);
+  
+  // Métricas calculadas
+  const totalValue = activeProducts.reduce((sum, p) => sum + p.price, 0);
+  const avgPrice = activeProducts.length > 0 ? totalValue / activeProducts.length : 0;
+  const featuredCount = activeProducts.filter(p => p.featured).length;
 
   const stats = [
-    { label: 'Produtos Ativos', value: activeProducts.length, icon: PackageCheck, color: 'text-primary', bg: 'hsla(43,96%,52%,0.1)', border: 'hsla(43,96%,52%,0.2)' },
-    { label: 'Total no Catálogo', value: products.length, icon: Package, color: 'text-blue-400', bg: 'hsla(200,100%,60%,0.08)', border: 'hsla(200,100%,60%,0.2)' },
-    { label: 'Inativos', value: products.length - activeProducts.length, icon: TrendingUp, color: 'text-purple-400', bg: 'hsla(280,80%,65%,0.08)', border: 'hsla(280,80%,65%,0.2)' },
-    { label: 'Seguidores', value: '2.5K+', icon: Users, color: 'text-green-400', bg: 'hsla(142,71%,45%,0.08)', border: 'hsla(142,71%,45%,0.2)' },
+    { label: 'Produtos Ativos', value: activeProducts.length, icon: PackageCheck, color: 'text-primary', bg: 'hsla(43,96%,52%,0.1)', border: 'hsla(43,96%,52%,0.2)', trend: '+12%' },
+    { label: 'Valor Total', value: fmt(totalValue), icon: DollarSign, color: 'text-green-400', bg: 'hsla(142,71%,45%,0.08)', border: 'hsla(142,71%,45%,0.2)', trend: '+8%' },
+    { label: 'Ticket Médio', value: fmt(avgPrice), icon: TrendingUp, color: 'text-blue-400', bg: 'hsla(200,100%,60%,0.08)', border: 'hsla(200,100%,60%,0.2)', trend: '+5%' },
+    { label: 'Destaques', value: featuredCount, icon: Star, color: 'text-purple-400', bg: 'hsla(280,80%,65%,0.08)', border: 'hsla(280,80%,65%,0.2)', trend: '—' },
   ];
 
   return (
     <AdminLayout>
-      <div className="space-y-6 max-w-5xl">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-black text-white">Dashboard</h1>
-          <p className="text-sm mt-0.5" style={{ color: 'hsla(45,20%,96%,0.45)' }}>
-            Bem-vindo ao painel da {clientConfig.company.name} {clientConfig.company.nameHighlight}
-          </p>
+      <div className="space-y-6 max-w-6xl">
+        {/* Aviso de Supabase não configurado */}
+        {!hasSupabase && (
+          <div className="p-4 rounded-xl flex items-start gap-3" style={{ background: 'hsla(25,95%,53%,0.1)', border: '1px solid hsla(25,95%,53%,0.3)' }}>
+            <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-orange-400">Banco de dados não configurado</p>
+              <p className="text-xs mt-1" style={{ color: 'hsla(45,20%,96%,0.6)' }}>
+                Os dados estão sendo salvos apenas localmente neste navegador. Configure o Supabase em Configurações para garantir que produtos e pedidos não se percam.
+              </p>
+            </div>
+          </div>
+        )}
+        {/* Header com relógio */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-black text-white">Dashboard</h1>
+            <p className="text-sm mt-0.5" style={{ color: 'hsla(45,20%,96%,0.45)' }}>
+              Bem-vindo ao painel da {clientConfig.company.name} {clientConfig.company.nameHighlight}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-black text-primary tabular-nums">
+              {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+            <p className="text-xs" style={{ color: 'hsla(45,20%,96%,0.4)' }}>
+              {time.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </p>
+          </div>
         </div>
+
+        {/* Onboarding checklist */}
+        <OnboardingChecklist />
 
         {/* Supabase warning */}
         {!hasSupabase && (
@@ -52,21 +90,28 @@ export default function AdminDashboard() {
           </motion.div>
         )}
 
-        {/* Stats grid */}
+        {/* Stats grid com animações */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
             <motion.div key={stat.label}
               initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
               transition={{ delay: i * 0.07 }}>
-              <div className="rounded-2xl p-5 transition-all duration-300"
+              <div className="rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group"
                 style={{ background: stat.bg, border: `1px solid ${stat.border}` }}
                 onMouseEnter={e => ((e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLElement).style.transform = 'translateY(0)')}>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold" style={{ color: 'hsla(45,20%,96%,0.5)' }}>{stat.label}</p>
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: `radial-gradient(circle at 50% 50%, ${stat.bg}, transparent 70%)` }} />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-semibold" style={{ color: 'hsla(45,20%,96%,0.5)' }}>{stat.label}</p>
+                    <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                  </div>
+                  <p className={`text-3xl font-black ${stat.color} mb-1`}>{stat.value}</p>
+                  <p className="text-xs text-green-400 font-semibold">{stat.trend}</p>
                 </div>
-                <p className={`text-3xl font-black ${stat.color}`}>{stat.value}</p>
               </div>
             </motion.div>
           ))}
@@ -127,7 +172,7 @@ export default function AdminDashboard() {
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
                   style={{ background: 'linear-gradient(135deg, hsla(43,96%,52%,0.15), hsla(200,100%,60%,0.1))' }}>
                   {product.image_url
-                    ? <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                    ? <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     : <Package className="w-5 h-5 text-primary" />}
                 </div>
                 <div className="flex-1 min-w-0">

@@ -1,22 +1,109 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Package, MessageCircle, CreditCard, Star, ExternalLink, Zap } from 'lucide-react';
-import { useProductStore } from '@/lib/stores/productStore';
+import { Package, MessageCircle, CreditCard, Star, ExternalLink, Zap, ShoppingCart, Check, Flame, Sparkles, Gift, Tag, Gem, Target, Rocket, DollarSign, Lock, PackageCheck, Award } from 'lucide-react';
+import { useProductStore, type Product } from '@/lib/stores/productStore';
 import { useContentStore } from '@/lib/stores/contentStore';
+import { useCartStore } from '@/lib/stores/cartStore';
+import { usePaymentStore } from '@/lib/stores/paymentStore';
 import { clientConfig } from '@/config/client';
+import { toast } from 'sonner';
+import { trackEvent } from '@/lib/analytics/track';
+
+// Mapeamento de badges para ícones
+const BADGE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  'LANÇAMENTO': Zap,
+  'NOVO': Sparkles,
+  'OFERTA': Gift,
+  'PROMOÇÃO': Tag,
+  'EXCLUSIVO': Gem,
+  'DESTAQUE': Target,
+  'MAIS VENDIDO': Rocket,
+  'MELHOR PREÇO': DollarSign,
+  'LACRADO': Lock,
+  'PRONTA ENTREGA': PackageCheck,
+  'TOP': Award,
+  '50% OFF': Tag,
+  'HOT': Flame,
+};
+
+// Função para extrair ícone do badge
+function getBadgeIcon(badge: string): React.ComponentType<{ className?: string }> | null {
+  const upperBadge = badge.toUpperCase();
+  for (const [key, Icon] of Object.entries(BADGE_ICONS)) {
+    if (upperBadge.includes(key)) return Icon;
+  }
+  return null;
+}
+
+// Componente de imagem com fallback robusto
+function ProductImage({ src, alt }: { src: string; alt: string }) {
+  const [error, setError] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  if (error || !src) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-6">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: 'hsla(43,96%,52%,0.1)', border: '1px solid hsla(43,96%,52%,0.2)' }}>
+          <Package className="w-8 h-8 text-primary opacity-60" />
+        </div>
+        <p className="text-xs text-center font-semibold line-clamp-2"
+          style={{ color: 'hsla(45,20%,96%,0.4)' }}>{alt}</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+        referrerPolicy="no-referrer"
+      />
+    </>
+  );
+}
 
 export function ProductsSection() {
   const { fetchProducts, getActiveProducts } = useProductStore();
   const { content } = useContentStore();
+  const { addItem } = useCartStore();
+  const { config: paymentConfig } = usePaymentStore();
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const activeProducts = getActiveProducts();
   const whatsappUrl = content.whatsapp_link || `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   const fmt = (p: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p);
+  const isCheckoutMode = paymentConfig.mode === 'checkout';
 
-  const handleClick = (title: string, link?: string | null) => {
-    if (link) { window.open(link, '_blank'); return; }
-    window.open(`${whatsappUrl}?text=${encodeURIComponent(`Olá! Tenho interesse no ${title}. Pode me passar mais informações?`)}`, '_blank');
+  const handleClick = (product: Product) => {
+    if (isCheckoutMode) {
+      addItem(product);
+      trackEvent('add_to_cart', {
+        currency: 'BRL',
+        value: product.price,
+        items: [{ item_id: product.id, item_name: product.title, price: product.price, quantity: 1 }],
+      });
+      toast.success('Adicionado ao carrinho', { description: product.title });
+      return;
+    }
+    if (product.affiliate_link) {
+      trackEvent('view_item', { item_id: product.id, item_name: product.title, value: product.price, currency: 'BRL' });
+      window.open(product.affiliate_link, '_blank');
+      return;
+    }
+    trackEvent('whatsapp_click', { item_id: product.id, item_name: product.title });
+    trackEvent('generate_lead', { item_id: product.id, item_name: product.title, value: product.price, currency: 'BRL' });
+    window.open(`${whatsappUrl}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`, '_blank');
   };
 
   if (!clientConfig.features.products) return null;
@@ -81,9 +168,7 @@ export function ProductsSection() {
                   <div className="relative aspect-square overflow-hidden"
                     style={{ background: 'linear-gradient(135deg,hsla(225,25%,11%,1) 0%,hsla(220,20%,8%,1) 100%)' }}>
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy" />
+                      <ProductImage src={product.image_url} alt={product.title} />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-6">
                         {/* Placeholder premium com nome do produto */}
@@ -98,11 +183,15 @@ export function ProductsSection() {
                     {/* Shimmer overlay */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                       style={{ background: 'linear-gradient(135deg, transparent 40%, hsla(255,255%,255%,0.04) 50%, transparent 60%)' }} />
-                    {/* Badge premium com emoji */}
+                    {/* Badge premium com ícone */}
                     {product.badge && (
-                      <span className="absolute bottom-3 left-3 px-3 py-1.5 rounded-full text-[11px] font-black max-w-[calc(100%-24px)] truncate"
+                      <span className="absolute bottom-3 left-3 px-3 py-1.5 rounded-full text-[11px] font-black max-w-[calc(100%-24px)] truncate flex items-center gap-1.5"
                         style={{ background: 'linear-gradient(135deg,hsl(43,96%,52%),hsl(38,92%,44%))', color: 'hsl(220,20%,4%)', boxShadow: '0 0 14px hsla(43,96%,52%,0.6)' }}>
-                        {product.badge}
+                        {getBadgeIcon(product.badge) && (() => {
+                          const Icon = getBadgeIcon(product.badge)!;
+                          return <Icon className="w-3 h-3" />;
+                        })()}
+                        {product.badge.replace(/[🔥⚡🏷️✨💎🎯🚀💰🔒📦⭐🎁]/g, '').trim()}
                       </span>
                     )}
                     {product.featured && (
@@ -139,7 +228,7 @@ export function ProductsSection() {
                       )}
                     </div>
                     {/* CTA */}
-                    <button onClick={() => handleClick(product.title, product.affiliate_link)}
+                    <button onClick={() => handleClick(product)}
                       className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
                       style={{
                         background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))',
@@ -148,9 +237,11 @@ export function ProductsSection() {
                       }}
                       onMouseEnter={e => ((e.currentTarget as HTMLElement).style.boxShadow = '0 0 28px hsla(43,96%,52%,0.55)')}
                       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px hsla(43,96%,52%,0.3)')}>
-                      {product.affiliate_link
-                        ? <><ExternalLink className="w-3.5 h-3.5" />Ver Oferta</>
-                        : <><MessageCircle className="w-3.5 h-3.5" />Consultar</>}
+                      {isCheckoutMode
+                        ? <><ShoppingCart className="w-3.5 h-3.5" />Adicionar ao Carrinho</>
+                        : product.affiliate_link
+                          ? <><ExternalLink className="w-3.5 h-3.5" />Ver Oferta</>
+                          : <><MessageCircle className="w-3.5 h-3.5" />Consultar</>}
                     </button>
                   </div>
                 </div>
