@@ -13,6 +13,7 @@ import { CartDrawer } from '@/components/site/CartDrawer';
 import { TawkToChat } from '@/components/TawkToChat';
 import { SimpleChatbot } from '@/components/SimpleChatbot';
 import { ParticleBackground } from '@/components/ParticleBackground';
+import { SectionDivider, SectionDividerGlow } from '@/components/site/SectionDivider';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
@@ -185,11 +186,21 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <SectionDivider to="hsl(220,20%,5%)" />
         <BrandsTicker />
+        <SectionDividerGlow />
         <ProductsSection />
+        <SectionDivider from="hsl(225,25%,6%)" to="hsl(220,20%,4%)" flip />
         <FeaturesSection />
+        <SectionDividerGlow />
         <TestimonialsSection />
-        {content.instagram_enabled && <InstagramSection />}
+        {content.instagram_enabled && (
+          <>
+            <SectionDividerGlow />
+            <InstagramSection />
+          </>
+        )}
+        <SectionDivider to="hsl(225,25%,8%)" />
         <CTASection />
       </main>
       <Footer />

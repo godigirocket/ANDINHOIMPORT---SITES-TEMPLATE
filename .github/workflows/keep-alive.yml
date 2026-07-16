@@ -18,6 +18,9 @@ jobs:
           - name: "Lume"
             url_secret: "SUPABASE_URL_LUME"
             key_secret: "SUPABASE_KEY_LUME"
+          - name: "Trap"
+            url_secret: "SUPABASE_URL_TRAP"
+            key_secret: "SUPABASE_KEY_TRAP"
           # Adicione mais projetos aqui:
           # - name: "Loja Fashion"
           #   url_secret: "SUPABASE_URL_FASHION"
