@@ -15,6 +15,9 @@ jobs:
           - name: "Andinho Import"
             url_secret: "SUPABASE_URL_ANDINHO"
             key_secret: "SUPABASE_KEY_ANDINHO"
+          - name: "Lume"
+            url_secret: "SUPABASE_URL_LUME"
+            key_secret: "SUPABASE_KEY_LUME"
           # Adicione mais projetos aqui:
           # - name: "Loja Fashion"
           #   url_secret: "SUPABASE_URL_FASHION"
