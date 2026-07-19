@@ -109,32 +109,17 @@ export function ProductsSection() {
   if (!clientConfig.features.products) return null;
 
   return (
-    <section id="products" className="relative py-24 md:py-32 overflow-hidden">
-      {/* Background único — gradiente azul-escuro diferente do hero */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(220,20%,4%) 0%, hsl(225,25%,6%) 50%, hsl(220,20%,4%) 100%)' }} />
-      {/* Glow lateral esquerdo */}
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.06) 0%, transparent 70%)' }} />
-      {/* Glow lateral direito */}
-      <div className="absolute right-0 top-1/3 w-[400px] h-[400px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, hsla(200,100%,60%,0.04) 0%, transparent 70%)' }} />
-      {/* Linhas horizontais decorativas */}
-      <div className="absolute inset-0 pointer-events-none opacity-30"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 80px, hsla(43,96%,52%,0.03) 80px, hsla(43,96%,52%,0.03) 81px)' }} />
-
+    <section id="products" className="relative py-20 md:py-28 overflow-hidden">
+      <div className="absolute inset-0" style={{ background: 'hsl(220,20%,4%)' }} />
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <motion.div initial={{ y: 24, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5"
-            style={{ border: '1px solid hsla(43,96%,52%,0.25)', background: 'hsla(43,96%,52%,0.06)' }}>
-            <Zap className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[10px] font-black tracking-[0.25em] uppercase text-primary">Pronta Entrega</span>
-          </div>
-          <h2 className="font-black text-4xl md:text-6xl tracking-tight mb-4">
-            <span className="gradient-text">Modelos Disponíveis</span>
+          viewport={{ once: true }} className="text-center mb-12">
+          <h2 className="font-black text-3xl md:text-5xl tracking-tight mb-3">
+            <span className="text-white">Nossos </span>
+            <span className="gradient-text">Produtos</span>
           </h2>
-          <p className="text-white/50 text-sm max-w-md mx-auto">
+          <p className="text-white/45 text-sm max-w-md mx-auto">
             Parcelamento facilitado · Garantia total · Entrega rápida
           </p>
         </motion.div>

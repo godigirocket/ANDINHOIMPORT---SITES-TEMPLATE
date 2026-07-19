@@ -44,22 +44,12 @@ export function HeroSection() {
         />
       ))}
 
-      {/* Overlay cinematográfico — escuro à esquerda, transparente à direita */}
+      {/* Overlay cinematográfico */}
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(105deg, hsla(220,20%,4%,0.97) 0%, hsla(220,20%,4%,0.82) 45%, hsla(220,20%,4%,0.25) 100%)' }} />
+        style={{ background: 'linear-gradient(105deg, hsla(220,20%,4%,0.95) 0%, hsla(220,20%,4%,0.75) 50%, hsla(220,20%,4%,0.2) 100%)' }} />
       {/* Fade inferior */}
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(to top, hsl(220,20%,4%) 0%, transparent 35%)' }} />
-      {/* Glow dourado ambiente */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 45% at 15% 65%, hsla(43,96%,52%,0.1) 0%, transparent 70%)' }} />
-      {/* Grid futurista sutil */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(hsla(43,96%,52%,0.05) 1px, transparent 1px), linear-gradient(90deg, hsla(43,96%,52%,0.05) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-          opacity: 0.4,
-        }} />
+        style={{ background: 'linear-gradient(to top, hsl(220,20%,4%) 0%, transparent 30%)' }} />
 
       {/* Indicadores de slide */}
       <div className="absolute bottom-20 right-8 z-20 flex flex-col gap-2">
@@ -80,16 +70,12 @@ export function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 w-full pt-28 pb-24">
         <div className="max-w-xl">
 
-          {/* Badge pill */}
-          <motion.div initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+          {/* Eyebrow */}
+          <motion.p initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8"
-            style={{ border: '1px solid hsla(43,96%,52%,0.4)', background: 'hsla(43,96%,52%,0.08)', backdropFilter: 'blur(8px)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-black tracking-[0.25em] uppercase text-primary">
-              {content.hero_badge || hero.badge}
-            </span>
-          </motion.div>
+            className="text-xs font-semibold tracking-wide uppercase mb-6 text-primary">
+            {content.hero_badge || hero.badge}
+          </motion.p>
 
           {/* Título gigante */}
           <motion.h1 initial={{ y: 28, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
@@ -160,21 +146,23 @@ export function HeroSection() {
             </button>
           </motion.div>
 
-          {/* Stats row */}
+          {/* Confiança — dados reais */}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.65, delay: 0.44 }}
-            className="flex gap-8 mt-12 pt-8"
-            style={{ borderTop: '1px solid hsla(255,255%,255%,0.08)' }}>
-            {[
-              { value: '18x', label: 'sem juros' },
-              { value: '2.5k+', label: 'clientes' },
-              { value: '100%', label: 'original' },
-            ].map(stat => (
-              <div key={stat.label}>
-                <p className="text-2xl font-black text-primary leading-none">{stat.value}</p>
-                <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>{stat.label}</p>
-              </div>
-            ))}
+            className="flex gap-6 mt-12 pt-6"
+            style={{ borderTop: '1px solid hsla(255,255%,255%,0.06)' }}>
+            <div>
+              <p className="text-lg font-bold text-primary leading-none">{clientConfig.features.maxInstallments}x</p>
+              <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>sem juros</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-white leading-none">Garantia</p>
+              <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>12 meses</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-white leading-none">Original</p>
+              <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>100% verificado</p>
+            </div>
           </motion.div>
         </div>
       </div>
