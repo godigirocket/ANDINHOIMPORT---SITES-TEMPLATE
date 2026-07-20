@@ -52,12 +52,10 @@ export const PRODUCTS: ProductData[] = [
     availability: 'Pronta entrega',
     badge: 'DESTAQUE',
     featured: true,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-blue-select-202209?wid=800&hei=800&fmt=jpeg&qlt=90',
-    images: [
-      'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-blue-select-202209?wid=800&hei=800&fmt=jpeg&qlt=90',
-    ],
+    image: 'https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?w=600&q=80&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?w=600&q=80&auto=format&fit=crop'],
     whatsappMessage: 'Olá! Vi o iPhone 14 128GB Azul no site e gostaria de consultar disponibilidade e condições.',
-    description: 'iPhone 14 128GB Azul em estado impecável. Seminovo com garantia de 90 dias, bateria acima de 85%.',
+    description: 'iPhone 14 128GB Azul em estado impecável. Seminovo com garantia de 90 dias.',
   },
   {
     id: 'iphone-15-pro-max-256gb',
@@ -75,12 +73,10 @@ export const PRODUCTS: ProductData[] = [
     availability: 'Pronta entrega',
     badge: 'LANÇAMENTO',
     featured: true,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-max-natural-titanium-select?wid=800&hei=800&fmt=jpeg&qlt=90',
-    images: [
-      'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-max-natural-titanium-select?wid=800&hei=800&fmt=jpeg&qlt=90',
-    ],
-    whatsappMessage: 'Olá! Vi o iPhone 15 Pro Max 256GB no site e gostaria de consultar disponibilidade e condições.',
-    description: 'iPhone 15 Pro Max 256GB Titânio Natural. Novo, lacrado, com nota fiscal e garantia Apple de 12 meses.',
+    image: 'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=600&q=80&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=600&q=80&auto=format&fit=crop'],
+    whatsappMessage: 'Olá! Vi o iPhone 15 Pro Max 256GB no site e gostaria de consultar.',
+    description: 'iPhone 15 Pro Max 256GB Titânio Natural. Novo, lacrado, com nota fiscal e garantia de 12 meses.',
   },
   {
     id: 'iphone-15-pro-128gb',
@@ -98,12 +94,10 @@ export const PRODUCTS: ProductData[] = [
     availability: 'Pronta entrega',
     badge: 'MAIS VENDIDO',
     featured: true,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-black-titanium-select?wid=800&hei=800&fmt=jpeg&qlt=90',
-    images: [
-      'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-black-titanium-select?wid=800&hei=800&fmt=jpeg&qlt=90',
-    ],
-    whatsappMessage: 'Olá! Vi o iPhone 15 Pro 128GB no site e gostaria de consultar disponibilidade e condições.',
-    description: 'iPhone 15 Pro 128GB Titânio Preto. Chip A17 Pro, câmera 48MP, USB-C. Novo lacrado com garantia.',
+    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&q=80&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&q=80&auto=format&fit=crop'],
+    whatsappMessage: 'Olá! Vi o iPhone 15 Pro 128GB no site e gostaria de consultar.',
+    description: 'iPhone 15 Pro 128GB Titânio Preto. Chip A17 Pro, câmera 48MP. Novo lacrado com garantia.',
   },
   {
     id: 'iphone-16-pro-256gb',
@@ -120,12 +114,10 @@ export const PRODUCTS: ProductData[] = [
     availability: 'Pronta entrega',
     badge: 'LANÇAMENTO',
     featured: true,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-desert-titanium-select?wid=800&hei=800&fmt=jpeg&qlt=90',
-    images: [
-      'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-desert-titanium-select?wid=800&hei=800&fmt=jpeg&qlt=90',
-    ],
-    whatsappMessage: 'Olá! Vi o iPhone 16 Pro 256GB no site e gostaria de consultar disponibilidade e condições.',
-    description: 'iPhone 16 Pro 256GB Titânio Desert. Câmera 5x zoom, chip A18 Pro. Lançamento 2024, novo lacrado.',
+    image: 'https://images.unsplash.com/photo-1710023038911-154e4820bab7?w=600&q=80&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1710023038911-154e4820bab7?w=600&q=80&auto=format&fit=crop'],
+    whatsappMessage: 'Olá! Vi o iPhone 16 Pro 256GB no site e gostaria de consultar.',
+    description: 'iPhone 16 Pro 256GB Titânio Desert. Câmera 5x zoom, chip A18 Pro. Lançamento, novo lacrado.',
   },
 ];
 
@@ -134,7 +126,7 @@ export const CATEGORIES = [
   { id: 'apple', label: 'Apple' },
   { id: 'xiaomi', label: 'Xiaomi' },
   { id: 'smartwatch', label: 'Smartwatches' },
-  { id: 'accessory', label: 'Acessórios' },
+  { id: 'accessory', label: 'Acess�rios' },
 ] as const;
 
 export function getProductBySlug(slug: string): ProductData | undefined {

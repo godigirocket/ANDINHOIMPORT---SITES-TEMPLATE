@@ -5,8 +5,8 @@ import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
 
 const FALLBACK_IMAGES = [
-  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1920&q=95&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1920&q=95&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1600&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1600&q=85&auto=format&fit=crop',
 ];
 
 const iconMap: Record<string, React.ElementType> = { ShieldCheck, Zap, Award };
