@@ -6,6 +6,7 @@ import { AuthProvider } from '@/lib/auth/AuthContext';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import Checkout from './pages/Checkout';
+import ProductDetail from './pages/ProductDetail';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
@@ -40,6 +41,7 @@ const App = () => (
             {/* Public */}
             <Route path="/" element={<Index />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/produtos/:slug" element={<ProductDetail />} />
 
             {/* Admin */}
             <Route path="/admin/login" element={<AdminLogin />} />
