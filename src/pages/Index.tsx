@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
-import { BrandsTicker } from '@/components/site/BrandsTicker';
 import { ProductsSection } from '@/components/site/ProductsSection';
-import { FeaturesSection } from '@/components/site/FeaturesSection';
 import { TestimonialsSection } from '@/components/site/TestimonialsSection';
 import { InstagramSection } from '@/components/site/InstagramSection';
 import { CTASection } from '@/components/site/CTASection';
@@ -14,9 +12,6 @@ import { FloatingCart } from '@/components/site/FloatingCart';
 import { CartDrawer } from '@/components/site/CartDrawer';
 import { TawkToChat } from '@/components/TawkToChat';
 import { SimpleChatbot } from '@/components/SimpleChatbot';
-import { ParticleBackground } from '@/components/ParticleBackground';
-import { SectionDivider, SectionDividerGlow } from '@/components/site/SectionDivider';
-import { SmoothScrollProvider } from '@/components/scroll/SmoothScroll';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
@@ -200,7 +195,6 @@ const Index = () => {
   }, [content.ga_id, content.meta_pixel, content.tiktok_pixel]);
 
   return (
-    <SmoothScrollProvider>
     <div className="min-h-screen" style={{ background: '#050505' }}>
       <Header />
       <main>
@@ -218,7 +212,6 @@ const Index = () => {
       <SimpleChatbot />
       <TawkToChat />
     </div>
-    </SmoothScrollProvider>
   );
 };
 
