@@ -14,12 +14,8 @@ interface InstagramPost {
 const LOCAL_KEY = `${clientConfig.id}_instagram_posts`;
 
 const DEFAULT_POSTS: InstagramPost[] = [
-  { id:'1', url:'https://www.instagram.com/p/DObPY6cjlKo/', img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80&auto=format&fit=crop', caption:'iPhone 15 Pro Max disponível!' },
-  { id:'2', url:'https://www.instagram.com/p/C1pzytvPSdT/', img:'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80&auto=format&fit=crop', caption:'Xiaomi 14 Ultra chegou!' },
-  { id:'3', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80&auto=format&fit=crop', caption:'Apple Watch Series 9' },
-  { id:'4', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&q=80&auto=format&fit=crop', caption:'Parcelamento em até 18x' },
-  { id:'5', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=400&q=80&auto=format&fit=crop', caption:'Produtos originais garantidos' },
-  { id:'6', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=400&q=80&auto=format&fit=crop', caption:'Entrega rápida para todo Brasil' },
+  { id:'1', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80&auto=format&fit=crop', caption:'iPhone 15 Pro Max disponível!' },
+  { id:'2', url:'https://www.instagram.com/andinhoimport/', img:'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80&auto=format&fit=crop', caption:'Novidades toda semana' },
 ];
 
 function loadPosts(): InstagramPost[] {
@@ -41,14 +37,7 @@ export function InstagramSection() {
 
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">
-      {/* Background — gradiente com tom rosado/instagram */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, hsl(220,20%,4%) 0%, hsl(220,18%,5%) 50%, hsl(220,20%,4%) 100%)' }} />
-      {/* Glow instagram */}
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, hsla(330,80%,55%,0.05) 0%, transparent 70%)' }} />
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.04) 0%, transparent 70%)' }} />
+      <div className="absolute inset-0" style={{ background: 'hsl(220,20%,4%)' }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
