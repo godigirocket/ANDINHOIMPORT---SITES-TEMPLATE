@@ -26,6 +26,22 @@ const Index = () => {
   useEffect(() => {
     fetchContent();
     captureUTMs();
+    // Registrar visita
+    try {
+      const key = `${clientConfig.id}_visit_stats`;
+      const raw = localStorage.getItem(key);
+      const stats = raw ? JSON.parse(raw) : { total: 0, today: 0, todayDate: '', lastWeek: [0,0,0,0,0,0,0] };
+      const today = new Date().toISOString().split('T')[0];
+      if (stats.todayDate !== today) {
+        stats.lastWeek = [...stats.lastWeek.slice(1), stats.today];
+        stats.today = 1;
+        stats.todayDate = today;
+      } else {
+        stats.today++;
+      }
+      stats.total++;
+      localStorage.setItem(key, JSON.stringify(stats));
+    } catch {}
   }, [fetchContent]);
 
   // SEO dinâmico — meta tags, OG, Twitter Card

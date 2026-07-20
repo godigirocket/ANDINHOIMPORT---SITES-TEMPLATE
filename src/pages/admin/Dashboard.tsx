@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Package, PackageCheck, ArrowRight, Plus, ExternalLink, AlertCircle, TrendingUp, Users, ShoppingCart, DollarSign, Eye, Clock, Zap, Star } from 'lucide-react';
+import { Package, PackageCheck, ArrowRight, Plus, ExternalLink, AlertCircle, TrendingUp, Users, ShoppingCart, DollarSign, Eye, Clock, Zap, Star, MousePointerClick, Globe, Smartphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProductStore } from '@/lib/stores/productStore';
@@ -9,10 +9,46 @@ import { clientConfig } from '@/config/client';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { OnboardingChecklist } from '@/components/admin/OnboardingChecklist';
 
+// Contador de visitas persistente
+const VISITS_KEY = `${clientConfig.id}_visit_stats`;
+
+interface VisitStats {
+  total: number;
+  today: number;
+  todayDate: string;
+  lastWeek: number[];
+}
+
+function getVisitStats(): VisitStats {
+  try {
+    const raw = localStorage.getItem(VISITS_KEY);
+    if (!raw) return { total: 0, today: 0, todayDate: '', lastWeek: [0,0,0,0,0,0,0] };
+    return JSON.parse(raw);
+  } catch { return { total: 0, today: 0, todayDate: '', lastWeek: [0,0,0,0,0,0,0] }; }
+}
+
+function recordVisit() {
+  const stats = getVisitStats();
+  const today = new Date().toISOString().split('T')[0];
+  
+  if (stats.todayDate !== today) {
+    // Novo dia — rotaciona a semana
+    stats.lastWeek = [...stats.lastWeek.slice(1), stats.today];
+    stats.today = 1;
+    stats.todayDate = today;
+  } else {
+    stats.today++;
+  }
+  stats.total++;
+  localStorage.setItem(VISITS_KEY, JSON.stringify(stats));
+  return stats;
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { products, fetchProducts, getActiveProducts, hasSupabase } = useProductStore();
   const [time, setTime] = useState(new Date());
+  const [visits, setVisits] = useState<VisitStats>(getVisitStats());
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
   
@@ -22,19 +58,24 @@ export default function AdminDashboard() {
     return () => clearInterval(timer);
   }, []);
 
+  // Atualizar visitas ao carregar
+  useEffect(() => {
+    setVisits(getVisitStats());
+  }, []);
+
   const activeProducts = getActiveProducts();
   const fmt = (p: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p);
   
   // Métricas calculadas
   const totalValue = activeProducts.reduce((sum, p) => sum + p.price, 0);
   const avgPrice = activeProducts.length > 0 ? totalValue / activeProducts.length : 0;
-  const featuredCount = activeProducts.filter(p => p.featured).length;
+  const weeklyVisits = visits.lastWeek.reduce((a, b) => a + b, 0) + visits.today;
 
   const stats = [
-    { label: 'Produtos Ativos', value: activeProducts.length, icon: PackageCheck, color: 'text-primary', bg: 'hsla(43,96%,52%,0.1)', border: 'hsla(43,96%,52%,0.2)', trend: '+12%' },
-    { label: 'Valor Total', value: fmt(totalValue), icon: DollarSign, color: 'text-green-400', bg: 'hsla(142,71%,45%,0.08)', border: 'hsla(142,71%,45%,0.2)', trend: '+8%' },
-    { label: 'Ticket Médio', value: fmt(avgPrice), icon: TrendingUp, color: 'text-blue-400', bg: 'hsla(200,100%,60%,0.08)', border: 'hsla(200,100%,60%,0.2)', trend: '+5%' },
-    { label: 'Destaques', value: featuredCount, icon: Star, color: 'text-purple-400', bg: 'hsla(280,80%,65%,0.08)', border: 'hsla(280,80%,65%,0.2)', trend: '—' },
+    { label: 'Visitas Hoje', value: visits.today, icon: Eye, color: 'text-primary', bg: 'hsla(43,96%,52%,0.1)', border: 'hsla(43,96%,52%,0.2)' },
+    { label: 'Visitas Semana', value: weeklyVisits, icon: TrendingUp, color: 'text-blue-400', bg: 'hsla(200,100%,60%,0.08)', border: 'hsla(200,100%,60%,0.2)' },
+    { label: 'Produtos Ativos', value: activeProducts.length, icon: PackageCheck, color: 'text-green-400', bg: 'hsla(142,71%,45%,0.08)', border: 'hsla(142,71%,45%,0.2)' },
+    { label: 'Valor em Catálogo', value: fmt(totalValue), icon: DollarSign, color: 'text-purple-400', bg: 'hsla(280,80%,65%,0.08)', border: 'hsla(280,80%,65%,0.2)' },
   ];
 
   return (
@@ -73,23 +114,6 @@ export default function AdminDashboard() {
         {/* Onboarding checklist */}
         <OnboardingChecklist />
 
-        {/* Supabase warning */}
-        {!hasSupabase && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="flex items-start gap-3 p-4 rounded-xl"
-            style={{ background: 'hsla(43,96%,52%,0.06)', border: '1px solid hsla(43,96%,52%,0.2)' }}>
-            <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-bold text-primary mb-1">Supabase não configurado</p>
-              <p style={{ color: 'hsla(45,20%,96%,0.6)' }}>
-                Dados salvos localmente. Crie <code className="px-1 rounded text-xs" style={{ background: 'hsla(43,96%,52%,0.15)' }}>.env</code> com{' '}
-                <code className="px-1 rounded text-xs" style={{ background: 'hsla(43,96%,52%,0.15)' }}>VITE_SUPABASE_URL</code> e{' '}
-                <code className="px-1 rounded text-xs" style={{ background: 'hsla(43,96%,52%,0.15)' }}>VITE_SUPABASE_ANON_KEY</code>.
-              </p>
-            </div>
-          </motion.div>
-        )}
-
         {/* Stats grid com animações */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
@@ -109,8 +133,7 @@ export default function AdminDashboard() {
                     <p className="text-xs font-semibold" style={{ color: 'hsla(45,20%,96%,0.5)' }}>{stat.label}</p>
                     <stat.icon className={`w-4 h-4 ${stat.color}`} />
                   </div>
-                  <p className={`text-3xl font-black ${stat.color} mb-1`}>{stat.value}</p>
-                  <p className="text-xs text-green-400 font-semibold">{stat.trend}</p>
+                  <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
                 </div>
               </div>
             </motion.div>
