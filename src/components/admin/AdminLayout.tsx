@@ -41,8 +41,6 @@ const navItems = [
   { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
   { label: 'SEO & Google', icon: Search, path: '/admin/seo' },
   { label: 'Analytics & Pixels', icon: BarChart3, path: '/admin/analytics' },
-  { label: 'Editor de Tema', icon: Palette, path: '/admin/theme' },
-  { label: 'Configurações', icon: Settings, path: '/admin/settings' },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

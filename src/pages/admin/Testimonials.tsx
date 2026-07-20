@@ -16,7 +16,13 @@ interface Testimonial {
 }
 
 const LOCAL_KEY = 'andinho-import_testimonials_v2';
-const load = (): Testimonial[] => { try { const r = localStorage.getItem(LOCAL_KEY); return r ? JSON.parse(r) : []; } catch { return []; } };
+const DEFAULT_TESTIMONIALS: Testimonial[] = [
+  { id: '1', name: 'Carlos M.', text: 'iPhone 15 Pro Max chegou em 2 dias, lacrado e com nota. Atendimento impecável pelo WhatsApp.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
+  { id: '2', name: 'Ana Paula', text: 'Parcelei em 18x sem juros. Xiaomi 14 Ultra perfeito, exatamente como descrito.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
+  { id: '3', name: 'Rafael T.', text: 'Terceira compra aqui. Sempre original, preço justo e entrega rápida. Confiança total.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
+  { id: '4', name: 'Juliana K.', text: 'Apple Watch lacrado com nota fiscal. Pix com 5% de desconto, super tranquilo.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
+];
+const load = (): Testimonial[] => { try { const r = localStorage.getItem(LOCAL_KEY); const p = r ? JSON.parse(r) : []; return p.length > 0 ? p : DEFAULT_TESTIMONIALS; } catch { return DEFAULT_TESTIMONIALS; } };
 const save = (t: Testimonial[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(t)); } catch {} };
 const isOk = () => { const u = import.meta.env.VITE_SUPABASE_URL as string; return !!u && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co'); };
 const emptyForm = () => ({ name: '', text: '', avatar_url: null as string | null, rating: 5, active: true });

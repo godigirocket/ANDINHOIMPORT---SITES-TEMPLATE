@@ -242,8 +242,15 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       return { error: '⚠️ Supabase não configurado. Dados não serão persistidos.' };
     }
 
+    // Filtrar apenas colunas que existem na tabela
+    const allowedKeys = ['title', 'description', 'price', 'old_price', 'image_url', 'affiliate_link', 'category', 'featured', 'status', 'badge', 'installments', 'sort_order'];
+    const filtered: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    for (const key of allowedKeys) {
+      if (key in data) filtered[key] = (data as Record<string, unknown>)[key];
+    }
+
     const { data: rows, error } = await supabase
-      .from('products').update({ ...data, updated_at: new Date().toISOString() })
+      .from('products').update(filtered)
       .eq('id', id).select();
 
     if (error) {
