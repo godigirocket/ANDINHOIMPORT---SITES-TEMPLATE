@@ -58,9 +58,9 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
           transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(${isHovered ? '12px' : '0px'})`,
           transformStyle: 'preserve-3d',
           background: 'linear-gradient(145deg, #0c0c0f 0%, #08080a 100%)',
-          border: `1px solid ${isHovered ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.06)'}`,
+          border: `1px solid ${isHovered ? 'rgba(245,183,0,0.3)' : 'rgba(245,183,0,0.06)'}`,
           boxShadow: isHovered
-            ? '0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(255,255,255,0.08)'
+            ? '0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(245,183,0,0.08)'
             : '0 8px 30px rgba(0,0,0,0.4)',
         }}
       >
@@ -81,7 +81,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
             className="absolute inset-0 pointer-events-none transition-opacity duration-700"
             style={{
               opacity: isHovered ? 1 : 0,
-              background: 'linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.03) 45%, transparent 60%)',
+              background: 'linear-gradient(115deg, transparent 30%, rgba(245,183,0,0.03) 45%, transparent 60%)',
             }}
           />
 
@@ -90,9 +90,9 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
             <span
               className="absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide"
               style={{
-                background: 'linear-gradient(135deg, #ffffff, #d4a000)',
+                background: 'linear-gradient(135deg, #F5B700, #d4a000)',
                 color: '#050505',
-                boxShadow: '0 4px 12px rgba(255,255,255,0.3)',
+                boxShadow: '0 4px 12px rgba(245,183,0,0.3)',
                 transform: 'translateZ(40px)',
               }}
             >
@@ -119,7 +119,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
         {/* Content */}
         <div className="p-5 space-y-3">
           <div>
-            <h3 className="font-bold text-white text-sm group-hover:text-[#ffffff] transition-colors">
+            <h3 className="font-bold text-white text-sm group-hover:text-[#F5B700] transition-colors">
               {product.title} {product.storage}
             </h3>
             <p className="text-xs mt-0.5" style={{ color: '#a6a6aa' }}>
@@ -130,7 +130,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
           {/* Price */}
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-black" style={{ color: '#ffffff' }}>
+              <span className="text-xl font-black" style={{ color: '#F5B700' }}>
                 {fmt(product.price)}
               </span>
               {product.oldPrice && (
@@ -145,7 +145,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
           </div>
 
           {/* Warranty + CTA */}
-          <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px solid rgba(245,183,0,0.05)' }}>
             <span className="text-[10px] font-medium" style={{ color: '#888' }}>
               Garantia {product.warranty}
             </span>
@@ -156,7 +156,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
               onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all"
               style={{
-                background: 'linear-gradient(135deg, #ffffff, #d4a000)',
+                background: 'linear-gradient(135deg, #F5B700, #d4a000)',
                 color: '#050505',
               }}
             >

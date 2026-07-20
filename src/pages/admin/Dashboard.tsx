@@ -58,24 +58,13 @@ export default function AdminDashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  // Atualizar visitas ao carregar
-  useEffect(() => {
-    setVisits(getVisitStats());
-  }, []);
-
   const activeProducts = getActiveProducts();
   const fmt = (p: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p);
-  
-  // Métricas calculadas
   const totalValue = activeProducts.reduce((sum, p) => sum + p.price, 0);
-  const avgPrice = activeProducts.length > 0 ? totalValue / activeProducts.length : 0;
-  const weeklyVisits = visits.lastWeek.reduce((a, b) => a + b, 0) + visits.today;
 
   const stats = [
-    { label: 'Visitas Hoje', value: visits.today, icon: Eye, color: 'text-primary', bg: 'hsla(43,96%,52%,0.1)', border: 'hsla(43,96%,52%,0.2)' },
-    { label: 'Visitas Semana', value: weeklyVisits, icon: TrendingUp, color: 'text-blue-400', bg: 'hsla(200,100%,60%,0.08)', border: 'hsla(200,100%,60%,0.2)' },
-    { label: 'Produtos Ativos', value: activeProducts.length, icon: PackageCheck, color: 'text-green-400', bg: 'hsla(142,71%,45%,0.08)', border: 'hsla(142,71%,45%,0.2)' },
-    { label: 'Valor em Catálogo', value: fmt(totalValue), icon: DollarSign, color: 'text-purple-400', bg: 'hsla(280,80%,65%,0.08)', border: 'hsla(280,80%,65%,0.2)' },
+    { label: 'Produtos Ativos', value: activeProducts.length, icon: PackageCheck, color: 'text-primary', bg: 'hsla(43,96%,52%,0.1)', border: 'hsla(43,96%,52%,0.2)' },
+    { label: 'Valor em Catálogo', value: fmt(totalValue), icon: DollarSign, color: 'text-green-400', bg: 'hsla(142,71%,45%,0.08)', border: 'hsla(142,71%,45%,0.2)' },
   ];
 
   return (

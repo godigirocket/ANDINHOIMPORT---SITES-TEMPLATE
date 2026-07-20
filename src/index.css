@@ -6,17 +6,17 @@
 
 @layer base {
   :root {
-    /* ── ANDINHO IMPORT — Preto e Branco ── */
+    /* ── ANDINHO IMPORT — Preto com accent dourado ── */
     --background: 0 0% 3%;
     --foreground: 0 0% 96%;
     --card: 0 0% 6%;
     --card-foreground: 0 0% 96%;
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 96%;
-    --primary: 0 0% 100%;
+    --primary: 43 96% 52%;
     --primary-foreground: 0 0% 3%;
-    --primary-dark: 0 0% 85%;
-    --primary-light: 0 0% 100%;
+    --primary-dark: 38 92% 42%;
+    --primary-light: 48 100% 65%;
     --secondary: 0 0% 10%;
     --secondary-foreground: 45 20% 96%;
     --accent: 43 96% 52%;
@@ -90,23 +90,24 @@
   /* Pill glow button */
   .btn-gold {
     @apply font-bold rounded-full px-7 py-3 transition-all focus:outline-none;
-    background: hsl(0,0%,100%);
+    background: linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(38,92%,44%) 100%);
     color: hsl(0,0%,3%);
-    box-shadow: 0 4px 20px rgba(255,255,255,0.15);
+    box-shadow: 0 4px 20px hsla(43,96%,52%,0.2);
   }
   .btn-gold:hover {
-    box-shadow: 0 4px 30px rgba(255,255,255,0.25);
+    box-shadow: 0 4px 30px hsla(43,96%,52%,0.35);
     transform: translateY(-1px);
   }
   .btn-gold:active { transform: scale(0.98); }
   /* Gradient text */
   .gradient-text {
-    @apply text-white;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(38,92%,44%) 100%);
   }
-  .gradient-primary { background: hsl(0,0%,100%); }
-  .gradient-accent  { background: hsl(0,0%,95%); }
-  .shadow-glow      { box-shadow: 0 0 30px rgba(255,255,255,0.1); }
-  .shadow-neon      { box-shadow: 0 0 15px rgba(255,255,255,0.15); }
+  .gradient-primary { background: linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%)); }
+  .gradient-accent  { background: linear-gradient(135deg, hsl(43,96%,52%), hsl(48,100%,65%)); }
+  .shadow-glow      { box-shadow: 0 0 30px hsla(43,96%,52%,0.2); }
+  .shadow-neon      { box-shadow: 0 0 15px hsla(43,96%,52%,0.15); }
   .hover-lift { @apply transition-all duration-300; }
   .hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
   /* Scan line effect */
