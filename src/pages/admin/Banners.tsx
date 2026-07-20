@@ -16,7 +16,10 @@ interface Banner {
 }
 
 const LOCAL_KEY = 'andinho-import_banners_v2';
-const load = (): Banner[] => { try { const r = localStorage.getItem(LOCAL_KEY); return r ? JSON.parse(r) : []; } catch { return []; } };
+const DEFAULT_BANNERS: Banner[] = [
+  { id: '1', image_url: 'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1200&q=85&auto=format&fit=crop', title: 'Banner principal', link_url: '', active: true, sort_order: 0 },
+];
+const load = (): Banner[] => { try { const r = localStorage.getItem(LOCAL_KEY); const p = r ? JSON.parse(r) : []; return p.length > 0 ? p : DEFAULT_BANNERS; } catch { return DEFAULT_BANNERS; } };
 const save = (b: Banner[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(b)); } catch {} };
 const isOk = () => { const u = import.meta.env.VITE_SUPABASE_URL as string; return !!u && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co'); };
 

@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS, type ProductData, getWhatsAppUrl } from '@/data/products';
-import { ProductTiltCard } from '@/components/3d/ProductTiltCard';
+import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
 
 export function ProductsSection() {
   const navigate = useNavigate();
-  const filtered = PRODUCTS;
+  const { fetchProducts, getActiveProducts, isLoading } = useProductStore();
+
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  const products = getActiveProducts();
 
   if (!clientConfig.features.products) return null;
 
@@ -34,20 +37,75 @@ export function ProductsSection() {
         </motion.div>
 
         {/* Grid */}
-        {filtered.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-16">
+            <p className="text-sm" style={{ color: '#888' }}>Carregando...</p>
+          </div>
+        ) : products.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {filtered.map((product, i) => (
-              <ProductTiltCard
-                key={product.id}
-                product={product}
-                index={i}
-                onClick={() => navigate(`/produtos/${product.slug}`)}
-              />
+            {products.map((product, i) => (
+              <motion.div key={product.id}
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="rounded-2xl overflow-hidden cursor-pointer group"
+                style={{ background: '#0a0a0c', border: '1px solid rgba(255,255,255,0.06)' }}
+                onClick={() => {
+                  const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`;
+                  window.open(wa, '_blank');
+                }}
+              >
+                {/* Imagem */}
+                <div className="aspect-square overflow-hidden" style={{ background: '#080808' }}>
+                  {product.image_url ? (
+                    <img src={product.image_url} alt={product.title}
+                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs" style={{ color: '#444' }}>Sem imagem</span>
+                    </div>
+                  )}
+                  {product.badge && (
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold"
+                      style={{ background: 'hsl(43,96%,52%)', color: '#050505' }}>
+                      {product.badge}
+                    </span>
+                  )}
+                </div>
+                {/* Info */}
+                <div className="p-4">
+                  <h3 className="text-sm font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                    {product.title}
+                  </h3>
+                  {product.description && (
+                    <p className="text-xs mb-3 line-clamp-1" style={{ color: '#888' }}>{product.description}</p>
+                  )}
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="text-lg font-black" style={{ color: 'hsl(43,96%,52%)' }}>
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                    </span>
+                    {product.old_price && (
+                      <span className="text-xs line-through" style={{ color: '#666' }}>
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.old_price)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] mb-3" style={{ color: '#777' }}>
+                    ou {product.installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price / product.installments)}
+                  </p>
+                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold"
+                    style={{ background: 'hsl(43,96%,52%)', color: '#050505' }}>
+                    <MessageCircle className="w-3.5 h-3.5" /> Consultar
+                  </button>
+                </div>
+              </motion.div>
             ))}
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-sm" style={{ color: '#888' }}>Nenhum produto nesta categoria.</p>
+            <p className="text-sm" style={{ color: '#888' }}>Nenhum produto cadastrado.</p>
           </div>
         )}
 
