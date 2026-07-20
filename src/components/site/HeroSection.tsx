@@ -35,7 +35,7 @@ export function HeroSection() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [reducedMotion]);
 
-  const show3D = webglSupported && !reducedMotion;
+  const show3D = false; // Temporariamente desativado para debug
 
   return (
     <section ref={sectionRef} id="hero" className="relative min-h-screen flex items-center overflow-hidden">
