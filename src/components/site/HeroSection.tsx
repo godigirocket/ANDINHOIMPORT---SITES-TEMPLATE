@@ -1,178 +1,167 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, ChevronDown, ShieldCheck, Zap, Award } from 'lucide-react';
+import { MessageCircle, ChevronDown, Shield, CreditCard, Package, Truck } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
+import { useWebGLSupport } from '@/hooks/useWebGLSupport';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { WebGLFallback } from '@/components/three/WebGLFallback';
 
-// Imagens de fundo — vêm do contentStore (editáveis pelo painel admin)
-// Fallback: Unsplash em alta qualidade (sem bloqueio de hotlinking)
-const FALLBACK_IMAGES = [
-  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1920&q=95&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1920&q=95&auto=format&fit=crop',
-];
-
-const iconMap: Record<string, React.ElementType> = { ShieldCheck, Zap, Award };
+// Lazy load do canvas 3D — Three.js não carrega até ser necessário
+const AndinhoHeroCanvas = lazy(() =>
+  import('@/components/three/AndinhoHeroCanvas').then(m => ({ default: m.AndinhoHeroCanvas }))
+);
 
 export function HeroSection() {
   const { content } = useContentStore();
-  const { hero } = clientConfig.initialContent;
-  const [bgIdx, setBgIdx] = useState(0);
-
-  // URLs das imagens vêm do painel admin (contentStore)
-  const bgImages = [
-    content.hero_bg_1 || FALLBACK_IMAGES[0],
-    content.hero_bg_2 || FALLBACK_IMAGES[1],
-  ];
-
-  useEffect(() => {
-    const t = setInterval(() => setBgIdx(i => (i + 1) % bgImages.length), 7000);
-    return () => clearInterval(t);
-  }, [bgImages.length]);
+  const webglSupported = useWebGLSupport();
+  const reducedMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const whatsappUrl = content.whatsapp_link || `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   const msg = encodeURIComponent(clientConfig.company.contact.whatsappMessage);
 
+  // Track scroll progress para o canvas 3D
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, -rect.top / rect.height));
+      setScrollProgress(progress);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [reducedMotion]);
+
+  const show3D = webglSupported && !reducedMotion;
+
   return (
-    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background images com crossfade */}
-      {bgImages.map((src, i) => (
-        <motion.div key={i}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('${src}')` }}
-          animate={{ opacity: i === bgIdx ? 1 : 0 }}
-          transition={{ duration: 1.8, ease: 'easeInOut' }}
-        />
-      ))}
-
-      {/* Overlay cinematográfico */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(105deg, hsla(220,20%,4%,0.95) 0%, hsla(220,20%,4%,0.75) 50%, hsla(220,20%,4%,0.2) 100%)' }} />
-      {/* Fade inferior */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(to top, hsl(220,20%,4%) 0%, transparent 30%)' }} />
-
-      {/* Indicadores de slide */}
-      <div className="absolute bottom-20 right-8 z-20 flex flex-col gap-2">
-        {bgImages.map((_, i) => (
-          <button key={i} onClick={() => setBgIdx(i)}
-            className="w-1.5 rounded-full transition-all duration-300"
-            style={{
-              height: i === bgIdx ? '24px' : '6px',
-              background: i === bgIdx ? 'hsl(43,96%,52%)' : 'hsla(255,255%,255%,0.25)',
-              boxShadow: i === bgIdx ? '0 0 8px hsla(43,96%,52%,0.6)' : 'none',
-            }}
-            aria-label={`Slide ${i + 1}`}
-          />
-        ))}
-      </div>
+    <section ref={sectionRef} id="hero" className="relative min-h-screen flex items-center overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0" style={{ background: '#050505' }} />
+      {/* Glow ambiental dourado sutil */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(245,183,0,0.06) 0%, transparent 70%)' }} />
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 w-full pt-28 pb-24">
-        <div className="max-w-xl">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 w-full py-24 md:py-0">
+        <div className="grid lg:grid-cols-2 gap-8 items-center min-h-screen">
+          
+          {/* Lado esquerdo — Texto */}
+          <div className="order-2 lg:order-1">
+            <motion.p
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-xs font-semibold tracking-widest uppercase mb-5"
+              style={{ color: '#F5B700' }}
+            >
+              Tecnologia, procedência e confiança
+            </motion.p>
 
-          {/* Eyebrow */}
-          <motion.p initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-xs font-semibold tracking-wide uppercase mb-6 text-primary">
-            {content.hero_badge || hero.badge}
-          </motion.p>
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="font-black tracking-tight mb-5 leading-[0.9]"
+              style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)' }}
+            >
+              <span className="text-white block">Seu próximo</span>
+              <span style={{ color: '#F5B700' }} className="block">smartphone</span>
+              <span className="text-white block">está aqui.</span>
+            </motion.h1>
 
-          {/* Título gigante */}
-          <motion.h1 initial={{ y: 28, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.1 }}
-            className="font-black leading-[0.88] tracking-tight mb-6"
-            style={{ fontSize: 'clamp(3.8rem, 11vw, 8rem)' }}>
-            <span className="text-white block drop-shadow-2xl">{content.hero_title || hero.headline}</span>
-            <span className="gradient-text block drop-shadow-2xl">{hero.headlineGold}</span>
-          </motion.h1>
+            <motion.p
+              initial={{ y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-sm md:text-base max-w-md mb-8 leading-relaxed"
+              style={{ color: '#a6a6aa' }}
+            >
+              Apple, Xiaomi, smartwatches e acessórios com garantia, 
+              parcelamento e atendimento direto em {clientConfig.company.location.city}.
+            </motion.p>
 
-          {/* Subtítulo */}
-          <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.18 }}
-            className="text-sm md:text-base max-w-md mb-8 leading-relaxed"
-            style={{
-              color: 'hsla(45,20%,96%,0.65)',
-              borderLeft: '2px solid hsla(43,96%,52%,0.6)',
-              paddingLeft: '14px',
-            }}>
-            {content.hero_subtitle || hero.subheadline}
-          </motion.p>
+            {/* CTAs */}
+            <motion.div
+              initial={{ y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-wrap gap-3 mb-10"
+            >
+              <button
+                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-7 py-3.5 rounded-full text-sm font-bold transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #F5B700, #d4a000)',
+                  color: '#050505',
+                  boxShadow: '0 8px 24px rgba(245,183,0,0.25)',
+                }}
+              >
+                Ver Produtos
+              </button>
+              <a
+                href={`${whatsappUrl}?text=${msg}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold transition-all"
+                style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#f7f7f7' }}
+              >
+                <MessageCircle className="w-4 h-4" />
+                Chamar no WhatsApp
+              </a>
+            </motion.div>
 
-          {/* Mini badges de diferenciais */}
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.26 }}
-            className="flex flex-wrap gap-2.5 mb-10">
-            {hero.badges.map((b) => {
-              const Icon = iconMap[b.icon] || ShieldCheck;
-              return (
-                <div key={b.label} className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                  style={{
-                    background: 'hsla(220,20%,8%,0.85)',
-                    border: '1px solid hsla(43,96%,52%,0.22)',
-                    backdropFilter: 'blur(10px)',
-                  }}>
-                  <Icon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                  <div>
-                    <p className="text-[9px] font-black text-white leading-none tracking-wide">{b.label}</p>
-                    <p className="text-[8px] text-primary leading-none mt-0.5 font-semibold">{b.sub}</p>
-                  </div>
+            {/* Selos */}
+            <motion.div
+              initial={{ y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-wrap gap-4"
+            >
+              {[
+                { icon: CreditCard, label: 'Até 18x' },
+                { icon: Shield, label: 'Garantia' },
+                { icon: Package, label: 'Original' },
+                { icon: Truck, label: 'Pronta entrega' },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <Icon className="w-3.5 h-3.5" style={{ color: '#F5B700' }} />
+                  <span className="text-[11px] font-medium" style={{ color: '#888' }}>{label}</span>
                 </div>
-              );
-            })}
-          </motion.div>
+              ))}
+            </motion.div>
+          </div>
 
-          {/* CTAs */}
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.34 }}
-            className="flex flex-wrap gap-3">
-            <a href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
-              className="btn-gold flex items-center gap-2 text-sm">
-              <MessageCircle className="w-4 h-4" />
-              {content.cta_primary_text || hero.ctaPrimary}
-            </a>
-            <button
-              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-              className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
-              style={{
-                border: '1px solid hsla(255,255%,255%,0.18)',
-                color: 'hsla(45,20%,96%,0.75)',
-                backdropFilter: 'blur(10px)',
-                background: 'hsla(220,20%,8%,0.4)',
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; (e.currentTarget as HTMLElement).style.borderColor = 'hsla(43,96%,52%,0.4)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'hsla(45,20%,96%,0.75)'; (e.currentTarget as HTMLElement).style.borderColor = 'hsla(255,255%,255%,0.18)'; }}>
-              {content.cta_secondary_text || hero.ctaSecondary}
-              <ChevronDown className="w-4 h-4" />
-            </button>
-          </motion.div>
-
-          {/* Confiança — dados reais */}
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.44 }}
-            className="flex gap-6 mt-12 pt-6"
-            style={{ borderTop: '1px solid hsla(255,255%,255%,0.06)' }}>
-            <div>
-              <p className="text-lg font-bold text-primary leading-none">{clientConfig.features.maxInstallments}x</p>
-              <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>sem juros</p>
-            </div>
-            <div>
-              <p className="text-lg font-bold text-white leading-none">Garantia</p>
-              <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>12 meses</p>
-            </div>
-            <div>
-              <p className="text-lg font-bold text-white leading-none">Original</p>
-              <p className="text-[10px] mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>100% verificado</p>
-            </div>
+          {/* Lado direito — Canvas 3D ou Fallback */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="order-1 lg:order-2 h-[350px] md:h-[500px] lg:h-[600px] relative"
+          >
+            {show3D ? (
+              <Suspense fallback={<WebGLFallback />}>
+                <AndinhoHeroCanvas scrollProgress={scrollProgress} />
+              </Suspense>
+            ) : (
+              <WebGLFallback />
+            )}
           </motion.div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-        <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 1.6, repeat: Infinity }}
-          style={{ color: 'hsla(45,20%,96%,0.3)' }}>
-          <ChevronDown className="w-5 h-5" />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
+      >
+        <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+          <ChevronDown className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.3)' }} />
         </motion.div>
       </motion.div>
     </section>
