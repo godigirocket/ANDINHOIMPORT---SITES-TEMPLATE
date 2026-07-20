@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           vendor: ["react", "react-dom", "react-router-dom"],
           ui: ["framer-motion", "lucide-react"],
-          animation: ["gsap", "@studio-freight/lenis"],
+          animation: ["gsap"],
           supabase: ["@supabase/supabase-js"],
           state: ["zustand", "zod", "@tanstack/react-query"],
         },
