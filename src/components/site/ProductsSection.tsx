@@ -45,13 +45,27 @@ export function ProductsSection() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {products.map((product, i) => (
               <motion.div key={product.id}
-                initial={{ y: 30, opacity: 0 }}
+                initial={{ y: 40, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -8, rotateX: 2, rotateY: -2, transition: { duration: 0.3 } }}
                 className="rounded-2xl overflow-hidden cursor-pointer group relative"
-                style={{ background: '#141416', border: '1px solid rgba(245,183,0,0.08)' }}
+                style={{ 
+                  background: '#111114', 
+                  border: '1px solid rgba(245,183,0,0.06)',
+                  perspective: '800px',
+                  transformStyle: 'preserve-3d',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.border = '1px solid rgba(245,183,0,0.25)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(245,183,0,0.08)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.border = '1px solid rgba(245,183,0,0.06)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
+                }}
                 onClick={() => {
                   const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`;
                   window.open(wa, '_blank');
@@ -62,19 +76,23 @@ export function ProductsSection() {
                   style={{ boxShadow: 'inset 0 1px 0 rgba(245,183,0,0.1), 0 0 20px rgba(245,183,0,0.05)' }} />
 
                 {/* Imagem */}
-                <div className="aspect-square overflow-hidden relative" style={{ background: '#1a1a1e' }}>
+                <div className="aspect-square overflow-hidden relative" style={{ background: 'linear-gradient(160deg, #0f0f12 0%, #1c1c20 100%)' }}>
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.title}
                       className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700"
+                      style={{ transform: 'translateZ(20px)' }}
                       loading="lazy" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="text-xs" style={{ color: '#444' }}>Sem imagem</span>
                     </div>
                   )}
+                  {/* Shimmer on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                    style={{ background: 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%)' }} />
                   {product.badge && (
                     <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold"
-                      style={{ background: 'hsl(43,96%,52%)', color: '#050505' }}>
+                      style={{ background: 'hsl(43,96%,52%)', color: '#050505', boxShadow: '0 2px 8px rgba(245,183,0,0.3)' }}>
                       {product.badge}
                     </span>
                   )}
