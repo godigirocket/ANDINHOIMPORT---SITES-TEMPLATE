@@ -165,8 +165,8 @@ const isSupabaseConfigured = () => {
 };
 
 export const useProductStore = create<ProductStore>((set, get) => ({
-  // Carrega CACHE para exibição imediata, fetchProducts busca a verdade do Supabase
-  products:    initialProducts,
+  // Inicia vazio — aguarda fetch do Supabase
+  products:    [],
   isLoading:   true,
   error:       null,
   hasSupabase: isSupabaseConfigured(),
@@ -203,7 +203,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const products = (data ?? []) as Product[];
 
     saveCache(products);
-    set({ products: products.length > 0 ? products : initialProducts, isLoading: false, hasSupabase: true, error: null });
+    set({ products, isLoading: false, hasSupabase: true, error: null });
   },
 
   getProduct: (id) => get().products.find(p => p.id === id),
