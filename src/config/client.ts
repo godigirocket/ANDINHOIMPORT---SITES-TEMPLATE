@@ -43,9 +43,9 @@ export const clientConfig: ClientConfig = {
   id: 'andinho-import',
   version: '3.0.0',
   brand: {
-    colorPrimary: '43 96% 52%',
-    colorBackground: '220 20% 4%',
-    colorForeground: '45 20% 96%',
+    colorPrimary: '0 0% 100%',
+    colorBackground: '0 0% 3%',
+    colorForeground: '0 0% 96%',
     fontFamily: "'Inter', sans-serif",
     // Logo real da Andinho Import — URL hospedada
     logoUrl: 'https://i.ibb.co/WCSDy8H/logo.jpg',

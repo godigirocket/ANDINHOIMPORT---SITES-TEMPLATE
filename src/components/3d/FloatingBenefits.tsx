@@ -19,7 +19,7 @@ export function FloatingBenefits() {
           className="text-center mb-14"
         >
           <h2 className="font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
-            Por que a <span style={{ color: '#F5B700' }}>Andinho Import</span>
+            Por que a <span style={{ color: '#ffffff' }}>Andinho Import</span>
           </h2>
           <p className="text-sm" style={{ color: '#a6a6aa' }}>
             Condições reais, sem surpresas.
@@ -44,17 +44,17 @@ export function FloatingBenefits() {
               {/* Glow on hover */}
               <div
                 className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{ boxShadow: 'inset 0 0 30px rgba(245,183,0,0.05)' }}
+                style={{ boxShadow: 'inset 0 0 30px rgba(255,255,255,0.05)' }}
               />
 
               <div
                 className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(245,183,0,0.08)', border: '1px solid rgba(245,183,0,0.15)' }}
+                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
-                <b.icon className="w-5 h-5" style={{ color: '#F5B700' }} />
+                <b.icon className="w-5 h-5" style={{ color: '#ffffff' }} />
               </div>
 
-              <p className="text-2xl font-black mb-1" style={{ color: '#F5B700' }}>
+              <p className="text-2xl font-black mb-1" style={{ color: '#ffffff' }}>
                 {b.number}
               </p>
               <p className="text-xs font-medium" style={{ color: '#ccc' }}>

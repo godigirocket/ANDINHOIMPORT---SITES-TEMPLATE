@@ -58,7 +58,7 @@ export function InstagramSection() {
               <span className="gradient-text">{clientConfig.company.name} {clientConfig.company.nameHighlight}</span>
             </h2>
             <p className="text-sm mt-1" style={{ color: 'hsla(45,20%,96%,0.4)' }}>
-              @andinhoimport · 2.5K+ seguidores
+              @andinhoimport
             </p>
           </div>
           <a href={instagramUrl} target="_blank" rel="noopener noreferrer"

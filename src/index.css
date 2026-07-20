@@ -6,18 +6,18 @@
 
 @layer base {
   :root {
-    /* ── ANDINHO IMPORT — Futuristic Dark Gold ── */
-    --background: 220 20% 4%;
-    --foreground: 45 20% 96%;
-    --card: 220 20% 7%;
-    --card-foreground: 45 20% 96%;
-    --popover: 220 20% 7%;
-    --popover-foreground: 45 20% 96%;
-    --primary: 43 96% 52%;
-    --primary-foreground: 220 20% 4%;
-    --primary-dark: 38 92% 42%;
-    --primary-light: 48 100% 65%;
-    --secondary: 220 20% 10%;
+    /* ── ANDINHO IMPORT — Preto e Branco ── */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 3%;
+    --primary-dark: 0 0% 85%;
+    --primary-light: 0 0% 100%;
+    --secondary: 0 0% 10%;
     --secondary-foreground: 45 20% 96%;
     --accent: 43 96% 52%;
     --accent-foreground: 220 20% 4%;
@@ -90,24 +90,23 @@
   /* Pill glow button */
   .btn-gold {
     @apply font-bold rounded-full px-7 py-3 transition-all focus:outline-none;
-    background: linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(38,92%,44%) 100%);
-    color: hsl(220,20%,4%);
-    box-shadow: 0 0 20px hsla(43,96%,52%,0.4), 0 4px 15px hsla(43,96%,52%,0.2);
+    background: hsl(0,0%,100%);
+    color: hsl(0,0%,3%);
+    box-shadow: 0 4px 20px rgba(255,255,255,0.15);
   }
   .btn-gold:hover {
-    box-shadow: 0 0 35px hsla(43,96%,52%,0.6), 0 4px 20px hsla(43,96%,52%,0.3);
-    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 30px rgba(255,255,255,0.25);
+    transform: translateY(-1px);
   }
   .btn-gold:active { transform: scale(0.98); }
   /* Gradient text */
   .gradient-text {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-primary);
+    @apply text-white;
   }
-  .gradient-primary { background: var(--gradient-primary); }
-  .gradient-accent  { background: var(--gradient-accent); }
-  .shadow-glow      { box-shadow: var(--shadow-glow); }
-  .shadow-neon      { box-shadow: var(--shadow-neon); }
+  .gradient-primary { background: hsl(0,0%,100%); }
+  .gradient-accent  { background: hsl(0,0%,95%); }
+  .shadow-glow      { box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+  .shadow-neon      { box-shadow: 0 0 15px rgba(255,255,255,0.15); }
   .hover-lift { @apply transition-all duration-300; }
   .hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
   /* Scan line effect */

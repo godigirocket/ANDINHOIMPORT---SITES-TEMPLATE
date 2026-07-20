@@ -30,7 +30,7 @@ export function ProductsSection() {
         >
           <h2 className="font-black text-3xl md:text-5xl tracking-tight mb-3">
             <span className="text-white">Nossos </span>
-            <span style={{ color: '#F5B700' }}>Produtos</span>
+            <span style={{ color: '#ffffff' }}>Produtos</span>
           </h2>
           <p className="text-sm max-w-md mx-auto" style={{ color: '#a6a6aa' }}>
             Modelos selecionados, condições facilitadas e atendimento direto.
@@ -50,9 +50,9 @@ export function ProductsSection() {
               onClick={() => setActiveFilter(cat.id)}
               className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
               style={{
-                background: activeFilter === cat.id ? '#F5B700' : 'rgba(255,255,255,0.04)',
+                background: activeFilter === cat.id ? '#ffffff' : 'rgba(255,255,255,0.04)',
                 color: activeFilter === cat.id ? '#050505' : '#a6a6aa',
-                border: `1px solid ${activeFilter === cat.id ? '#F5B700' : 'rgba(255,255,255,0.08)'}`,
+                border: `1px solid ${activeFilter === cat.id ? '#ffffff' : 'rgba(255,255,255,0.08)'}`,
               }}
             >
               {cat.label}
@@ -91,9 +91,9 @@ export function ProductsSection() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
             style={{
-              border: '1px solid rgba(245,183,0,0.3)',
-              color: '#F5B700',
-              background: 'rgba(245,183,0,0.05)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: '#ffffff',
+              background: 'rgba(255,255,255,0.05)',
             }}
           >
             <MessageCircle className="w-4 h-4" />
