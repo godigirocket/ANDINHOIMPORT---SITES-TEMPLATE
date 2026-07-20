@@ -166,8 +166,8 @@ const isSupabaseConfigured = () => {
 
 export const useProductStore = create<ProductStore>((set, get) => ({
   // Carrega CACHE para exibição imediata, fetchProducts busca a verdade do Supabase
-  products:    loadCache().length > 0 ? loadCache() : initialProducts,
-  isLoading:   false,
+  products:    initialProducts,
+  isLoading:   true,
   error:       null,
   hasSupabase: isSupabaseConfigured(),
 
@@ -201,11 +201,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     const products = (data ?? []) as Product[];
-    
-    // Se banco está vazio e cache tem dados, pode ser que o cliente nunca rodou a migration
-    if (products.length === 0) {
-      console.warn('[Products] ⚠️ Tabela products vazia no Supabase. Verifique se a migration SQL foi executada.');
-    }
 
     saveCache(products);
     set({ products: products.length > 0 ? products : initialProducts, isLoading: false, hasSupabase: true, error: null });
