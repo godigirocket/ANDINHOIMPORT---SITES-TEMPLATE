@@ -40,7 +40,7 @@ const App = () => (
     <AuthProvider>
       <TooltipProvider>
         <Sonner richColors position="top-right" />
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <BrowserRouter>
           <Routes>
             {/* Public */}
             <Route path="/" element={<Index />} />
