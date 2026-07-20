@@ -52,7 +52,8 @@ export function HeroSection() {
         <div className="max-w-xl">
           <motion.p initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-xs font-semibold tracking-wide uppercase mb-6 text-primary">
+            className="text-[10px] font-bold tracking-[0.2em] uppercase mb-4"
+            style={{ color: 'hsl(43,96%,52%)' }}>
             {content.hero_badge || hero.badge}
           </motion.p>
 

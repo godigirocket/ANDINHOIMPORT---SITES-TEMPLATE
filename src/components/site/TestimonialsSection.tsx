@@ -26,18 +26,19 @@ export function TestimonialsSection() {
     });
   }, []);
 
-  // Auto-scroll lateral
+  // Auto-scroll — 1 por vez
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     const interval = setInterval(() => {
+      const cardWidth = 320;
       const maxScroll = el.scrollWidth - el.clientWidth;
       if (el.scrollLeft >= maxScroll - 10) {
         el.scrollTo({ left: 0, behavior: 'smooth' });
       } else {
-        el.scrollBy({ left: 340, behavior: 'smooth' });
+        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
       }
-    }, 4000);
+    }, 3500);
     return () => clearInterval(interval);
   }, [items]);
 
@@ -53,12 +54,12 @@ export function TestimonialsSection() {
 
         {/* Scroll container */}
         <div ref={scrollRef}
-          className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex gap-4 overflow-x-hidden snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none' }}
         >
           {items.map((t) => (
             <div key={t.id}
-              className="flex-shrink-0 w-[300px] sm:w-[340px] snap-start p-6 rounded-2xl"
+              className="flex-shrink-0 w-full sm:w-[320px] snap-center p-6 rounded-2xl"
               style={{ background: '#0c0c0e', border: '1px solid rgba(255,255,255,0.05)' }}
             >
               {/* Stars */}

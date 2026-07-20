@@ -105,12 +105,12 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
             <span
               className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-semibold"
               style={{
-                background: 'rgba(34,197,94,0.12)',
-                border: '1px solid rgba(34,197,94,0.3)',
-                color: '#4ade80',
+                background: 'rgba(245,183,0,0.12)',
+                border: '1px solid rgba(245,183,0,0.3)',
+                color: 'hsl(43,96%,52%)',
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'hsl(43,96%,52%)' }} />
               Disponível
             </span>
           )}

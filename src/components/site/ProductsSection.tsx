@@ -2,17 +2,13 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES, type ProductData, getWhatsAppUrl } from '@/data/products';
+import { PRODUCTS, type ProductData, getWhatsAppUrl } from '@/data/products';
 import { ProductTiltCard } from '@/components/3d/ProductTiltCard';
 import { clientConfig } from '@/config/client';
 
 export function ProductsSection() {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState('all');
-
-  const filtered = activeFilter === 'all'
-    ? PRODUCTS
-    : PRODUCTS.filter(p => p.category === activeFilter);
+  const filtered = PRODUCTS;
 
   if (!clientConfig.features.products) return null;
 
@@ -35,29 +31,6 @@ export function ProductsSection() {
           <p className="text-sm max-w-md mx-auto" style={{ color: '#a6a6aa' }}>
             Modelos selecionados, condições facilitadas e atendimento direto.
           </p>
-        </motion.div>
-
-        {/* Filters */}
-        <motion.div
-          initial={{ y: 16, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-2 mb-10"
-        >
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveFilter(cat.id)}
-              className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
-              style={{
-                background: activeFilter === cat.id ? '#F5B700' : 'rgba(245,183,0,0.04)',
-                color: activeFilter === cat.id ? '#050505' : '#a6a6aa',
-                border: `1px solid ${activeFilter === cat.id ? '#F5B700' : 'rgba(245,183,0,0.08)'}`,
-              }}
-            >
-              {cat.label}
-            </button>
-          ))}
         </motion.div>
 
         {/* Grid */}
