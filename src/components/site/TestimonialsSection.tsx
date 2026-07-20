@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 
@@ -16,7 +16,7 @@ const DEFAULT: Testimonial[] = [
 
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -26,65 +26,74 @@ export function TestimonialsSection() {
     });
   }, []);
 
-  // Auto-scroll — 1 por vez
+  // Auto-rotate: 1 por vez com fade
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    if (items.length <= 1) return;
     const interval = setInterval(() => {
-      const cardWidth = 320;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (el.scrollLeft >= maxScroll - 10) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
-      }
-    }, 3500);
+      setCurrent(prev => (prev + 1) % items.length);
+    }, 4000);
     return () => clearInterval(interval);
-  }, [items]);
+  }, [items.length]);
+
+  const t = items[current];
+  if (!t) return null;
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: '#080808' }}>
-      <div className="max-w-7xl mx-auto px-4">
+    <section className="relative py-16 md:py-24" style={{ background: '#080808' }}>
+      <div className="max-w-2xl mx-auto px-4">
         <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} className="mb-10">
-          <h2 className="font-black text-2xl md:text-4xl tracking-tight">
+          viewport={{ once: true }} className="mb-8">
+          <h2 className="font-black text-2xl md:text-3xl tracking-tight text-center">
             O que dizem <span className="gradient-text">nossos clientes</span>
           </h2>
         </motion.div>
 
-        {/* Scroll container */}
-        <div ref={scrollRef}
-          className="flex gap-4 overflow-x-hidden snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {items.map((t) => (
-            <div key={t.id}
-              className="flex-shrink-0 w-full sm:w-[320px] snap-center p-6 rounded-2xl"
-              style={{ background: '#0c0c0e', border: '1px solid rgba(255,255,255,0.05)' }}
+        {/* 1 depoimento por vez com fade */}
+        <div className="relative min-h-[180px] flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="text-center w-full"
             >
               {/* Stars */}
-              <div className="flex gap-0.5 mb-3">
+              <div className="flex justify-center gap-1 mb-4">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-current text-primary" />
+                  <Star key={i} className="w-4 h-4 fill-current" style={{ color: 'hsl(43,96%,52%)' }} />
                 ))}
               </div>
+
               {/* Text */}
-              <p className="text-sm leading-relaxed mb-4" style={{ color: '#ccc' }}>
+              <p className="text-base md:text-lg leading-relaxed mb-5 italic" style={{ color: '#ddd' }}>
                 "{t.text}"
               </p>
+
               {/* Author */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center gap-3">
                 {t.avatar_url ? (
-                  <img src={t.avatar_url} alt={t.name} className="w-8 h-8 rounded-full object-cover" />
+                  <img src={t.avatar_url} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
                 ) : (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
                     style={{ background: 'hsla(43,96%,52%,0.15)', color: 'hsl(43,96%,52%)' }}>
                     {t.name.charAt(0)}
                   </div>
                 )}
-                <span className="text-xs font-semibold text-white">{t.name}</span>
+                <span className="text-sm font-semibold text-white">{t.name}</span>
               </div>
-            </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Dots indicator */}
+        <div className="flex justify-center gap-1.5 mt-6">
+          {items.map((_, i) => (
+            <button key={i} onClick={() => setCurrent(i)}
+              className="w-1.5 h-1.5 rounded-full transition-all"
+              style={{ background: i === current ? 'hsl(43,96%,52%)' : 'rgba(255,255,255,0.2)' }}
+            />
           ))}
         </div>
       </div>

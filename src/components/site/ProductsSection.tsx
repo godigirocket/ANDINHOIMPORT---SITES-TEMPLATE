@@ -51,7 +51,7 @@ export function ProductsSection() {
                 transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 className="rounded-2xl overflow-hidden cursor-pointer group relative"
-                style={{ background: '#111113', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ background: '#141416', border: '1px solid rgba(245,183,0,0.08)' }}
                 onClick={() => {
                   const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`;
                   window.open(wa, '_blank');
@@ -62,7 +62,7 @@ export function ProductsSection() {
                   style={{ boxShadow: 'inset 0 1px 0 rgba(245,183,0,0.1), 0 0 20px rgba(245,183,0,0.05)' }} />
 
                 {/* Imagem */}
-                <div className="aspect-square overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #0d0d0f 0%, #151517 100%)' }}>
+                <div className="aspect-square overflow-hidden relative" style={{ background: '#1a1a1e' }}>
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.title}
                       className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700"
