@@ -89,7 +89,7 @@ export function ProductsSection() {
                   )}
                   {/* Shimmer on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                    style={{ background: 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%)' }} />
+                    style={{ background: 'linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.05) 50%, transparent 80%)' }} />
                   {product.badge && (
                     <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold"
                       style={{ background: 'hsl(43,96%,52%)', color: '#050505', boxShadow: '0 2px 8px rgba(245,183,0,0.3)' }}>
