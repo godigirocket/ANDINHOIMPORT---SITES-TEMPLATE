@@ -10,7 +10,7 @@ export interface SiteContentData {
   cta_secondary_text: string;
   whatsapp_link: string;
   instagram_link: string;
-  instagram_enabled: boolean; // Toggle para mostrar/ocultar seção Instagram
+  instagram_enabled: boolean;
   support_text: string;
   contact_phone: string;
   contact_email: string;
@@ -22,11 +22,8 @@ export interface SiteContentData {
   meta_pixel: string;
   tiktok_pixel: string;
   google_search_console_token: string;
-  // URLs das imagens de fundo do hero — editáveis pelo painel
   hero_bg_1: string;
   hero_bg_2: string;
-  // Toggle para mostrar/ocultar seção Instagram
-  instagram_enabled: boolean;
 }
 
 const defaultContent: SiteContentData = {
@@ -52,7 +49,6 @@ const defaultContent: SiteContentData = {
   // Imagens padrão de alta qualidade (Unsplash — sem bloqueio)
   hero_bg_1: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1920&q=95&auto=format&fit=crop',
   hero_bg_2: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1920&q=95&auto=format&fit=crop',
-  instagram_enabled: true,
 };
 
 const LOCAL_KEY = `${clientConfig.id}_content_v4`;
@@ -124,7 +120,6 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         google_search_console_token: d.google_search_console_token ?? '',
         hero_bg_1:          d.hero_bg_1            ?? defaultContent.hero_bg_1,
         hero_bg_2:          d.hero_bg_2            ?? defaultContent.hero_bg_2,
-        instagram_enabled:  d.instagram_enabled    ?? defaultContent.instagram_enabled,
       };
       saveLocal(content);
       set({ content, isLoading: false });
