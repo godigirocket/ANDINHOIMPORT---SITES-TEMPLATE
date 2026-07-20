@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => ({
           vendor: ["react", "react-dom", "react-router-dom"],
           ui: ["framer-motion", "lucide-react"],
           animation: ["gsap"],
-          three: ["three", "@react-three/fiber", "@react-three/drei"],
+          three: ["three", "@react-three/fiber"],
           supabase: ["@supabase/supabase-js"],
           state: ["zustand", "zod", "@tanstack/react-query"],
         },
