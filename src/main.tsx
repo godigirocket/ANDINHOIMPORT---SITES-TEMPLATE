@@ -3,7 +3,17 @@ import App from "./App.tsx";
 import "./index.css";
 import { applyTheme } from "./lib/utils/applyTheme";
 
-// Aplica o tema do clientConfig antes de renderizar
+// Aplica o tema
 applyTheme();
+
+// Bloquear inspect/devtools em produção
+if (import.meta.env.PROD) {
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F12') e.preventDefault();
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) e.preventDefault();
+    if (e.ctrlKey && e.key === 'u') e.preventDefault();
+  });
+}
 
 createRoot(document.getElementById("root")!).render(<App />);

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { CreditCard, Shield, Package, Truck } from 'lucide-react';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const benefits = [
   { icon: CreditCard, number: '18x', text: 'Parcelamento facilitado', delay: 0 },
@@ -9,6 +10,8 @@ const benefits = [
 ];
 
 export function FloatingBenefits() {
+  const gridRef = useScrollAnimation<HTMLDivElement>('.gsap-item', 0.15);
+
   return (
     <section className="relative py-20 md:py-28" style={{ background: '#050505' }}>
       <div className="max-w-5xl mx-auto px-4">
@@ -26,15 +29,11 @@ export function FloatingBenefits() {
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {benefits.map((b, i) => (
-            <motion.div
+            <div
               key={b.text}
-              initial={{ y: 30, opacity: 0, rotateX: 8 }}
-              whileInView={{ y: 0, opacity: 1, rotateX: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: b.delay }}
-              className="relative p-6 rounded-2xl text-center group"
+              className="gsap-item relative p-6 rounded-2xl text-center group"
               style={{
                 background: '#0a0a0c',
                 border: '1px solid rgba(245,183,0,0.05)',
@@ -60,7 +59,7 @@ export function FloatingBenefits() {
               <p className="text-xs font-medium" style={{ color: '#ccc' }}>
                 {b.text}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

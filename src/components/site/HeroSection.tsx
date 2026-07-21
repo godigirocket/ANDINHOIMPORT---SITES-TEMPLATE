@@ -48,8 +48,8 @@ export function HeroSection() {
         style={{ background: 'linear-gradient(to top, hsl(220,20%,4%) 0%, transparent 30%)' }} />
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 w-full pt-28 pb-24">
-        <div className="max-w-xl">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full pt-28 pb-24">
+        <div className="max-w-lg">
           <motion.p initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="text-[10px] font-bold tracking-[0.2em] uppercase mb-4"
@@ -59,8 +59,8 @@ export function HeroSection() {
 
           <motion.h1 initial={{ y: 28, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.65, delay: 0.1 }}
-            className="font-black leading-[0.88] tracking-tight mb-6"
-            style={{ fontSize: 'clamp(3.5rem, 10vw, 7rem)' }}>
+            className="font-black leading-[0.9] tracking-tight mb-6"
+            style={{ fontSize: 'clamp(2.8rem, 8vw, 5.5rem)' }}>
             <span className="text-white block">{content.hero_title || hero.headline}</span>
             <span className="gradient-text block">{hero.headlineGold}</span>
           </motion.h1>
