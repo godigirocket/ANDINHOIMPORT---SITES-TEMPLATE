@@ -76,24 +76,23 @@ export function ProductsSection() {
                   style={{ boxShadow: 'inset 0 1px 0 rgba(245,183,0,0.1), 0 0 20px rgba(245,183,0,0.05)' }} />
 
                 {/* Imagem */}
-                <div className="aspect-square overflow-hidden relative" style={{ background: 'linear-gradient(160deg, #0f0f12 0%, #1c1c20 100%)' }}>
+                <div className="aspect-[4/3] overflow-hidden relative flex items-center justify-center" style={{ background: '#0a0a0c' }}>
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.title}
-                      className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700"
-                      style={{ transform: 'translateZ(20px)' }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       loading="lazy" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-xs" style={{ color: '#444' }}>Sem imagem</span>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: '#0d0d0f' }}>
+                      <span className="text-xs" style={{ color: '#333' }}>Sem imagem</span>
                     </div>
                   )}
                   {/* Shimmer on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
                     style={{ background: 'linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.05) 50%, transparent 80%)' }} />
                   {product.badge && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold"
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide"
                       style={{ background: 'hsl(43,96%,52%)', color: '#050505', boxShadow: '0 2px 8px rgba(245,183,0,0.3)' }}>
-                      {product.badge}
+                      {product.badge.replace(/[^\w\sÀ-ú]/g, '').trim()}
                     </span>
                   )}
                 </div>

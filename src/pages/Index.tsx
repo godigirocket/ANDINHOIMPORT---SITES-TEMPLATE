@@ -7,6 +7,7 @@ import { InstagramSection } from '@/components/site/InstagramSection';
 import { CTASection } from '@/components/site/CTASection';
 import { FAQSection } from '@/components/site/FAQSection';
 import { FloatingBenefits } from '@/components/3d/FloatingBenefits';
+import { SectionDivider } from '@/components/site/SectionDivider';
 import { Footer } from '@/components/site/Footer';
 import { FloatingCart } from '@/components/site/FloatingCart';
 import { CartDrawer } from '@/components/site/CartDrawer';
@@ -199,11 +200,17 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <SectionDivider />
         <ProductsSection />
+        <SectionDivider />
         <FloatingBenefits />
+        <SectionDivider />
         <TestimonialsSection />
+        <SectionDivider />
         {content.instagram_enabled && <InstagramSection />}
+        {content.instagram_enabled && <SectionDivider />}
         <FAQSection />
+        <SectionDivider />
         <CTASection />
       </main>
       <Footer />
