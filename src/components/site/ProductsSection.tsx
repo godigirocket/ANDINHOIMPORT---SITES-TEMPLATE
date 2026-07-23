@@ -17,7 +17,7 @@ export function ProductsSection() {
 
   return (
     <section id="products" className="relative py-20 md:py-28">
-      <div className="absolute inset-0" style={{ background: '#050505' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050505 0%, #0a0a0d 50%, #050505 100%)' }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}

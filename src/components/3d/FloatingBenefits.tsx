@@ -13,7 +13,7 @@ export function FloatingBenefits() {
   const gridRef = useScrollAnimation<HTMLDivElement>('.gsap-item', 0.15);
 
   return (
-    <section className="relative py-20 md:py-28" style={{ background: '#050505' }}>
+    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, #050505 0%, #08080b 50%, #050505 100%)' }}>
       <div className="max-w-5xl mx-auto px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}

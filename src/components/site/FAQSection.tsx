@@ -18,7 +18,7 @@ export function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <section className="relative py-20 md:py-28" style={{ background: '#050505' }}>
+    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, #050505 0%, #07070a 50%, #050505 100%)' }}>
       <div className="max-w-3xl mx-auto px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
