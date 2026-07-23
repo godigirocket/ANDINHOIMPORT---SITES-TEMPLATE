@@ -9,19 +9,24 @@ export function CTASection() {
   const msg = encodeURIComponent(clientConfig.company.contact.whatsappMessage);
 
   return (
-    <section id="cta" className="relative py-24 md:py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, hsl(220,20%,4%) 0%, hsl(225,22%,6%) 50%, hsl(220,20%,4%) 100%)' }} />
+    <section id="cta" className="relative py-28 md:py-36 overflow-hidden">
+      {/* Background com glow central */}
+      <div className="absolute inset-0" style={{ background: '#050505' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, rgba(245,183,0,0.06) 0%, transparent 70%)', filter: 'blur(40px)' }} />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <motion.div initial={{ y: 24, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} transition={{ duration: 0.6 }}>
+      <div className="relative z-10 max-w-3xl mx-auto px-5 text-center">
+        <motion.div initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }} transition={{ duration: 0.7 }}>
 
-          <h2 className="font-black text-3xl md:text-5xl tracking-tight mb-5 leading-tight text-white">
+          <p className="text-xs font-bold tracking-[0.2em] uppercase mb-4" style={{ color: 'hsl(43,96%,52%)' }}>
+            Pronto para garantir o seu?
+          </p>
+
+          <h2 className="font-black text-4xl md:text-6xl tracking-tight mb-6 leading-[0.95] text-white">
             {clientConfig.initialContent.cta.headline}
           </h2>
-          <p className="text-sm md:text-base mb-10 max-w-lg mx-auto" style={{ color: 'hsla(45,20%,96%,0.55)' }}>
+          <p className="text-sm md:text-base mb-12 max-w-md mx-auto" style={{ color: '#999' }}>
             {content.support_text || clientConfig.initialContent.cta.subheadline}
           </p>
 

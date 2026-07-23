@@ -29,10 +29,10 @@ export function ProductsSection() {
         >
           <h2 className="font-black text-3xl md:text-5xl tracking-tight mb-3">
             <span className="text-white">Nossos </span>
-            <span style={{ color: '#F5B700' }}>Produtos</span>
+            <span className="gradient-text">Produtos</span>
           </h2>
-          <p className="text-sm max-w-md mx-auto" style={{ color: '#a6a6aa' }}>
-            Modelos selecionados, condições facilitadas e atendimento direto.
+          <p className="text-xs md:text-sm max-w-md mx-auto" style={{ color: '#777' }}>
+            Modelos selecionados com garantia e parcelamento.
           </p>
         </motion.div>
 
@@ -53,18 +53,20 @@ export function ProductsSection() {
                 className="rounded-2xl overflow-hidden cursor-pointer group relative"
                 style={{ 
                   background: '#111114', 
-                  border: '1px solid rgba(245,183,0,0.06)',
+                  border: '1px solid rgba(245,183,0,0.08)',
                   perspective: '800px',
                   transformStyle: 'preserve-3d',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                  boxShadow: '0 2px 16px rgba(0,0,0,0.5)',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.border = '1px solid rgba(245,183,0,0.25)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(245,183,0,0.08)';
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.border = '1px solid rgba(245,183,0,0.35)';
+                  el.style.boxShadow = '0 16px 48px rgba(0,0,0,0.7), 0 0 24px rgba(245,183,0,0.06)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.border = '1px solid rgba(245,183,0,0.06)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.border = '1px solid rgba(245,183,0,0.08)';
+                  el.style.boxShadow = '0 2px 16px rgba(0,0,0,0.5)';
                 }}
                 onClick={() => {
                   const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`;

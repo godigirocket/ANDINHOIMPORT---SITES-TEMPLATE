@@ -31,11 +31,11 @@ export function HeroSection() {
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background images com crossfade */}
+      {/* Background images com crossfade + parallax */}
       {bgImages.map((src, i) => (
         <motion.div key={i}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('${src}')` }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
+          style={{ backgroundImage: `url('${src}')`, backgroundAttachment: 'fixed' }}
           animate={{ opacity: i === bgIdx ? 1 : 0 }}
           transition={{ duration: 1.8, ease: 'easeInOut' }}
         />
