@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
 import { ProductsSection } from '@/components/site/ProductsSection';
+import { ProcessShowcase } from '@/components/site/ProcessShowcase';
 import { FeaturesSection } from '@/components/site/FeaturesSection';
 import { TestimonialsSection } from '@/components/site/TestimonialsSection';
 import { InstagramSection } from '@/components/site/InstagramSection';
@@ -205,6 +206,8 @@ const Index = () => {
         <BrandsTicker />
         <SectionDivider />
         <ProductsSection />
+        <SectionDivider />
+        <ProcessShowcase />
         <SectionDivider />
         <FeaturesSection />
         <SectionDivider />

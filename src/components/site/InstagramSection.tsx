@@ -1,11 +1,46 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Instagram } from 'lucide-react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const FALLBACK_PHOTO = 'https://images.unsplash.com/photo-1592286927505-1def25115558?w=1000&q=85&auto=format&fit=crop';
 
 export function InstagramSection() {
   const { content } = useContentStore();
   const instagramUrl = content.instagram_link || clientConfig.company.social.instagram;
+  const photoRef = useRef<HTMLDivElement>(null);
+
+  // Reveal cinematográfico: a foto "abre" em íris ao entrar na viewport
+  useEffect(() => {
+    const el = photoRef.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    gsap.set(el, { clipPath: 'circle(12% at 50% 50%)', scale: 1.25 });
+
+    const tween = gsap.to(el, {
+      clipPath: 'circle(75% at 50% 50%)',
+      scale: 1,
+      duration: 1.4,
+      ease: 'power4.out',
+      clearProps: 'clipPath,transform',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 78%',
+        once: true,
+      },
+    });
+
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    };
+  }, []);
 
   return (
     <section className="relative py-16 md:py-24" style={{ background: '#050505' }}>
@@ -25,15 +60,16 @@ export function InstagramSection() {
             </div>
           </div>
 
-          {/* Foto grande central — placeholder para o dono colocar */}
-          <div className="relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6"
-            style={{ background: '#0a0a0c', border: '1px solid rgba(255,255,255,0.06)', aspectRatio: '1/1' }}>
-            {/* Placeholder — será substituído por foto real via admin */}
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center">
-                <Instagram className="w-12 h-12 mx-auto mb-3" style={{ color: '#333' }} />
-                <p className="text-xs" style={{ color: '#555' }}>Foto do Instagram</p>
-              </div>
+          {/* Foto grande central — reveal em íris ao entrar na viewport */}
+          <div className="relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6 animate-glow-pulse"
+            style={{ background: '#0a0a0c', border: '1px solid rgba(245,183,0,0.12)', aspectRatio: '1/1' }}>
+            <div ref={photoRef} className="w-full h-full">
+              <img
+                src={FALLBACK_PHOTO}
+                alt="Últimas novidades no Instagram da Andinho Import"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
           </div>
 
