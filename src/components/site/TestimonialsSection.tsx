@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { useParallax } from '@/hooks/useParallax';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -17,6 +18,7 @@ const DEFAULT: Testimonial[] = [
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);
   const [current, setCurrent] = useState(0);
+  const glowRef = useParallax<HTMLDivElement>(0.25);
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -39,8 +41,10 @@ export function TestimonialsSection() {
   if (!t) return null;
 
   return (
-    <section className="relative py-16 md:py-24" style={{ background: '#080808' }}>
-      <div className="max-w-2xl mx-auto px-4">
+    <section id="testimonials" className="relative py-16 md:py-24 overflow-hidden" style={{ background: '#080808' }}>
+      <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[500px] h-[300px] pointer-events-none"
+        style={{ marginLeft: '-250px', marginTop: '-150px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.05) 0%, transparent 70%)', filter: 'blur(20px)', willChange: 'transform' }} />
+      <div className="relative max-w-2xl mx-auto px-4">
         <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }} className="mb-8">
           <h2 className="font-black text-2xl md:text-3xl tracking-tight text-center">

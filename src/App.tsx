@@ -3,6 +3,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/lib/auth/AuthContext';
+import { SmoothScrollProvider } from '@/components/scroll/SmoothScroll';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import Checkout from './pages/Checkout';
@@ -41,6 +42,7 @@ const App = () => (
       <TooltipProvider>
         <Sonner richColors position="top-right" />
         <BrowserRouter>
+          <SmoothScrollProvider>
           <Routes>
             {/* Public */}
             <Route path="/" element={<Index />} />
@@ -70,6 +72,7 @@ const App = () => (
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </SmoothScrollProvider>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

@@ -29,15 +29,22 @@ export function FloatingBenefits() {
           </p>
         </motion.div>
 
-        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{ perspective: '1000px' }}>
           {benefits.map((b, i) => (
             <div
               key={b.text}
-              className="gsap-item relative p-6 rounded-2xl text-center group"
+              className="gsap-item relative p-6 rounded-2xl text-center group transition-shadow duration-300"
               style={{
                 background: '#0a0a0c',
                 border: '1px solid rgba(245,183,0,0.05)',
                 transformStyle: 'preserve-3d',
+                transition: 'transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-6px) rotateX(8deg) scale(1.02)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0) rotateX(0) scale(1)';
               }}
             >
               {/* Glow on hover */}

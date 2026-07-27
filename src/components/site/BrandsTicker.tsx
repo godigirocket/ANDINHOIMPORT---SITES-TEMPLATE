@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // Cada marca: ícone SVG real + nome — Apple e JBL com ícone próprio + nome visível
 const brands = [
@@ -79,6 +80,8 @@ const brands = [
 const items = [...brands, ...brands];
 
 export function BrandsTicker() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div
       className="w-full overflow-hidden select-none"
@@ -90,7 +93,7 @@ export function BrandsTicker() {
       }}
     >
       <motion.div
-        animate={{ x: ['0%', '-50%'] }}
+        animate={reducedMotion ? undefined : { x: ['0%', '-50%'] }}
         transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
         className="flex items-center"
         style={{ width: 'max-content' }}

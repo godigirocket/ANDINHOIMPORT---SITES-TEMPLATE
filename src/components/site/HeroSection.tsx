@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { MessageCircle, ChevronDown, ShieldCheck, Zap, Award } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
+import { useParallax } from '@/hooks/useParallax';
+import { useTilt3D } from '@/hooks/useTilt3D';
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1600&q=85&auto=format&fit=crop',
@@ -15,6 +17,9 @@ export function HeroSection() {
   const { content } = useContentStore();
   const { hero } = clientConfig.initialContent;
   const [bgIdx, setBgIdx] = useState(0);
+  const bgParallaxRef = useParallax<HTMLDivElement>(0.14);
+  const orbParallaxRef = useParallax<HTMLDivElement>(-0.35);
+  const contentTiltRef = useTilt3D<HTMLDivElement>(3.5);
 
   const bgImages = [
     content.hero_bg_1 || FALLBACK_IMAGES[0],
@@ -31,15 +36,23 @@ export function HeroSection() {
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background images com crossfade + parallax */}
-      {bgImages.map((src, i) => (
-        <motion.div key={i}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
-          style={{ backgroundImage: `url('${src}')`, backgroundAttachment: 'fixed' }}
-          animate={{ opacity: i === bgIdx ? 1 : 0 }}
-          transition={{ duration: 1.8, ease: 'easeInOut' }}
-        />
-      ))}
+      {/* Background images com crossfade + parallax real (GSAP, funciona no iOS) */}
+      <div ref={bgParallaxRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
+        {bgImages.map((src, i) => (
+          <motion.div key={i}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-[1.16]"
+            style={{ backgroundImage: `url('${src}')` }}
+            animate={{ opacity: i === bgIdx ? 1 : 0 }}
+            transition={{ duration: 1.8, ease: 'easeInOut' }}
+          />
+        ))}
+      </div>
+
+      {/* Orbe de luz flutuante — parallax (GSAP) no wrapper + drift ambiente (CSS) no filho, para não brigarem pela mesma transform */}
+      <div ref={orbParallaxRef} className="absolute -top-24 right-[8%] w-[420px] h-[420px] pointer-events-none" style={{ willChange: 'transform' }}>
+        <div className="w-full h-full rounded-full animate-ambient-drift"
+          style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.14) 0%, transparent 70%)', filter: 'blur(20px)' }} />
+      </div>
 
       {/* Overlay */}
       <div className="absolute inset-0"
@@ -48,8 +61,8 @@ export function HeroSection() {
         style={{ background: 'linear-gradient(to top, hsl(220,20%,4%) 0%, transparent 30%)' }} />
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full pt-28 pb-24">
-        <div className="max-w-lg">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full pt-28 pb-24" style={{ perspective: '1200px' }}>
+        <div ref={contentTiltRef} className="max-w-lg" style={{ transformStyle: 'preserve-3d' }}>
           <motion.p initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="text-[10px] font-bold tracking-[0.2em] uppercase mb-4"

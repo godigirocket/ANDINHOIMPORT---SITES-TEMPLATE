@@ -4,10 +4,12 @@ import { MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
+import { useParallax } from '@/hooks/useParallax';
 
 export function ProductsSection() {
   const navigate = useNavigate();
   const { fetchProducts, getActiveProducts, isLoading } = useProductStore();
+  const orbRef = useParallax<HTMLDivElement>(0.4);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -16,8 +18,10 @@ export function ProductsSection() {
   if (!clientConfig.features.products) return null;
 
   return (
-    <section id="products" className="relative py-20 md:py-28">
+    <section id="products" className="relative py-20 md:py-28 overflow-hidden">
       <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050505 0%, #0a0a0d 50%, #050505 100%)' }} />
+      <div ref={orbRef} className="absolute top-10 left-[6%] w-[360px] h-[360px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.05) 0%, transparent 70%)', filter: 'blur(10px)', willChange: 'transform' }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
@@ -42,19 +46,19 @@ export function ProductsSection() {
             <p className="text-sm" style={{ color: '#888' }}>Carregando...</p>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" style={{ perspective: '1200px' }}>
             {products.map((product, i) => (
               <motion.div key={product.id}
                 initial={{ y: 40, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -8, rotateX: 2, rotateY: -2, transition: { duration: 0.3 } }}
+                whileHover={{ y: -10, rotateX: 5, rotateY: -5, scale: 1.02, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
                 className="rounded-2xl overflow-hidden cursor-pointer group relative"
-                style={{ 
-                  background: '#111114', 
+                style={{
+                  background: '#111114',
                   border: '1px solid rgba(245,183,0,0.08)',
-                  perspective: '800px',
+                  perspective: '1000px',
                   transformStyle: 'preserve-3d',
                   boxShadow: '0 2px 16px rgba(0,0,0,0.5)',
                 }}

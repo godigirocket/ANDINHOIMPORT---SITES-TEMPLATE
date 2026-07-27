@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
 import { ProductsSection } from '@/components/site/ProductsSection';
+import { FeaturesSection } from '@/components/site/FeaturesSection';
 import { TestimonialsSection } from '@/components/site/TestimonialsSection';
 import { InstagramSection } from '@/components/site/InstagramSection';
 import { CTASection } from '@/components/site/CTASection';
 import { FAQSection } from '@/components/site/FAQSection';
 import { FloatingBenefits } from '@/components/3d/FloatingBenefits';
+import { BrandsTicker } from '@/components/site/BrandsTicker';
 import { SectionDivider } from '@/components/site/SectionDivider';
 import { Footer } from '@/components/site/Footer';
 import { FloatingCart } from '@/components/site/FloatingCart';
@@ -200,8 +202,11 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <BrandsTicker />
         <SectionDivider />
         <ProductsSection />
+        <SectionDivider />
+        <FeaturesSection />
         <SectionDivider />
         <FloatingBenefits />
         <SectionDivider />
