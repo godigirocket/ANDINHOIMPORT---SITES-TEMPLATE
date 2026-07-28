@@ -7,7 +7,7 @@ import { Footer } from '@/components/site/Footer';
 export default function Services() {
   const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent('Olá! Gostaria de consultar sobre assistência técnica.')}`;
   return (
-    <div className="min-h-screen" style={{ background: '#050505', color: '#f7f7f7' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(240,6%,11%)', color: '#f7f7f7' }}>
       <Header />
       <main className="pt-24 pb-20 px-4 max-w-4xl mx-auto">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
@@ -26,7 +26,7 @@ export default function Services() {
               { icon: Battery, title: 'Bateria', desc: 'Substituição com peças compatíveis' },
               { icon: Wrench, title: 'Manutenção geral', desc: 'Conectores, botões e componentes' },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="p-5 rounded-2xl" style={{ background: '#0a0a0c', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div key={title} className="p-5 rounded-2xl" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <Icon className="w-5 h-5 mb-3" style={{ color: '#F5B700' }} />
                 <p className="text-sm font-bold text-white mb-1">{title}</p>
                 <p className="text-xs" style={{ color: '#a6a6aa' }}>{desc}</p>

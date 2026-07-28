@@ -19,7 +19,7 @@ export default function Products() {
   const filtered = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
 
   return (
-    <div className="min-h-screen" style={{ background: '#050505', color: '#f7f7f7' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(240,6%,11%)', color: '#f7f7f7' }}>
       <Header />
       <main className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>

@@ -374,7 +374,7 @@ export function SimpleChatbot() {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-6 right-6 z-50 w-[90vw] sm:w-[380px] h-[85vh] sm:h-[600px] max-h-[600px] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
             style={{ 
-              background: 'hsl(220,20%,7%)',
+              background: 'hsl(240,6%,15%)',
               border: '1px solid hsla(43,96%,52%,0.2)'
             }}
           >

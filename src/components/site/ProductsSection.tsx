@@ -4,12 +4,10 @@ import { MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
-import { useParallax } from '@/hooks/useParallax';
 
 export function ProductsSection() {
   const navigate = useNavigate();
   const { fetchProducts, getActiveProducts, isLoading } = useProductStore();
-  const orbRef = useParallax<HTMLDivElement>(0.4);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -19,9 +17,7 @@ export function ProductsSection() {
 
   return (
     <section id="products" className="relative py-20 md:py-28 overflow-hidden">
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050505 0%, #0a0a0d 50%, #050505 100%)' }} />
-      <div ref={orbRef} className="absolute top-10 left-[6%] w-[360px] h-[360px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.05) 0%, transparent 70%)', filter: 'blur(10px)', willChange: 'transform' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(213,24%,15%) 50%, hsl(240,6%,11%) 100%)' }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
@@ -56,7 +52,7 @@ export function ProductsSection() {
                 whileHover={{ y: -10, rotateX: 5, rotateY: -5, scale: 1.02, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
                 className="rounded-2xl overflow-hidden cursor-pointer group relative"
                 style={{
-                  background: '#111114',
+                  background: 'hsl(213,20%,19%)',
                   border: '1px solid rgba(245,183,0,0.08)',
                   perspective: '1000px',
                   transformStyle: 'preserve-3d',
@@ -82,14 +78,14 @@ export function ProductsSection() {
                   style={{ boxShadow: 'inset 0 1px 0 rgba(245,183,0,0.1), 0 0 20px rgba(245,183,0,0.05)' }} />
 
                 {/* Imagem */}
-                <div className="aspect-[4/3] overflow-hidden relative flex items-center justify-center" style={{ background: '#0a0a0c' }}>
+                <div className="aspect-[4/3] overflow-hidden relative flex items-center justify-center" style={{ background: 'hsl(213,18%,16%)' }}>
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       loading="lazy" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: '#0d0d0f' }}>
-                      <span className="text-xs" style={{ color: '#333' }}>Sem imagem</span>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'hsl(213,16%,15%)' }}>
+                      <span className="text-xs" style={{ color: '#666' }}>Sem imagem</span>
                     </div>
                   )}
                   {/* Shimmer on hover */}

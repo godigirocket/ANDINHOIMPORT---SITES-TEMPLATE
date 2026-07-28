@@ -18,7 +18,7 @@ export function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, #050505 0%, #07070a 50%, #050505 100%)' }}>
+    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(262,20%,16%) 50%, hsl(240,6%,11%) 100%)' }}>
       <div className="max-w-3xl mx-auto px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -44,7 +44,7 @@ export function FAQSection() {
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
                 className="w-full flex items-center justify-between p-5 rounded-xl text-left transition-all"
                 style={{
-                  background: openIdx === i ? 'rgba(245,183,0,0.04)' : '#0a0a0c',
+                  background: openIdx === i ? 'rgba(245,183,0,0.06)' : 'hsl(262,14%,18%)',
                   border: `1px solid ${openIdx === i ? 'rgba(245,183,0,0.2)' : 'rgba(255,255,255,0.04)'}`,
                 }}
               >

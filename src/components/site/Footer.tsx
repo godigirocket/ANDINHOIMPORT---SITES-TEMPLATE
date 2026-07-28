@@ -26,7 +26,7 @@ export function Footer() {
 
   return (
     <footer className="relative overflow-hidden"
-      style={{ background: 'hsl(220,20%,3%)', borderTop: '1px solid hsla(43,96%,52%,0.08)' }}>
+      style={{ background: 'hsl(240,6%,9%)', borderTop: '1px solid hsla(43,96%,52%,0.08)' }}>
       {/* Glow ambiente */}
       <div className="absolute bottom-0 right-0 w-[400px] h-[250px] pointer-events-none"
         style={{ background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.07) 0%, transparent 70%)' }} />
@@ -106,7 +106,7 @@ export function Footer() {
           <a href="https://www.instagram.com/GODIGIROCKET" target="_blank" rel="noopener noreferrer"
             className="group relative flex items-center gap-2.5 px-6 py-3 rounded-full overflow-hidden transition-all duration-300"
             style={{
-              background: 'hsl(220,20%,9%)',
+              background: 'hsl(240,6%,16%)',
               border: '1px solid hsla(255,255%,255%,0.1)',
               boxShadow: '0 2px 16px hsla(0,0%,0%,0.4)',
             }}

@@ -30,7 +30,7 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(speed = 0.3)
         trigger,
         start: 'top bottom',
         end: 'bottom top',
-        scrub: 0.8,
+        scrub: true,
       },
     });
 

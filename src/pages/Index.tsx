@@ -199,7 +199,7 @@ const Index = () => {
   }, [content.ga_id, content.meta_pixel, content.tiktok_pixel]);
 
   return (
-    <div className="min-h-screen" style={{ background: '#050505' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(240,6%,11%)' }}>
       <Header />
       <main>
         <HeroSection />

@@ -65,7 +65,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
         }}
       >
         {/* Image area */}
-        <div className="relative aspect-square overflow-hidden" style={{ background: '#0a0a0c' }}>
+        <div className="relative aspect-square overflow-hidden" style={{ background: 'hsl(240,6%,16%)' }}>
           <img
             src={product.image}
             alt={`${product.title} ${product.storage} ${product.color}`}

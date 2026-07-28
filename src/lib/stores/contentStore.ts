@@ -24,6 +24,7 @@ export interface SiteContentData {
   google_search_console_token: string;
   hero_bg_1: string;
   hero_bg_2: string;
+  instagram_photo: string;
 }
 
 const defaultContent: SiteContentData = {
@@ -49,6 +50,8 @@ const defaultContent: SiteContentData = {
   // Imagens padrão de alta qualidade (Unsplash — sem bloqueio)
   hero_bg_1: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1920&q=95&auto=format&fit=crop',
   hero_bg_2: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1920&q=95&auto=format&fit=crop',
+  // Vazio por padrão — a seção Instagram usa a foto de um produto real como fallback
+  instagram_photo: '',
 };
 
 const LOCAL_KEY = `${clientConfig.id}_content_v4`;
@@ -120,6 +123,7 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         google_search_console_token: d.google_search_console_token ?? '',
         hero_bg_1:          d.hero_bg_1            ?? defaultContent.hero_bg_1,
         hero_bg_2:          d.hero_bg_2            ?? defaultContent.hero_bg_2,
+        instagram_photo:    d.instagram_photo      ?? defaultContent.instagram_photo,
       };
       saveLocal(content);
       set({ content, isLoading: false });

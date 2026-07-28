@@ -18,7 +18,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-[hsl(240,6%,11%)] flex items-center justify-center">
         <div className="text-center">
           <p className="text-white text-lg mb-4">Produto não encontrado</p>
           <button onClick={() => navigate('/')} className="btn-gold px-6 py-3 text-sm">
@@ -33,7 +33,7 @@ export default function ProductDetail() {
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen bg-[hsl(240,6%,11%)] text-white">
       {/* Header */}
       <header className="fixed top-0 w-full z-50 px-4 py-4" style={{ background: 'rgba(5,5,5,0.8)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -60,7 +60,7 @@ export default function ProductDetail() {
             transition={{ duration: 0.6 }}
             className="sticky top-28"
           >
-            <div className="relative rounded-3xl overflow-hidden" style={{ background: '#0a0a0c' }}>
+            <div className="relative rounded-3xl overflow-hidden" style={{ background: 'hsl(240,6%,16%)' }}>
               <img
                 src={product.image}
                 alt={`${product.title} ${product.storage} ${product.color}`}

@@ -18,7 +18,6 @@ export function HeroSection() {
   const { hero } = clientConfig.initialContent;
   const [bgIdx, setBgIdx] = useState(0);
   const bgParallaxRef = useParallax<HTMLDivElement>(0.14);
-  const orbParallaxRef = useParallax<HTMLDivElement>(-0.35);
   const contentTiltRef = useTilt3D<HTMLDivElement>(3.5);
 
   const bgImages = [
@@ -48,17 +47,15 @@ export function HeroSection() {
         ))}
       </div>
 
-      {/* Orbe de luz flutuante — parallax (GSAP) no wrapper + drift ambiente (CSS) no filho, para não brigarem pela mesma transform */}
-      <div ref={orbParallaxRef} className="absolute -top-24 right-[8%] w-[420px] h-[420px] pointer-events-none" style={{ willChange: 'transform' }}>
-        <div className="w-full h-full rounded-full animate-ambient-drift"
-          style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.14) 0%, transparent 70%)', filter: 'blur(20px)' }} />
-      </div>
+      {/* Orbe de luz flutuante — estático, sem custo de scroll */}
+      <div className="absolute -top-24 right-[8%] w-[420px] h-[420px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.14) 0%, transparent 70%)', filter: 'blur(20px)' }} />
 
       {/* Overlay */}
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(105deg, hsla(220,20%,4%,0.95) 0%, hsla(220,20%,4%,0.75) 50%, hsla(220,20%,4%,0.2) 100%)' }} />
+        style={{ background: 'linear-gradient(105deg, hsla(240,6%,11%,0.95) 0%, hsla(240,6%,11%,0.75) 50%, hsla(240,6%,11%,0.2) 100%)' }} />
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(to top, hsl(220,20%,4%) 0%, transparent 30%)' }} />
+        style={{ background: 'linear-gradient(to top, hsl(240,6%,11%) 0%, transparent 30%)' }} />
 
       {/* Conteúdo */}
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full pt-28 pb-24" style={{ perspective: '1200px' }}>
@@ -93,7 +90,7 @@ export function HeroSection() {
               const Icon = iconMap[b.icon] || ShieldCheck;
               return (
                 <div key={b.label} className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                  style={{ background: 'hsla(220,20%,8%,0.85)', border: '1px solid hsla(43,96%,52%,0.22)' }}>
+                  style={{ background: 'hsla(240,6%,17%,0.85)', border: '1px solid hsla(43,96%,52%,0.22)' }}>
                   <Icon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                   <div>
                     <p className="text-[9px] font-black text-white leading-none tracking-wide">{b.label}</p>
@@ -116,7 +113,7 @@ export function HeroSection() {
             <button
               onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
               className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
-              style={{ border: '1px solid hsla(255,255%,255%,0.18)', color: 'hsla(45,20%,96%,0.75)', background: 'hsla(220,20%,8%,0.4)' }}>
+              style={{ border: '1px solid hsla(255,255%,255%,0.18)', color: 'hsla(45,20%,96%,0.75)', background: 'hsla(240,6%,17%,0.4)' }}>
               {content.cta_secondary_text || hero.ctaSecondary}
               <ChevronDown className="w-4 h-4" />
             </button>

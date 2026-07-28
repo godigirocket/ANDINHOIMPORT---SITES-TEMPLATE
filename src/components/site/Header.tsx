@@ -39,8 +39,8 @@ export function Header() {
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
           background: isScrolled
-            ? 'hsla(220,20%,4%,0.96)'
-            : 'hsla(220,20%,4%,0.6)',
+            ? 'hsla(240,6%,9%,0.96)'
+            : 'hsla(240,6%,9%,0.6)',
           backdropFilter: 'blur(20px)',
           borderBottom: isScrolled ? '1px solid hsla(43,96%,52%,0.1)' : '1px solid transparent',
           boxShadow: isScrolled ? '0 4px 30px hsla(0,0%,0%,0.4)' : 'none',
@@ -109,7 +109,7 @@ export function Header() {
         {isMobileMenuOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 md:hidden"
-            style={{ background: 'hsla(220,20%,4%,0.98)', backdropFilter: 'blur(24px)' }}>
+            style={{ background: 'hsla(240,6%,9%,0.98)', backdropFilter: 'blur(24px)' }}>
             <div className="pt-24 px-6 flex flex-col gap-1">
               {navLinks.map((link, i) => (
                 <motion.a key={link.href} href={link.href}

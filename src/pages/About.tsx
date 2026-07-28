@@ -7,7 +7,7 @@ import { Footer } from '@/components/site/Footer';
 export default function About() {
   const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   return (
-    <div className="min-h-screen" style={{ background: '#050505', color: '#f7f7f7' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(240,6%,11%)', color: '#f7f7f7' }}>
       <Header />
       <main className="pt-24 pb-20 px-4 max-w-4xl mx-auto">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
@@ -26,14 +26,14 @@ export default function About() {
               { icon: Truck, label: 'Entrega rápida para a região' },
               { icon: Clock, label: 'Atendimento direto e ágil' },
             ].map(({ icon: Icon, label }) => (
-              <div key={label} className="p-5 rounded-2xl" style={{ background: '#0a0a0c', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div key={label} className="p-5 rounded-2xl" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <Icon className="w-5 h-5 mb-3" style={{ color: '#F5B700' }} />
                 <p className="text-xs font-medium" style={{ color: '#ccc' }}>{label}</p>
               </div>
             ))}
           </div>
 
-          <div className="p-6 rounded-2xl mb-8" style={{ background: '#0a0a0c', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="p-6 rounded-2xl mb-8" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
             <h2 className="font-bold text-sm mb-3 text-white">Localização e contato</h2>
             <div className="space-y-2 text-sm" style={{ color: '#a6a6aa' }}>
               <p className="flex items-center gap-2"><MapPin className="w-4 h-4" style={{ color: '#F5B700' }} /> {clientConfig.company.location.city}, {clientConfig.company.location.state}</p>

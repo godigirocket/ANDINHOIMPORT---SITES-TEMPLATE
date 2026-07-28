@@ -2,22 +2,20 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Clock, Headphones } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
-import { useParallax } from '@/hooks/useParallax';
 import { useTilt3D } from '@/hooks/useTilt3D';
 
 export function CTASection() {
   const { content } = useContentStore();
   const whatsappUrl = content.whatsapp_link || `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   const msg = encodeURIComponent(clientConfig.company.contact.whatsappMessage);
-  const glowRef = useParallax<HTMLDivElement>(0.35);
   const tiltRef = useTilt3D<HTMLDivElement>(4);
 
   return (
     <section id="cta" className="relative py-28 md:py-36 overflow-hidden">
-      {/* Background com glow central — parallax */}
-      <div className="absolute inset-0" style={{ background: '#050505' }} />
-      <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[600px] h-[400px] pointer-events-none"
-        style={{ marginLeft: '-300px', marginTop: '-200px', background: 'radial-gradient(ellipse, rgba(245,183,0,0.06) 0%, transparent 70%)', filter: 'blur(40px)', willChange: 'transform' }} />
+      {/* Background com glow central — estático */}
+      <div className="absolute inset-0" style={{ background: 'hsl(240,6%,11%)' }} />
+      <div className="absolute top-1/2 left-1/2 w-[600px] h-[400px] pointer-events-none"
+        style={{ marginLeft: '-300px', marginTop: '-200px', background: 'radial-gradient(ellipse, rgba(245,183,0,0.06) 0%, transparent 70%)', filter: 'blur(40px)' }} />
 
       <div className="relative z-10" style={{ perspective: '1000px' }}>
       <div ref={tiltRef} className="max-w-3xl mx-auto px-5 text-center" style={{ transformStyle: 'preserve-3d' }}>

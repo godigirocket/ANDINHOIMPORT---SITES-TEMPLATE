@@ -13,7 +13,7 @@ export function FloatingBenefits() {
   const gridRef = useScrollAnimation<HTMLDivElement>('.gsap-item', 0.15);
 
   return (
-    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, #050505 0%, #08080b 50%, #050505 100%)' }}>
+    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(150,18%,14%) 50%, hsl(240,6%,11%) 100%)' }}>
       <div className="max-w-5xl mx-auto px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -35,7 +35,7 @@ export function FloatingBenefits() {
               key={b.text}
               className="gsap-item relative p-6 rounded-2xl text-center group transition-shadow duration-300"
               style={{
-                background: '#0a0a0c',
+                background: 'hsl(150,14%,18%)',
                 border: '1px solid rgba(245,183,0,0.05)',
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease',

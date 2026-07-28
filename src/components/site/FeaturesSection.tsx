@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock, LucideIcon } from 'lucide-react';
 import { clientConfig } from '@/config/client';
-import { useParallax } from '@/hooks/useParallax';
 
 const iconMap: Record<string, LucideIcon> = { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock };
 
@@ -18,15 +17,14 @@ const cardAccents = [
 export function FeaturesSection() {
   const { features } = clientConfig.initialContent;
   const waUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(clientConfig.company.contact.whatsappMessage)}`;
-  const glowRef = useParallax<HTMLDivElement>(0.3);
 
   return (
     <section id="features" className="relative py-24 md:py-32 overflow-hidden">
       {/* Background diferente — mais escuro com tom azul-marinho */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(220,20%,4%) 0%, hsl(222,28%,5%) 50%, hsl(220,20%,4%) 100%)' }} />
-      {/* Glow central — parallax (centralizado via margin para não brigar com o transform do GSAP) */}
-      <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[800px] h-[400px] pointer-events-none"
-        style={{ marginLeft: '-400px', marginTop: '-200px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.04) 0%, transparent 70%)', willChange: 'transform' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(224,30%,16%) 50%, hsl(240,6%,11%) 100%)' }} />
+      {/* Glow central — estático */}
+      <div className="absolute top-1/2 left-1/2 w-[800px] h-[400px] pointer-events-none"
+        style={{ marginLeft: '-400px', marginTop: '-200px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.04) 0%, transparent 70%)' }} />
       {/* Linhas verticais decorativas */}
       <div className="absolute inset-0 pointer-events-none opacity-20"
         style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 120px, hsla(43,96%,52%,0.03) 120px, hsla(43,96%,52%,0.03) 121px)' }} />
@@ -55,7 +53,7 @@ export function FeaturesSection() {
                 viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                 className="group relative rounded-2xl p-6 transition-all duration-300"
                 style={{
-                  background: `linear-gradient(145deg, hsla(222,28%,8%,0.9) 0%, hsla(220,20%,6%,0.95) 100%)`,
+                  background: `linear-gradient(145deg, hsla(224,26%,19%,0.9) 0%, hsla(224,22%,15%,0.95) 100%)`,
                   border: `1px solid ${accent.border}`,
                   boxShadow: `0 4px 20px hsla(0,0%,0%,0.3)`,
                 }}

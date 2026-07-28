@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
+import { useProductStore } from '@/lib/stores/productStore';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,8 +13,16 @@ const FALLBACK_PHOTO = 'https://images.unsplash.com/photo-1592286927505-1def2511
 
 export function InstagramSection() {
   const { content } = useContentStore();
+  const { products, fetchProducts } = useProductStore();
   const instagramUrl = content.instagram_link || clientConfig.company.social.instagram;
   const photoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  // Prioridade: foto configurada no admin > foto de um produto real em destaque > stock
+  const featuredProductPhoto = products.find(p => p.featured && p.image_url)?.image_url
+    || products.find(p => p.image_url)?.image_url;
+  const photoSrc = content.instagram_photo || featuredProductPhoto || FALLBACK_PHOTO;
 
   // Reveal cinematográfico: a foto "abre" em íris ao entrar na viewport
   useEffect(() => {
@@ -43,7 +52,7 @@ export function InstagramSection() {
   }, []);
 
   return (
-    <section className="relative py-16 md:py-24" style={{ background: '#050505' }}>
+    <section className="relative py-16 md:py-24" style={{ background: 'hsl(28,12%,13%)' }}>
       <div className="max-w-4xl mx-auto px-4">
         <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }} className="text-center">
@@ -61,13 +70,13 @@ export function InstagramSection() {
           </div>
 
           {/* Foto grande central — reveal em íris ao entrar na viewport */}
-          <div className="relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6 animate-glow-pulse"
-            style={{ background: '#0a0a0c', border: '1px solid rgba(245,183,0,0.12)', aspectRatio: '1/1' }}>
-            <div ref={photoRef} className="w-full h-full">
+          <div className="relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6"
+            style={{ background: 'hsl(28,10%,17%)', border: '1px solid rgba(245,183,0,0.12)', aspectRatio: '1/1', boxShadow: '0 0 30px hsla(43,96%,52%,0.15)' }}>
+            <div ref={photoRef} className="w-full h-full overflow-hidden">
               <img
-                src={FALLBACK_PHOTO}
+                src={photoSrc}
                 alt="Últimas novidades no Instagram da Andinho Import"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover animate-kenburns"
                 loading="lazy"
               />
             </div>

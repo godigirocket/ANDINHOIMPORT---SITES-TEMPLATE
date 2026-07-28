@@ -161,6 +161,12 @@ export default function AdminContent() {
                   onChange={url => setForm(prev => ({ ...prev, hero_bg_2: url }))}
                 />
 
+                <HeroImageUpload
+                  label="Foto do Instagram (seção 'Siga no Instagram')"
+                  value={form.instagram_photo}
+                  onChange={url => setForm(prev => ({ ...prev, instagram_photo: url }))}
+                />
+
                 <div className="p-4 rounded-xl space-y-2"
                   style={{ background: 'hsla(220,20%,8%,0.6)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
                   <p className="text-xs font-bold text-white">Como fazer upload:</p>
