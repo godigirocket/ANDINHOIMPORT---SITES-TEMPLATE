@@ -5,6 +5,9 @@ import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
 import { useReveal } from '@/lib/hooks/useReveal';
+import { useTilt3D } from '@/hooks/useTilt3D';
+import { useMagnetic } from '@/hooks/useMagnetic';
+import { spawnRipple } from '@/lib/utils/ripple';
 
 const FALLBACK_PHOTO = 'https://images.unsplash.com/photo-1592286927505-1def25115558?w=1000&q=85&auto=format&fit=crop';
 
@@ -13,6 +16,10 @@ export function InstagramSection() {
   const { products, fetchProducts } = useProductStore();
   const instagramUrl = content.instagram_link || clientConfig.company.social.instagram;
   const photoRef = useReveal<HTMLDivElement>();
+  // Mockup 3D: tilt fica num wrapper separado do elemento observado pelo
+  // IntersectionObserver (misturar os dois no mesmo nó trava o reveal).
+  const photoTiltRef = useTilt3D<HTMLDivElement>(8);
+  const followBtnRef = useMagnetic<HTMLAnchorElement>(0.2);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -39,28 +46,34 @@ export function InstagramSection() {
             </div>
           </div>
 
-          {/* Foto grande central — reveal em íris ao entrar na viewport (IntersectionObserver) */}
-          <div ref={photoRef} className="iris-reveal relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6"
-            style={{ background: 'hsl(28,10%,17%)', border: '1px solid rgba(245,183,0,0.12)', aspectRatio: '1/1', boxShadow: '0 0 30px hsla(43,96%,52%,0.15)' }}>
-            <div className="iris-reveal-target w-full h-full overflow-hidden">
-              <img
-                src={photoSrc}
-                alt="Últimas novidades no Instagram da Andinho Import"
-                className="w-full h-full object-cover animate-kenburns"
-              />
+          {/* Foto grande central — mockup 3D: tilt no wrapper + reveal em íris por dentro */}
+          <div style={{ perspective: '900px' }} className="mx-auto max-w-lg mb-6">
+            <div ref={photoTiltRef} style={{ transformStyle: 'preserve-3d' }}>
+              <div ref={photoRef} className="iris-reveal relative rounded-2xl overflow-hidden"
+                style={{ background: 'hsl(28,10%,17%)', border: '1px solid rgba(245,183,0,0.12)', aspectRatio: '1/1', boxShadow: '0 0 30px hsla(43,96%,52%,0.15)' }}>
+                <div className="iris-reveal-target w-full h-full overflow-hidden">
+                  <img
+                    src={photoSrc}
+                    alt="Últimas novidades no Instagram da Andinho Import"
+                    className="w-full h-full object-cover animate-kenburns"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           {/* CTA */}
           <a
+            ref={followBtnRef}
             href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="glow-on-hover inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
+            className="ripple-container inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-transform"
             style={{
               background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
               color: '#fff',
             }}
+            onClick={(e) => spawnRipple(e.currentTarget, e.clientX, e.clientY)}
           >
             <Instagram className="w-4 h-4" />
             Seguir no Instagram

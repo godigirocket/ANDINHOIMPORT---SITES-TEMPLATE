@@ -93,7 +93,7 @@ const initialProducts: Product[] = [
     title: 'iPhone 15 Pro Max 256GB',
     description: 'Titânio Natural — Novo, lacrado com nota fiscal e garantia Apple',
     price: 7499, old_price: 8299,
-    image_url: 'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=800&q=85&auto=format&fit=crop',
+    image_url: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=85&auto=format&fit=crop',
     category: 'apple', featured: true, badge: 'LANÇAMENTO', installments: 18, sort_order: 0,
   }),
   mk({

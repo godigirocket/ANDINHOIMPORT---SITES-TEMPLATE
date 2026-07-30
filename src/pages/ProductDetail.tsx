@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, Shield, Truck, CreditCard, Check } from 'lucide-react';
 import { getProductBySlug, getWhatsAppUrl } from '@/data/products';
 import { clientConfig } from '@/config/client';
+import { RevealText } from '@/components/ui/RevealText';
+import { PremiumButton } from '@/components/ui/PremiumButton';
+import { TiltCard } from '@/components/ui/TiltCard';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -21,9 +24,9 @@ export default function ProductDetail() {
       <div className="min-h-screen bg-[hsl(240,6%,11%)] flex items-center justify-center">
         <div className="text-center">
           <p className="text-white text-lg mb-4">Produto não encontrado</p>
-          <button onClick={() => navigate('/')} className="btn-gold px-6 py-3 text-sm">
+          <PremiumButton onClick={() => navigate('/')} variant="primary" className="px-6 py-3 text-sm">
             Voltar ao início
-          </button>
+          </PremiumButton>
         </div>
       </div>
     );
@@ -35,19 +38,20 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-[hsl(240,6%,11%)] text-white">
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 px-4 py-4" style={{ background: 'rgba(5,5,5,0.8)', backdropFilter: 'blur(12px)' }}>
+      <header className="fixed top-0 w-full z-50 px-4 py-4" style={{ background: 'hsla(240,6%,9%,0.85)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors">
+          <button onClick={() => navigate(-1)} className="hover-underline flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" /> Voltar
           </button>
-          <a
+          <PremiumButton
             href={getWhatsAppUrl(product)}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-gold px-4 py-2 text-xs flex items-center gap-2"
+            variant="primary"
+            className="px-4 py-2 text-xs"
           >
             <MessageCircle className="w-3.5 h-3.5" /> Consultar
-          </a>
+          </PremiumButton>
         </div>
       </header>
 
@@ -60,13 +64,13 @@ export default function ProductDetail() {
             transition={{ duration: 0.6 }}
             className="sticky top-28"
           >
-            <div className="relative rounded-3xl overflow-hidden" style={{ background: 'hsl(240,6%,16%)' }}>
+            <TiltCard intensity={5} className="rounded-3xl" style={{ background: 'hsl(240,6%,16%)' }}>
               <img
                 src={product.image}
                 alt={`${product.title} ${product.storage} ${product.color}`}
-                className="w-full aspect-square object-contain p-10"
+                className="product-reflect w-full aspect-square object-contain p-10"
               />
-            </div>
+            </TiltCard>
           </motion.div>
 
           {/* Info */}
@@ -82,9 +86,9 @@ export default function ProductDetail() {
               </span>
             )}
 
-            <h1 className="text-3xl md:text-4xl font-black">
+            <RevealText as="h1" className="text-3xl md:text-4xl font-black">
               {product.title} <span style={{ color: '#F5B700' }}>{product.storage}</span>
-            </h1>
+            </RevealText>
 
             <p className="text-sm" style={{ color: '#a6a6aa' }}>
               {product.color} · {product.condition}
@@ -95,7 +99,7 @@ export default function ProductDetail() {
             </p>
 
             {/* Price */}
-            <div className="p-5 rounded-2xl" style={{ background: '#0b0b0d', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="p-5 rounded-2xl" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-black" style={{ color: '#F5B700' }}>{fmt(product.price)}</span>
                 {product.oldPrice && (
@@ -115,7 +119,7 @@ export default function ProductDetail() {
                 { icon: CreditCard, label: `Até ${product.installments}x sem juros` },
                 { icon: Check, label: 'Produto original' },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 p-3 rounded-xl" style={{ background: '#0b0b0d', border: '1px solid rgba(255,255,255,0.04)' }}>
+                <div key={label} className="flex items-center gap-2 p-3 rounded-xl" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <Icon className="w-4 h-4 flex-shrink-0" style={{ color: '#F5B700' }} />
                   <span className="text-xs" style={{ color: '#ccc' }}>{label}</span>
                 </div>
@@ -123,20 +127,16 @@ export default function ProductDetail() {
             </div>
 
             {/* CTA */}
-            <a
+            <PremiumButton
               href={getWhatsAppUrl(product)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 w-full py-4 rounded-full font-bold text-sm transition-all"
-              style={{
-                background: 'linear-gradient(135deg, #F5B700, #d4a000)',
-                color: '#050505',
-                boxShadow: '0 8px 30px rgba(245,183,0,0.25)',
-              }}
+              variant="primary"
+              className="w-full py-4 text-sm"
             >
               <MessageCircle className="w-5 h-5" />
               Consultar no WhatsApp
-            </a>
+            </PremiumButton>
 
             <p className="text-center text-xs" style={{ color: '#666' }}>
               Tire dúvidas e feche negócio direto com nossa equipe

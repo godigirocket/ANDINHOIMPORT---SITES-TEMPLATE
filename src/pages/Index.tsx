@@ -1,25 +1,27 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
 import { ProductsSection } from '@/components/site/ProductsSection';
-import { ProcessShowcase } from '@/components/site/ProcessShowcase';
-import { FeaturesSection } from '@/components/site/FeaturesSection';
-import { TestimonialsSection } from '@/components/site/TestimonialsSection';
-import { InstagramSection } from '@/components/site/InstagramSection';
-import { CTASection } from '@/components/site/CTASection';
-import { FAQSection } from '@/components/site/FAQSection';
-import { FloatingBenefits } from '@/components/3d/FloatingBenefits';
 import { BrandsTicker } from '@/components/site/BrandsTicker';
 import { SectionDivider } from '@/components/site/SectionDivider';
-import { Footer } from '@/components/site/Footer';
-import { FloatingCart } from '@/components/site/FloatingCart';
-import { CartDrawer } from '@/components/site/CartDrawer';
-import { TawkToChat } from '@/components/TawkToChat';
-import { SimpleChatbot } from '@/components/SimpleChatbot';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
 import { captureUTMs } from '@/lib/analytics/track';
+
+// Abaixo da dobra — carrega sob demanda, não trava o LCP da home
+const ProcessShowcase   = lazy(() => import('@/components/site/ProcessShowcase').then(m => ({ default: m.ProcessShowcase })));
+const FeaturesSection   = lazy(() => import('@/components/site/FeaturesSection').then(m => ({ default: m.FeaturesSection })));
+const FloatingBenefits  = lazy(() => import('@/components/3d/FloatingBenefits').then(m => ({ default: m.FloatingBenefits })));
+const TestimonialsSection = lazy(() => import('@/components/site/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
+const InstagramSection  = lazy(() => import('@/components/site/InstagramSection').then(m => ({ default: m.InstagramSection })));
+const FAQSection        = lazy(() => import('@/components/site/FAQSection').then(m => ({ default: m.FAQSection })));
+const CTASection        = lazy(() => import('@/components/site/CTASection').then(m => ({ default: m.CTASection })));
+const Footer            = lazy(() => import('@/components/site/Footer').then(m => ({ default: m.Footer })));
+const FloatingCart      = lazy(() => import('@/components/site/FloatingCart').then(m => ({ default: m.FloatingCart })));
+const CartDrawer        = lazy(() => import('@/components/site/CartDrawer').then(m => ({ default: m.CartDrawer })));
+const TawkToChat        = lazy(() => import('@/components/TawkToChat').then(m => ({ default: m.TawkToChat })));
+const SimpleChatbot     = lazy(() => import('@/components/SimpleChatbot').then(m => ({ default: m.SimpleChatbot })));
 
 const Index = () => {
   const { fetchContent, content } = useContentStore();
@@ -207,25 +209,29 @@ const Index = () => {
         <SectionDivider />
         <ProductsSection />
         <SectionDivider />
-        <ProcessShowcase />
-        <SectionDivider />
-        <FeaturesSection />
-        <SectionDivider />
-        <FloatingBenefits />
-        <SectionDivider />
-        <TestimonialsSection />
-        <SectionDivider />
-        {content.instagram_enabled && <InstagramSection />}
-        {content.instagram_enabled && <SectionDivider />}
-        <FAQSection />
-        <SectionDivider />
-        <CTASection />
+        <Suspense fallback={null}>
+          <ProcessShowcase />
+          <SectionDivider />
+          <FeaturesSection />
+          <SectionDivider />
+          <FloatingBenefits />
+          <SectionDivider />
+          <TestimonialsSection />
+          <SectionDivider />
+          {content.instagram_enabled && <InstagramSection />}
+          {content.instagram_enabled && <SectionDivider />}
+          <FAQSection />
+          <SectionDivider />
+          <CTASection />
+        </Suspense>
       </main>
-      <Footer />
-      <FloatingCart />
-      <CartDrawer />
-      <SimpleChatbot />
-      <TawkToChat />
+      <Suspense fallback={null}>
+        <Footer />
+        <FloatingCart />
+        <CartDrawer />
+        <SimpleChatbot />
+        <TawkToChat />
+      </Suspense>
     </div>
   );
 };

@@ -3,6 +3,9 @@ import { MapPin, MessageCircle, Instagram, Shield, Clock, Truck } from 'lucide-r
 import { clientConfig } from '@/config/client';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
+import { RevealText } from '@/components/ui/RevealText';
+import { PremiumButton } from '@/components/ui/PremiumButton';
+import { TiltCard } from '@/components/ui/TiltCard';
 
 export default function About() {
   const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
@@ -11,9 +14,9 @@ export default function About() {
       <Header />
       <main className="pt-24 pb-20 px-4 max-w-4xl mx-auto">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <h1 className="text-3xl md:text-4xl font-black mb-6">
+          <RevealText as="h1" className="text-3xl md:text-4xl font-black mb-6">
             Sobre a <span style={{ color: '#F5B700' }}>{clientConfig.company.name} {clientConfig.company.nameHighlight}</span>
-          </h1>
+          </RevealText>
           <p className="text-sm leading-relaxed mb-8" style={{ color: '#a6a6aa' }}>
             A {clientConfig.company.name} {clientConfig.company.nameHighlight} atende clientes de {clientConfig.company.location.city} e região
             com smartphones, smartwatches, acessórios e assistência técnica. Todos os produtos são originais, com garantia e condições
@@ -26,10 +29,10 @@ export default function About() {
               { icon: Truck, label: 'Entrega rápida para a região' },
               { icon: Clock, label: 'Atendimento direto e ágil' },
             ].map(({ icon: Icon, label }) => (
-              <div key={label} className="p-5 rounded-2xl" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <TiltCard key={label} className="p-5" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <Icon className="w-5 h-5 mb-3" style={{ color: '#F5B700' }} />
                 <p className="text-xs font-medium" style={{ color: '#ccc' }}>{label}</p>
-              </div>
+              </TiltCard>
             ))}
           </div>
 
@@ -42,9 +45,9 @@ export default function About() {
             </div>
           </div>
 
-          <a href={wa} target="_blank" rel="noopener noreferrer" className="btn-gold inline-flex items-center gap-2 px-6 py-3 text-sm">
+          <PremiumButton href={wa} target="_blank" rel="noopener noreferrer" variant="primary" className="px-6 py-3 text-sm">
             <MessageCircle className="w-4 h-4" /> Falar no WhatsApp
-          </a>
+          </PremiumButton>
         </motion.div>
       </main>
       <Footer />

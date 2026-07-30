@@ -12,6 +12,9 @@ import { Label } from '@/components/ui/label';
 import { generatePixPayload, formatPixKeyForPayload } from '@/lib/pix/brcode';
 import { trackEvent } from '@/lib/analytics/track';
 import { saveOrder } from '@/lib/orders/orderStore';
+import { RevealText } from '@/components/ui/RevealText';
+import { PremiumButton } from '@/components/ui/PremiumButton';
+import { spawnRipple } from '@/lib/utils/ripple';
 
 type Step = 'info' | 'payment' | 'success';
 type PaymentMethod = 'pix' | 'stripe' | 'mercadopago';
@@ -110,9 +113,9 @@ export default function Checkout() {
         <div className="text-center space-y-4">
           <ShoppingBag className="w-12 h-12 mx-auto text-primary/40" />
           <p className="text-white font-bold">Carrinho vazio</p>
-          <button onClick={() => navigate('/')} className="btn-gold text-sm">
-            <ArrowLeft className="w-4 h-4 mr-2 inline" />Voltar à loja
-          </button>
+          <PremiumButton onClick={() => navigate('/')} variant="primary" className="text-sm">
+            <ArrowLeft className="w-4 h-4" />Voltar à loja
+          </PremiumButton>
         </div>
       </div>
     );
@@ -330,8 +333,8 @@ export default function Checkout() {
         {step === 'info' && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <div className="rounded-2xl p-6 space-y-5"
-              style={{ background: 'hsla(220,20%,7%,0.8)', border: '1px solid hsla(43,96%,52%,0.1)' }}>
-              <h2 className="text-lg font-bold text-white">Seus dados</h2>
+              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(43,96%,52%,0.1)' }}>
+              <RevealText as="h2" className="text-lg font-bold text-white">Seus dados</RevealText>
               <form onSubmit={handleInfoSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
@@ -357,7 +360,7 @@ export default function Checkout() {
                 </div>
 
                 <div className="p-4 rounded-xl space-y-2"
-                  style={{ background: 'hsla(220,20%,10%,0.8)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
+                  style={{ background: 'hsla(240,6%,20%,0.85)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
                   <p className="text-xs font-bold text-white/60 mb-3">Resumo do pedido</p>
                   {items.map(item => (
                     <div key={item.product.id} className="flex items-center justify-between text-xs">
@@ -371,9 +374,9 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-gold w-full flex items-center justify-center gap-2 text-sm">
+                <PremiumButton type="submit" variant="primary" className="w-full text-sm">
                   Continuar para pagamento <ArrowLeft className="w-4 h-4 rotate-180" />
-                </button>
+                </PremiumButton>
               </form>
             </div>
           </motion.div>
@@ -383,14 +386,14 @@ export default function Checkout() {
         {step === 'payment' && !method && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div className="rounded-2xl p-6"
-              style={{ background: 'hsla(220,20%,7%,0.8)', border: '1px solid hsla(43,96%,52%,0.1)' }}>
-              <h2 className="text-lg font-bold text-white mb-2">Escolha o pagamento</h2>
+              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(43,96%,52%,0.1)' }}>
+              <RevealText as="h2" className="text-lg font-bold text-white mb-2">Escolha o pagamento</RevealText>
               <p className="text-xs text-white/40 mb-5">Total: <span className="text-primary font-bold">{fmt(total)}</span></p>
 
               <div className="space-y-3">
                 {paymentConfig.pix_enabled && paymentConfig.pix_key && (
-                  <button onClick={() => setMethod('pix')} disabled={processing}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all hover:scale-[1.01]"
+                  <button onClick={(e) => { spawnRipple(e.currentTarget, e.clientX, e.clientY); setMethod('pix'); }} disabled={processing}
+                    className="ripple-container glow-on-hover w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
                     style={{ background: 'hsla(142,71%,45%,0.08)', border: '1px solid hsla(142,71%,45%,0.25)' }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{ background: 'hsla(142,71%,45%,0.15)' }}>
@@ -406,8 +409,8 @@ export default function Checkout() {
                 )}
 
                 {paymentConfig.stripe_enabled && paymentConfig.stripe_public_key && (
-                  <button onClick={handleStripePayment} disabled={processing}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all hover:scale-[1.01]"
+                  <button onClick={(e) => { spawnRipple(e.currentTarget, e.clientX, e.clientY); handleStripePayment(); }} disabled={processing}
+                    className="ripple-container glow-on-hover w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
                     style={{ background: 'hsla(200,100%,60%,0.06)', border: '1px solid hsla(200,100%,60%,0.2)' }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{ background: 'hsla(200,100%,60%,0.12)' }}>
@@ -421,8 +424,8 @@ export default function Checkout() {
                 )}
 
                 {paymentConfig.mercadopago_enabled && paymentConfig.mercadopago_public_key && (
-                  <button onClick={handleMercadoPagoPayment} disabled={processing}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all hover:scale-[1.01]"
+                  <button onClick={(e) => { spawnRipple(e.currentTarget, e.clientX, e.clientY); handleMercadoPagoPayment(); }} disabled={processing}
+                    className="ripple-container glow-on-hover w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
                     style={{ background: 'hsla(200,100%,50%,0.06)', border: '1px solid hsla(200,100%,50%,0.2)' }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{ background: 'hsla(200,100%,50%,0.12)' }}>
@@ -458,13 +461,13 @@ export default function Checkout() {
         {step === 'payment' && method === 'pix' && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <div className="rounded-2xl p-6 space-y-5"
-              style={{ background: 'hsla(220,20%,7%,0.8)', border: '1px solid hsla(142,71%,45%,0.15)' }}>
+              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(142,71%,45%,0.15)' }}>
               <div className="text-center">
                 <div className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center"
                   style={{ background: 'hsla(142,71%,45%,0.15)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
                   <QrCode className="w-7 h-7 text-green-400" />
                 </div>
-                <h2 className="text-lg font-bold text-white">Pague com Pix</h2>
+                <RevealText as="h2" className="text-lg font-bold text-white">Pague com Pix</RevealText>
                 <p className="text-xs text-white/40 mt-1">Escaneie o QR ou copie o código</p>
               </div>
 
@@ -497,7 +500,7 @@ export default function Checkout() {
                     <Label className="text-xs text-white/60">Pix Copia e Cola</Label>
                     <div className="relative">
                       <div className="p-3 pr-24 rounded-xl text-[10px] font-mono break-all max-h-24 overflow-y-auto"
-                        style={{ background: 'hsla(220,20%,10%,0.8)', border: '1px solid hsla(255,255%,255%,0.1)', color: 'hsla(45,20%,96%,0.7)' }}>
+                        style={{ background: 'hsla(240,6%,20%,0.85)', border: '1px solid hsla(255,255%,255%,0.1)', color: 'hsla(45,20%,96%,0.7)' }}>
                         {pixCode}
                       </div>
                       <button onClick={copyPix}
@@ -515,11 +518,10 @@ export default function Checkout() {
                     <p className="text-white/60"><strong className="text-white/80">Pedido:</strong> #{orderId}</p>
                   </div>
 
-                  <button onClick={() => handlePaymentSuccess('pix')}
-                    className="btn-gold w-full flex items-center justify-center gap-2 text-sm">
+                  <PremiumButton onClick={() => handlePaymentSuccess('pix')} variant="primary" className="w-full text-sm">
                     <CheckCircle2 className="w-4 h-4" />
                     Já paguei
-                  </button>
+                  </PremiumButton>
                 </>
               )}
             </div>
@@ -530,12 +532,12 @@ export default function Checkout() {
         {step === 'success' && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
             <div className="rounded-2xl p-8 text-center space-y-5"
-              style={{ background: 'hsla(220,20%,7%,0.8)', border: '1px solid hsla(142,71%,45%,0.2)' }}>
+              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(142,71%,45%,0.2)' }}>
               <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
                 style={{ background: 'hsla(142,71%,45%,0.15)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
                 <CheckCircle2 className="w-8 h-8 text-green-400" />
               </div>
-              <h2 className="text-xl font-black text-white">Pedido Confirmado!</h2>
+              <RevealText as="h2" className="text-xl font-black text-white">Pedido Confirmado!</RevealText>
               <p className="text-sm text-white/50">
                 Pedido <span className="text-primary font-bold">#{orderId}</span> registrado com sucesso.
               </p>
@@ -545,19 +547,17 @@ export default function Checkout() {
                   <p className="text-xs text-white/40">
                     Envie o comprovante pelo WhatsApp para agilizar a entrega:
                   </p>
-                  <button onClick={redirectWhatsApp}
-                    className="btn-gold w-full flex items-center justify-center gap-2 text-sm">
+                  <PremiumButton onClick={redirectWhatsApp} variant="primary" className="w-full text-sm">
                     <MessageCircle className="w-4 h-4" />
                     Enviar comprovante no WhatsApp
-                  </button>
+                  </PremiumButton>
                 </div>
               )}
 
-              <button onClick={() => navigate('/')}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white/60 hover:text-white transition-colors"
-                style={{ border: '1px solid hsla(255,255%,255%,0.1)' }}>
+              <PremiumButton onClick={() => navigate('/')} variant="secondary"
+                className="w-full py-2.5 text-sm font-semibold text-white/60 hover:text-white">
                 Voltar à loja
-              </button>
+              </PremiumButton>
             </div>
           </motion.div>
         )}

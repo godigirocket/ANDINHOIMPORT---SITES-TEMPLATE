@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
-import { useReveal } from '@/lib/hooks/useReveal';
+import { RevealText } from '@/components/ui/RevealText';
+import { TiltCard } from '@/components/ui/TiltCard';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -18,7 +19,6 @@ const DEFAULT: Testimonial[] = [
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);
   const [current, setCurrent] = useState(0);
-  const titleRef = useReveal<HTMLHeadingElement>();
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -44,15 +44,14 @@ export function TestimonialsSection() {
     <section id="testimonials" className="relative py-16 md:py-24" style={{ background: 'hsl(28,18%,14%)' }}>
       <div className="relative max-w-2xl mx-auto px-4">
         <div className="mb-8 text-center">
-          <h2 ref={titleRef} className="mask-reveal font-black text-2xl md:text-3xl tracking-tight">
-            <span className="mask-reveal-inner">
-              O que dizem <span className="gradient-text">nossos clientes</span>
-            </span>
-          </h2>
+          <RevealText as="h2" className="font-black text-2xl md:text-3xl tracking-tight">
+            O que dizem <span className="gradient-text">nossos clientes</span>
+          </RevealText>
         </div>
 
-        {/* 1 depoimento por vez com crossfade sobreposto (sem instante em branco) */}
-        <div className="relative min-h-[180px]">
+        {/* Card de depoimento com profundidade (tilt 3D) — crossfade sobreposto por dentro */}
+        <TiltCard intensity={4} className="relative min-h-[220px] p-8"
+          style={{ background: 'hsla(28,14%,20%,0.6)', border: '1px solid hsla(43,96%,52%,0.12)', backdropFilter: 'blur(12px)' }}>
           <AnimatePresence>
             <motion.div
               key={t.id}
@@ -60,7 +59,7 @@ export function TestimonialsSection() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex flex-col items-center justify-center text-center w-full"
+              className="absolute inset-0 flex flex-col items-center justify-center text-center w-full px-8"
             >
               {/* Stars */}
               <div className="flex justify-center gap-1 mb-4">
@@ -88,7 +87,7 @@ export function TestimonialsSection() {
               </div>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </TiltCard>
 
         {/* Dots indicator */}
         <div className="flex justify-center gap-1.5 mt-6">

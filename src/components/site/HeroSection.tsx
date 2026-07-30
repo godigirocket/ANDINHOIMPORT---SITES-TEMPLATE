@@ -6,10 +6,11 @@ import { useContentStore } from '@/lib/stores/contentStore';
 import { useParallax } from '@/hooks/useParallax';
 import { useTilt3D } from '@/hooks/useTilt3D';
 import { scrollToElement } from '@/lib/utils/scrollTo';
+import { PremiumButton } from '@/components/ui/PremiumButton';
 
 const FALLBACK_IMAGES = [
-  'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1600&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1600&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1600&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1600&q=85&auto=format&fit=crop',
 ];
 
 const iconMap: Record<string, React.ElementType> = { ShieldCheck, Zap, Award };
@@ -106,18 +107,15 @@ export function HeroSection() {
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.65, delay: 0.34 }}
             className="flex flex-wrap gap-3">
-            <a href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
-              className="btn-gold flex items-center gap-2 text-sm">
+            <PremiumButton href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
+              variant="primary" className="text-sm">
               <MessageCircle className="w-4 h-4" />
               {content.cta_primary_text || hero.ctaPrimary}
-            </a>
-            <button
-              onClick={() => scrollToElement('#products')}
-              className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
-              style={{ border: '1px solid hsla(255,255%,255%,0.18)', color: 'hsla(45,20%,96%,0.75)', background: 'hsla(240,6%,17%,0.4)' }}>
+            </PremiumButton>
+            <PremiumButton onClick={() => scrollToElement('#products')} variant="secondary" className="text-sm">
               {content.cta_secondary_text || hero.ctaSecondary}
               <ChevronDown className="w-4 h-4" />
-            </button>
+            </PremiumButton>
           </motion.div>
         </div>
       </div>

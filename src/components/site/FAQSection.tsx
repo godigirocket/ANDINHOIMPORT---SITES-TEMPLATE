@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { clientConfig } from '@/config/client';
+import { RevealText } from '@/components/ui/RevealText';
 
 const FAQ_ITEMS = [
   { q: 'Onde fica a Andinho Import?', a: `Atendemos em ${clientConfig.company.location.city}, ${clientConfig.company.location.state}. Consulte disponibilidade e opções de entrega pelo WhatsApp.` },
@@ -20,16 +21,11 @@ export function FAQSection() {
   return (
     <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(262,20%,16%) 50%, hsl(240,6%,11%) 100%)' }}>
       <div className="max-w-3xl mx-auto px-4">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
+        <div className="text-center mb-12">
+          <RevealText as="h2" className="font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
             Perguntas <span style={{ color: '#F5B700' }}>Frequentes</span>
-          </h2>
-        </motion.div>
+          </RevealText>
+        </div>
 
         <div className="space-y-2">
           {FAQ_ITEMS.map((item, i) => (
@@ -42,7 +38,7 @@ export function FAQSection() {
             >
               <button
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
-                className="w-full flex items-center justify-between p-5 rounded-xl text-left transition-all"
+                className="glow-on-hover w-full flex items-center justify-between p-5 rounded-xl text-left transition-all"
                 style={{
                   background: openIdx === i ? 'rgba(245,183,0,0.06)' : 'hsl(262,14%,18%)',
                   border: `1px solid ${openIdx === i ? 'rgba(245,183,0,0.2)' : 'rgba(255,255,255,0.04)'}`,

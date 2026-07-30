@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { type ProductData, getWhatsAppUrl } from '@/data/products';
+import { TiltCard } from '@/components/ui/TiltCard';
+import { spawnRipple } from '@/lib/utils/ripple';
 
 interface Props {
   product: ProductData;
@@ -10,91 +11,39 @@ interface Props {
 }
 
 /**
- * Card 3D com tilt baseado no cursor.
- * Mobile: entrada suave sem tilt.
- * Usa CSS perspective + rotateX/Y + translateZ.
+ * Card de produto padrão do site — mesmo TiltCard usado em Produtos,
+ * Depoimentos e Benefícios, pra manter um único sistema de cards.
  */
 export function ProductTiltCard({ product, index, onClick }: Props) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    setTilt({
-      x: (y - 0.5) * -8, // max 4deg each side
-      y: (x - 0.5) * 8,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
-    setIsHovered(false);
-  };
-
   const fmt = (n: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
   return (
     <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      className="relative cursor-pointer group"
-      style={{ perspective: '1000px' }}
+      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div
-        className="relative rounded-2xl overflow-hidden transition-all duration-300 ease-out"
-        style={{
-          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(${isHovered ? '12px' : '0px'})`,
-          transformStyle: 'preserve-3d',
-          background: 'linear-gradient(145deg, #0c0c0f 0%, #08080a 100%)',
-          border: `1px solid ${isHovered ? 'rgba(245,183,0,0.3)' : 'rgba(245,183,0,0.06)'}`,
-          boxShadow: isHovered
-            ? '0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(245,183,0,0.08)'
-            : '0 8px 30px rgba(0,0,0,0.4)',
-        }}
+      <TiltCard
+        onClick={onClick}
+        className="overflow-hidden cursor-pointer group relative"
+        style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(245,183,0,0.08)', boxShadow: '0 8px 30px rgba(0,0,0,0.4)' }}
       >
         {/* Image area */}
-        <div className="relative aspect-square overflow-hidden" style={{ background: 'hsl(240,6%,16%)' }}>
+        <div className="relative aspect-square overflow-hidden flex items-center justify-center" style={{ background: 'hsl(240,6%,13%)' }}>
           <img
             src={product.image}
             alt={`${product.title} ${product.storage} ${product.color}`}
-            className="w-full h-full object-contain p-6 transition-transform duration-500"
-            style={{
-              transform: `translateZ(30px) scale(${isHovered ? 1.05 : 1})`,
-            }}
+            className="product-reflect w-full h-full object-contain p-6 group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
-          />
-
-          {/* Reflection sweep on hover */}
-          <div
-            className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-            style={{
-              opacity: isHovered ? 1 : 0,
-              background: 'linear-gradient(115deg, transparent 30%, rgba(245,183,0,0.03) 45%, transparent 60%)',
-            }}
           />
 
           {/* Badge */}
           {product.badge && (
             <span
               className="absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide"
-              style={{
-                background: 'linear-gradient(135deg, #F5B700, #d4a000)',
-                color: '#050505',
-                boxShadow: '0 4px 12px rgba(245,183,0,0.3)',
-                transform: 'translateZ(40px)',
-              }}
+              style={{ background: 'linear-gradient(135deg, #F5B700, #d4a000)', color: '#050505', boxShadow: '0 4px 12px rgba(245,183,0,0.3)' }}
             >
               {product.badge}
             </span>
@@ -104,11 +53,7 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
           {product.availability === 'Pronta entrega' && (
             <span
               className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-semibold"
-              style={{
-                background: 'rgba(245,183,0,0.12)',
-                border: '1px solid rgba(245,183,0,0.3)',
-                color: 'hsl(43,96%,52%)',
-              }}
+              style={{ background: 'rgba(245,183,0,0.12)', border: '1px solid rgba(245,183,0,0.3)', color: 'hsl(43,96%,52%)' }}
             >
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'hsl(43,96%,52%)' }} />
               Disponível
@@ -153,19 +98,16 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
               href={getWhatsAppUrl(product)}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all"
-              style={{
-                background: 'linear-gradient(135deg, #F5B700, #d4a000)',
-                color: '#050505',
-              }}
+              onClick={(e) => { e.stopPropagation(); spawnRipple(e.currentTarget, e.clientX, e.clientY); }}
+              className="glow-on-hover ripple-container flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all"
+              style={{ background: 'linear-gradient(135deg, #F5B700, #d4a000)', color: '#050505' }}
             >
               <MessageCircle className="w-3 h-3" />
               Consultar
             </a>
           </div>
         </div>
-      </div>
+      </TiltCard>
     </motion.div>
   );
 }

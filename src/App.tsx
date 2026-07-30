@@ -2,9 +2,10 @@ import { lazy, Suspense } from 'react';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { SmoothScrollProvider } from '@/components/scroll/SmoothScroll';
+import { PremiumCursor } from '@/components/site/PremiumCursor';
 import Index from './pages/Index';
 
 // Rotas fora da home carregam sob demanda — reduz o JS que o visitante
@@ -40,6 +41,12 @@ const queryClient = new QueryClient({
   },
 });
 
+function StorefrontCursor() {
+  const location = useLocation();
+  if (location.pathname.startsWith('/admin')) return null;
+  return <PremiumCursor />;
+}
+
 function RouteFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(240,6%,11%)' }}>
@@ -55,6 +62,7 @@ const App = () => (
         <Sonner richColors position="top-right" />
         <BrowserRouter>
           <SmoothScrollProvider>
+          <StorefrontCursor />
           <Suspense fallback={<RouteFallback />}>
           <Routes>
             {/* Public */}

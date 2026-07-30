@@ -7,6 +7,8 @@ import { ProductTiltCard } from '@/components/3d/ProductTiltCard';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
 import { clientConfig } from '@/config/client';
+import { RevealText } from '@/components/ui/RevealText';
+import { PremiumButton } from '@/components/ui/PremiumButton';
 
 export default function Products() {
   const navigate = useNavigate();
@@ -30,10 +32,10 @@ export default function Products() {
             <span style={{ color: '#F5B700' }}>Produtos</span>
           </nav>
 
-          <h1 className="text-3xl md:text-4xl font-black mb-3">
+          <RevealText as="h1" className="text-3xl md:text-4xl font-black mb-3">
             <span className="text-white">Nossos </span>
             <span style={{ color: '#F5B700' }}>Produtos</span>
-          </h1>
+          </RevealText>
           <p className="text-sm mb-8 max-w-lg" style={{ color: '#a6a6aa' }}>
             iPhones, smartphones Xiaomi, smartwatches e acessórios originais
             com garantia, parcelamento facilitado e atendimento direto em {clientConfig.company.location.city}.
@@ -74,14 +76,15 @@ export default function Products() {
             <p className="text-sm mb-4" style={{ color: '#888' }}>
               Não encontrou o modelo que procura?
             </p>
-            <a
+            <PremiumButton
               href={`https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent('Olá! Gostaria de consultar modelos disponíveis.')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-gold inline-flex items-center gap-2 px-6 py-3 text-sm"
+              variant="primary"
+              className="px-6 py-3 text-sm"
             >
               <MessageCircle className="w-4 h-4" /> Consultar mais modelos
-            </a>
+            </PremiumButton>
           </div>
         </motion.div>
       </main>

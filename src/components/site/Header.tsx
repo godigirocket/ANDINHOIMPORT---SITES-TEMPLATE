@@ -82,9 +82,8 @@ export function Header() {
           <nav className="hidden md:flex items-center gap-7">
             {navLinks.map((link) => (
               <a key={link.href} href={link.href}
-                className="text-[11px] font-bold tracking-[0.12em] text-white/55 hover:text-white transition-colors uppercase relative group">
+                className="hover-underline text-[11px] font-bold tracking-[0.12em] text-white/55 hover:text-white transition-colors uppercase">
                 {link.label}
-                <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
               </a>
             ))}
           </nav>

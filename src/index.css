@@ -61,6 +61,18 @@
   }
   img { -webkit-user-drag: none; user-select: none; }
   ::selection { background: hsla(43,96%,52%,0.3); color: white; }
+
+  /* Scrollbar customizada */
+  html { scrollbar-width: thin; scrollbar-color: hsla(43,96%,52%,0.35) hsl(240,6%,9%); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: hsl(240,6%,9%); }
+  ::-webkit-scrollbar-thumb {
+    background-color: hsla(43,96%,52%,0.35);
+    border-radius: 999px;
+    border: 2px solid hsl(240,6%,9%);
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background-color: hsla(43,96%,52%,0.55); background-clip: padding-box; }
 }
 
 @layer components {
@@ -73,19 +85,6 @@
     @apply backdrop-blur-xl rounded-2xl border;
     background: hsla(220,14%,16%,0.8);
     border-color: hsla(220,10%,28%,0.5);
-  }
-  /* Futuristic neon card */
-  .neon-card {
-    @apply rounded-2xl border relative overflow-hidden;
-    background: linear-gradient(135deg, hsla(220,14%,17%,0.9) 0%, hsla(220,14%,14%,0.95) 100%);
-    border-color: hsla(43,96%,52%,0.15);
-    box-shadow: 0 0 0 1px hsla(43,96%,52%,0.08), inset 0 1px 0 hsla(255,255%,255%,0.05);
-    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-  }
-  .neon-card:hover {
-    border-color: hsla(43,96%,52%,0.35);
-    box-shadow: 0 0 0 1px hsla(43,96%,52%,0.2), 0 0 30px hsla(43,96%,52%,0.1), inset 0 1px 0 hsla(255,255%,255%,0.08);
-    transform: translateY(-2px);
   }
   /* Pill glow button */
   .btn-gold {
@@ -124,18 +123,6 @@
   .gradient-primary { background: linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%)); }
   .gradient-accent  { background: linear-gradient(135deg, hsl(43,96%,52%), hsl(48,100%,65%)); }
   .shadow-glow      { box-shadow: 0 0 30px hsla(43,96%,52%,0.2); }
-  .shadow-neon      { box-shadow: 0 0 15px hsla(43,96%,52%,0.15); }
-  .hover-lift { @apply transition-all duration-300; }
-  .hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
-  /* Scan line effect */
-  .scan-line::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(transparent 0%, hsla(43,96%,52%,0.03) 50%, transparent 100%);
-    background-size: 100% 4px;
-    pointer-events: none;
-  }
 }
 
 @layer utilities {
@@ -159,10 +146,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  .animate-glow-pulse,
-  .animate-float-y,
-  .animate-ambient-drift,
-  .animate-rotate-slow { animation: none !important; }
+  .animate-glow-pulse { animation: none !important; }
 }
 
 /* ── Stagger children (use with reveal-group) ── */
@@ -184,61 +168,10 @@
   transform: translateY(0);
 }
 
-/* ── Consistent Design Tokens ── */
-.card-base {
-  border-radius: var(--radius);
-  border: 1px solid hsl(var(--border));
-  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-}
-.card-base:hover {
-  border-color: hsla(var(--primary) / 0.3);
-  box-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.4), 0 0 0 1px hsla(var(--primary) / 0.1);
-}
-.btn-base {
-  @apply font-semibold rounded-xl px-5 py-2.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
-  border-radius: var(--radius);
-}
-.section-spacing {
-  @apply py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8;
-}
-
 /* ── Premium keyframes ── */
 @keyframes glow-pulse {
   0%,100% { box-shadow: 0 0 20px hsla(43,96%,52%,0.3); }
   50%      { box-shadow: 0 0 50px hsla(43,96%,52%,0.6), 0 0 80px hsla(43,96%,52%,0.2); }
-}
-@keyframes float-y {
-  0%,100% { transform: translateY(0px); }
-  50%      { transform: translateY(-10px); }
-}
-@keyframes shimmer-sweep {
-  0%   { transform: translateX(-100%) skewX(-15deg); }
-  100% { transform: translateX(300%) skewX(-15deg); }
-}
-@keyframes border-glow {
-  0%,100% { border-color: hsla(43,96%,52%,0.2); }
-  50%      { border-color: hsla(43,96%,52%,0.6); }
-}
-@keyframes ambient-drift {
-  0%,100% { transform: translate(0,0) scale(1); }
-  33%      { transform: translate(30px,-20px) scale(1.05); }
-  66%      { transform: translate(-20px,15px) scale(0.98); }
-}
-@keyframes particle-rise {
-  0%   { transform: translateY(0) translateX(0); opacity: 0; }
-  10%  { opacity: 0.8; }
-  90%  { opacity: 0.4; }
-  100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
-}
-@keyframes scan-h {
-  0%   { transform: translateY(-100%); opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-@keyframes rotate-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
 }
 @keyframes kenburns {
   0%,100% { transform: scale(1); }
@@ -246,9 +179,6 @@
 }
 
 .animate-glow-pulse    { animation: glow-pulse 2.5s ease-in-out infinite; }
-.animate-float-y       { animation: float-y 4s ease-in-out infinite; }
-.animate-ambient-drift { animation: ambient-drift 12s ease-in-out infinite; }
-.animate-rotate-slow   { animation: rotate-slow 20s linear infinite; }
 .animate-kenburns      { animation: kenburns 14s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -329,23 +259,21 @@
   .mask-reveal .mask-reveal-inner { transform: none; transition: none; }
 }
 
-/* ── Ícone social com label deslizando no hover ── */
+/* ── Ícone social com label deslizando no hover (transform-only) ── */
 .social-slide {
   display: inline-flex;
   align-items: center;
-  overflow: hidden;
 }
 .social-slide .social-slide-label {
-  max-width: 0;
+  display: inline-block;
   opacity: 0;
   white-space: nowrap;
-  overflow: hidden;
-  transition: max-width 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.25s ease, margin-left 0.35s ease;
+  transform: translateX(-6px);
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.25s ease;
 }
 .social-slide:hover .social-slide-label {
-  max-width: 140px;
   opacity: 1;
-  margin-left: 0.5rem;
+  transform: translateX(0);
 }
 
 /* ── Letras que respondem individualmente ao hover ── */
@@ -356,4 +284,111 @@
 .char-hover-group:hover .char:hover {
   transform: translateY(-6px);
   color: hsl(43,96%,52%);
+}
+
+/* ══════════════════ Design system — camada premium ══════════════════ */
+
+/* Botão outline (variante secundária do PremiumButton) */
+.btn-outline-premium {
+  @apply font-bold rounded-full px-7 py-3 transition-all relative overflow-hidden;
+  border: 1px solid hsla(255,255%,255%,0.15);
+  color: hsla(45,20%,96%,0.85);
+  background: hsla(240,6%,16%,0.5);
+  backdrop-filter: blur(8px);
+}
+.btn-outline-premium:hover {
+  border-color: hsla(43,96%,52%,0.4);
+  color: white;
+  transform: translateY(-1px);
+}
+.btn-outline-premium:active { transform: scale(0.98); }
+
+/* Ripple — só existe durante o clique, nunca contínuo */
+.ripple-container { position: relative; overflow: hidden; }
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: hsla(255,255%,255%,0.45);
+  pointer-events: none;
+  animation: ripple-anim 0.6s ease-out;
+}
+@keyframes ripple-anim { to { transform: scale(1); opacity: 0; } }
+
+/* Cursor premium — desktop com mouse fino, nunca em touch */
+.premium-cursor-dot, .premium-cursor-ring-wrap {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+.premium-cursor-dot {
+  width: 6px; height: 6px;
+  margin-left: -3px; margin-top: -3px;
+  border-radius: 50%;
+  background: hsl(43,96%,52%);
+}
+.premium-cursor-ring-visual {
+  width: 32px; height: 32px;
+  margin-left: -16px; margin-top: -16px;
+  border-radius: 50%;
+  border: 1px solid hsla(43,96%,52%,0.5);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s ease, background-color 0.2s ease;
+}
+.cursor-ring-active .premium-cursor-ring-visual {
+  transform: scale(1.4);
+  border-color: hsla(43,96%,52%,0.9);
+  background: hsla(43,96%,52%,0.08);
+}
+body.has-premium-cursor, body.has-premium-cursor * { cursor: none !important; }
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .premium-cursor-dot, .premium-cursor-ring-wrap { display: none !important; }
+}
+
+/* Mesh gradient + spotlight + noise — fundo premium reutilizável */
+.mesh-bg-gradient {
+  position: absolute; inset: -10%;
+  background:
+    radial-gradient(circle at 20% 20%, hsla(43,96%,52%,0.10), transparent 42%),
+    radial-gradient(circle at 82% 28%, hsla(224,70%,55%,0.08), transparent 42%),
+    radial-gradient(circle at 50% 85%, hsla(150,55%,45%,0.06), transparent 42%);
+  filter: blur(50px);
+}
+.mesh-bg-spotlight {
+  position: absolute; inset: 0;
+  background: radial-gradient(360px circle at var(--spot-x, 50%) var(--spot-y, 30%), hsla(43,96%,52%,0.07), transparent 70%);
+}
+.mesh-bg-noise {
+  position: absolute; inset: 0;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Divisor com brilho em movimento — transform-only, GPU-safe */
+.divider-glow-line { position: relative; overflow: hidden; }
+.divider-glow-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 30%; height: 100%;
+  background: linear-gradient(90deg, transparent, hsla(43,96%,52%,0.9), transparent);
+  animation: divider-sweep 4s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes divider-sweep {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  15%, 85% { opacity: 1; }
+  50%  { transform: translateX(233%); }
+  100% { transform: translateX(233%); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .divider-glow-line::after { animation: none; opacity: 0; }
+}
+
+/* Reflexo de produto — puro CSS, sem animação (Chrome/Safari/Edge;
+   degrada bem em navegadores sem suporte, sem quebrar nada) */
+.product-reflect {
+  -webkit-box-reflect: below 2px linear-gradient(to bottom, transparent, transparent 55%, hsla(255,255%,255%,0.12));
 }

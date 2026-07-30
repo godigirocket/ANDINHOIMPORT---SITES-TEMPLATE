@@ -1,6 +1,7 @@
 import { CreditCard, Shield, Package, Truck } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { useReveal } from '@/lib/hooks/useReveal';
+import { RevealText } from '@/components/ui/RevealText';
+import { TiltCard } from '@/components/ui/TiltCard';
 
 const benefits = [
   { icon: CreditCard, number: '18x', text: 'Parcelamento facilitado', delay: 0 },
@@ -11,59 +12,38 @@ const benefits = [
 
 export function FloatingBenefits() {
   const gridRef = useScrollAnimation<HTMLDivElement>('.gsap-item', 0.15);
-  const titleRef = useReveal<HTMLHeadingElement>();
 
   return (
     <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(150,18%,14%) 50%, hsl(240,6%,11%) 100%)' }}>
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-14">
-          <h2 ref={titleRef} className="mask-reveal font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
-            <span className="mask-reveal-inner">
-              Por que a <span style={{ color: '#F5B700' }}>Andinho Import</span>
-            </span>
-          </h2>
+          <RevealText as="h2" className="font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
+            Por que a <span style={{ color: '#F5B700' }}>Andinho Import</span>
+          </RevealText>
           <p className="text-sm" style={{ color: '#a6a6aa' }}>
             Condições reais, sem surpresas.
           </p>
         </div>
 
-        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{ perspective: '1000px' }}>
-          {benefits.map((b, i) => (
-            <div
-              key={b.text}
-              className="gsap-item relative p-6 rounded-2xl text-center group transition-shadow duration-300"
-              style={{
-                background: 'hsl(150,14%,18%)',
-                border: '1px solid rgba(245,183,0,0.05)',
-                transformStyle: 'preserve-3d',
-                transition: 'transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'translateY(-6px) rotateX(8deg) scale(1.02)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'translateY(0) rotateX(0) scale(1)';
-              }}
-            >
-              {/* Glow on hover */}
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{ boxShadow: 'inset 0 0 30px rgba(245,183,0,0.05)' }}
-              />
+        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {benefits.map((b) => (
+            <div key={b.text} className="gsap-item">
+              <TiltCard className="relative p-6 text-center group"
+                style={{ background: 'hsl(150,14%,18%)', border: '1px solid rgba(245,183,0,0.05)' }}>
+                <div
+                  className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center"
+                  style={{ background: 'rgba(245,183,0,0.08)', border: '1px solid rgba(245,183,0,0.15)' }}
+                >
+                  <b.icon className="w-5 h-5" style={{ color: '#F5B700' }} />
+                </div>
 
-              <div
-                className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(245,183,0,0.08)', border: '1px solid rgba(245,183,0,0.15)' }}
-              >
-                <b.icon className="w-5 h-5" style={{ color: '#F5B700' }} />
-              </div>
-
-              <p className="text-2xl font-black mb-1" style={{ color: '#F5B700' }}>
-                {b.number}
-              </p>
-              <p className="text-xs font-medium" style={{ color: '#ccc' }}>
-                {b.text}
-              </p>
+                <p className="text-2xl font-black mb-1" style={{ color: '#F5B700' }}>
+                  {b.number}
+                </p>
+                <p className="text-xs font-medium" style={{ color: '#ccc' }}>
+                  {b.text}
+                </p>
+              </TiltCard>
             </div>
           ))}
         </div>
