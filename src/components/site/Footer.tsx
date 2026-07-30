@@ -49,14 +49,16 @@ export function Footer() {
             <p className="text-sm text-white/50 mb-6 max-w-sm leading-relaxed">{company.description}</p>
             <div className="flex gap-2">
               <a href={instagramUrl} target="_blank" rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-primary transition-all"
+                className="social-slide px-2.5 h-9 rounded-lg text-white/50 hover:text-primary transition-colors"
                 style={{ background: 'hsla(255,255%,255%,0.05)', border: '1px solid hsla(255,255%,255%,0.1)' }}>
-                <Instagram className="w-4 h-4" />
+                <Instagram className="w-4 h-4 flex-shrink-0" />
+                <span className="social-slide-label text-xs font-semibold">Instagram</span>
               </a>
               <a href={`${whatsappUrl}?text=${waMsg}`} target="_blank" rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-[#25D366] transition-all"
+                className="social-slide px-2.5 h-9 rounded-lg text-white/50 hover:text-[#25D366] transition-colors"
                 style={{ background: 'hsla(255,255%,255%,0.05)', border: '1px solid hsla(255,255%,255%,0.1)' }}>
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4 flex-shrink-0" />
+                <span className="social-slide-label text-xs font-semibold">WhatsApp</span>
               </a>
             </div>
           </div>
@@ -66,7 +68,7 @@ export function Footer() {
             <h4 className="font-bold text-[10px] tracking-widest uppercase text-white/30 mb-4">Navegação</h4>
             <ul className="space-y-2.5 text-sm text-white/50">
               {[['Início','#hero'],['Produtos','#products'],['Benefícios','#features'],['Depoimentos','#testimonials'],['Contato','#cta']].map(([l,h]) => (
-                <li key={h}><a href={h} className="hover:text-white transition-colors">{l}</a></li>
+                <li key={h}><a href={h} className="hover-underline hover:text-white transition-colors">{l}</a></li>
               ))}
             </ul>
           </div>
@@ -76,8 +78,8 @@ export function Footer() {
             <h4 className="font-bold text-[10px] tracking-widest uppercase text-white/30 mb-4">Contato</h4>
             <ul className="space-y-3 text-sm text-white/50">
               <li className="flex items-start gap-2"><MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" /><span>{address}</span></li>
-              <li className="flex items-center gap-2"><Phone className="w-3.5 h-3.5 text-primary flex-shrink-0" /><a href={`tel:${phone}`} className="hover:text-white transition-colors">{phone}</a></li>
-              <li className="flex items-center gap-2"><Mail className="w-3.5 h-3.5 text-primary flex-shrink-0" /><a href={`mailto:${email}`} className="hover:text-white transition-colors truncate text-xs">{email}</a></li>
+              <li className="flex items-center gap-2"><Phone className="w-3.5 h-3.5 text-primary flex-shrink-0" /><a href={`tel:${phone}`} className="hover-underline hover:text-white transition-colors">{phone}</a></li>
+              <li className="flex items-center gap-2"><Mail className="w-3.5 h-3.5 text-primary flex-shrink-0" /><a href={`mailto:${email}`} className="hover-underline hover:text-white transition-colors truncate text-xs">{email}</a></li>
               <li className="pt-1">
                 <a href={`${whatsappUrl}?text=${waMsg}`} target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[#25D366] text-xs font-semibold hover:opacity-80 transition-all"

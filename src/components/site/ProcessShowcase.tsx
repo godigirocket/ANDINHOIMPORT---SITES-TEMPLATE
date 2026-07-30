@@ -7,6 +7,7 @@ import { clientConfig } from '@/config/client';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useProductStore } from '@/lib/stores/productStore';
+import { CharHoverText } from './CharHoverText';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -122,7 +123,7 @@ export function ProcessShowcase() {
                     {PANELS[active].kicker}
                   </p>
                   <h2 className="font-black text-3xl md:text-4xl tracking-tight text-white mb-4 leading-[1.05]">
-                    {PANELS[active].title}
+                    <CharHoverText text={PANELS[active].title} />
                   </h2>
                   <p className="text-sm leading-relaxed" style={{ color: 'hsla(45,20%,96%,0.65)' }}>
                     {PANELS[active].text}

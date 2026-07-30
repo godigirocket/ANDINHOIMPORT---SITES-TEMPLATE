@@ -87,7 +87,7 @@ export function InstagramSection() {
             href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
+            className="glow-on-hover inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
             style={{
               background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
               color: '#fff',

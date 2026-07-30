@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { useReveal } from '@/lib/hooks/useReveal';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -17,6 +18,7 @@ const DEFAULT: Testimonial[] = [
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);
   const [current, setCurrent] = useState(0);
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -41,12 +43,13 @@ export function TestimonialsSection() {
   return (
     <section id="testimonials" className="relative py-16 md:py-24" style={{ background: 'hsl(28,18%,14%)' }}>
       <div className="relative max-w-2xl mx-auto px-4">
-        <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} className="mb-8">
-          <h2 className="font-black text-2xl md:text-3xl tracking-tight text-center">
-            O que dizem <span className="gradient-text">nossos clientes</span>
+        <div className="mb-8 text-center">
+          <h2 ref={titleRef} className="mask-reveal font-black text-2xl md:text-3xl tracking-tight">
+            <span className="mask-reveal-inner">
+              O que dizem <span className="gradient-text">nossos clientes</span>
+            </span>
           </h2>
-        </motion.div>
+        </div>
 
         {/* 1 depoimento por vez com fade */}
         <div className="relative min-h-[180px] flex items-center justify-center">

@@ -92,7 +92,7 @@ export function Header() {
           {/* CTA */}
           <div className="hidden md:flex">
             <a href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 text-[11px] font-bold text-white/70 hover:text-white hover:border-primary/50 hover:bg-primary/8 transition-all tracking-wide">
+              className="glow-on-hover flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 text-[11px] font-bold text-white/70 hover:text-white hover:border-primary/50 hover:bg-primary/8 transition-all tracking-wide">
               <MessageCircle className="w-3.5 h-3.5" />
               FALE CONOSCO
             </a>

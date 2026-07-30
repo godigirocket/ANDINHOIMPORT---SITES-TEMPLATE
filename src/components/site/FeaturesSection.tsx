@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock, LucideIcon } from 'lucide-react';
 import { clientConfig } from '@/config/client';
+import { useReveal } from '@/lib/hooks/useReveal';
 
 const iconMap: Record<string, LucideIcon> = { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock };
 
@@ -17,6 +18,7 @@ const cardAccents = [
 export function FeaturesSection() {
   const { features } = clientConfig.initialContent;
   const waUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(clientConfig.company.contact.whatsappMessage)}`;
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   return (
     <section id="features" className="relative py-24 md:py-32 overflow-hidden">
@@ -31,16 +33,19 @@ export function FeaturesSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
-        <motion.div initial={{ y: 24, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} className="mb-14">
-          <h2 className="font-black text-4xl md:text-5xl tracking-tight mb-3">
-            Por que escolher a{' '}
-            <span className="gradient-text">{clientConfig.company.name} {clientConfig.company.nameHighlight}?</span>
+        <div className="mb-14">
+          <h2 ref={titleRef} className="mask-reveal font-black text-4xl md:text-5xl tracking-tight mb-3">
+            <span className="mask-reveal-inner">
+              Por que escolher a{' '}
+              <span className="gradient-text">{clientConfig.company.name} {clientConfig.company.nameHighlight}?</span>
+            </span>
           </h2>
-          <p className="text-sm max-w-md" style={{ color: 'hsla(45,20%,96%,0.45)' }}>
+          <motion.p initial={{ y: 12, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }} transition={{ delay: 0.3 }}
+            className="text-sm max-w-md" style={{ color: 'hsla(45,20%,96%,0.45)' }}>
             Trabalhamos com transparência e qualidade para garantir sua satisfação
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         {/* Grid 3x2 com cards coloridos */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">

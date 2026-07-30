@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
 import { CreditCard, Shield, Package, Truck } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useReveal } from '@/lib/hooks/useReveal';
 
 const benefits = [
   { icon: CreditCard, number: '18x', text: 'Parcelamento facilitado', delay: 0 },
@@ -11,23 +11,21 @@ const benefits = [
 
 export function FloatingBenefits() {
   const gridRef = useScrollAnimation<HTMLDivElement>('.gsap-item', 0.15);
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   return (
     <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(150,18%,14%) 50%, hsl(240,6%,11%) 100%)' }}>
       <div className="max-w-5xl mx-auto px-4">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-14"
-        >
-          <h2 className="font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
-            Por que a <span style={{ color: '#F5B700' }}>Andinho Import</span>
+        <div className="text-center mb-14">
+          <h2 ref={titleRef} className="mask-reveal font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
+            <span className="mask-reveal-inner">
+              Por que a <span style={{ color: '#F5B700' }}>Andinho Import</span>
+            </span>
           </h2>
           <p className="text-sm" style={{ color: '#a6a6aa' }}>
             Condições reais, sem surpresas.
           </p>
-        </motion.div>
+        </div>
 
         <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{ perspective: '1000px' }}>
           {benefits.map((b, i) => (

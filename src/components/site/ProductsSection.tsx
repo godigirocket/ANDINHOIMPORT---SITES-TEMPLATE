@@ -4,10 +4,12 @@ import { MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
+import { useReveal } from '@/lib/hooks/useReveal';
 
 export function ProductsSection() {
   const navigate = useNavigate();
   const { fetchProducts, getActiveProducts, isLoading } = useProductStore();
+  const titleRef = useReveal<HTMLHeadingElement>();
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -21,20 +23,22 @@ export function ProductsSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
-        <motion.div
-          initial={{ y: 24, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
-          <h2 className="font-black text-3xl md:text-5xl tracking-tight mb-3">
-            <span className="text-white">Nossos </span>
-            <span className="gradient-text">Produtos</span>
+        <div className="text-center mb-10">
+          <h2 ref={titleRef} className="mask-reveal font-black text-3xl md:text-5xl tracking-tight mb-3">
+            <span className="mask-reveal-inner">
+              <span className="text-white">Nossos </span>
+              <span className="gradient-text">Produtos</span>
+            </span>
           </h2>
-          <p className="text-xs md:text-sm max-w-md mx-auto" style={{ color: '#777' }}>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="text-xs md:text-sm max-w-md mx-auto" style={{ color: '#777' }}>
             Modelos selecionados com garantia e parcelamento.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         {/* Grid */}
         {isLoading ? (
@@ -119,7 +123,7 @@ export function ProductsSection() {
                   <p className="text-[11px] mb-4" style={{ color: '#888' }}>
                     ou {product.installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price / product.installments)}
                   </p>
-                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all group-hover:shadow-lg"
+                  <button className="glow-on-hover w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all group-hover:shadow-lg"
                     style={{ background: 'hsl(43,96%,52%)', color: '#050505', boxShadow: '0 4px 12px rgba(245,183,0,0.2)' }}>
                     <MessageCircle className="w-3.5 h-3.5" /> Consultar
                   </button>
