@@ -298,6 +298,21 @@
   .glow-on-hover::before { display: none; }
 }
 
+/* ── Iris reveal — foto que "abre" ao entrar na viewport (IntersectionObserver,
+   imune a bug de posição de scroll calculada antes de imagens carregarem) ── */
+.iris-reveal-target {
+  clip-path: circle(12% at 50% 50%);
+  transform: scale(1.25);
+  transition: clip-path 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+.iris-reveal.visible .iris-reveal-target {
+  clip-path: circle(75% at 50% 50%);
+  transform: scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .iris-reveal-target { clip-path: none; transform: none; transition: none; }
+}
+
 /* ── Masked reveal — texto revelado por uma cortina que desliza ── */
 .mask-reveal {
   position: relative;

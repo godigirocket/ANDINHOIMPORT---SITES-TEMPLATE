@@ -51,16 +51,16 @@ export function TestimonialsSection() {
           </h2>
         </div>
 
-        {/* 1 depoimento por vez com fade */}
-        <div className="relative min-h-[180px] flex items-center justify-center">
-          <AnimatePresence mode="wait">
+        {/* 1 depoimento por vez com crossfade sobreposto (sem instante em branco) */}
+        <div className="relative min-h-[180px]">
+          <AnimatePresence>
             <motion.div
               key={t.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4 }}
-              className="text-center w-full"
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0 flex flex-col items-center justify-center text-center w-full"
             >
               {/* Stars */}
               <div className="flex justify-center gap-1 mb-4">

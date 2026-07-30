@@ -1,13 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Instagram } from 'lucide-react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useReveal } from '@/lib/hooks/useReveal';
 
 const FALLBACK_PHOTO = 'https://images.unsplash.com/photo-1592286927505-1def25115558?w=1000&q=85&auto=format&fit=crop';
 
@@ -15,7 +12,7 @@ export function InstagramSection() {
   const { content } = useContentStore();
   const { products, fetchProducts } = useProductStore();
   const instagramUrl = content.instagram_link || clientConfig.company.social.instagram;
-  const photoRef = useRef<HTMLDivElement>(null);
+  const photoRef = useReveal<HTMLDivElement>();
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -23,33 +20,6 @@ export function InstagramSection() {
   const featuredProductPhoto = products.find(p => p.featured && p.image_url)?.image_url
     || products.find(p => p.image_url)?.image_url;
   const photoSrc = content.instagram_photo || featuredProductPhoto || FALLBACK_PHOTO;
-
-  // Reveal cinematográfico: a foto "abre" em íris ao entrar na viewport
-  useEffect(() => {
-    const el = photoRef.current;
-    if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    gsap.set(el, { clipPath: 'circle(12% at 50% 50%)', scale: 1.25 });
-
-    const tween = gsap.to(el, {
-      clipPath: 'circle(75% at 50% 50%)',
-      scale: 1,
-      duration: 1.4,
-      ease: 'power4.out',
-      clearProps: 'clipPath,transform',
-      scrollTrigger: {
-        trigger: el,
-        start: 'top 78%',
-        once: true,
-      },
-    });
-
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-    };
-  }, []);
 
   return (
     <section className="relative py-16 md:py-24" style={{ background: 'hsl(28,12%,13%)' }}>
@@ -69,15 +39,14 @@ export function InstagramSection() {
             </div>
           </div>
 
-          {/* Foto grande central — reveal em íris ao entrar na viewport */}
-          <div className="relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6"
+          {/* Foto grande central — reveal em íris ao entrar na viewport (IntersectionObserver) */}
+          <div ref={photoRef} className="iris-reveal relative mx-auto max-w-lg rounded-2xl overflow-hidden mb-6"
             style={{ background: 'hsl(28,10%,17%)', border: '1px solid rgba(245,183,0,0.12)', aspectRatio: '1/1', boxShadow: '0 0 30px hsla(43,96%,52%,0.15)' }}>
-            <div ref={photoRef} className="w-full h-full overflow-hidden">
+            <div className="iris-reveal-target w-full h-full overflow-hidden">
               <img
                 src={photoSrc}
                 alt="Últimas novidades no Instagram da Andinho Import"
                 className="w-full h-full object-cover animate-kenburns"
-                loading="lazy"
               />
             </div>
           </div>

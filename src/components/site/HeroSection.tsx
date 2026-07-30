@@ -5,6 +5,7 @@ import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useParallax } from '@/hooks/useParallax';
 import { useTilt3D } from '@/hooks/useTilt3D';
+import { scrollToElement } from '@/lib/utils/scrollTo';
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1600&q=85&auto=format&fit=crop',
@@ -111,7 +112,7 @@ export function HeroSection() {
               {content.cta_primary_text || hero.ctaPrimary}
             </a>
             <button
-              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => scrollToElement('#products')}
               className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
               style={{ border: '1px solid hsla(255,255%,255%,0.18)', color: 'hsla(45,20%,96%,0.75)', background: 'hsla(240,6%,17%,0.4)' }}>
               {content.cta_secondary_text || hero.ctaSecondary}
