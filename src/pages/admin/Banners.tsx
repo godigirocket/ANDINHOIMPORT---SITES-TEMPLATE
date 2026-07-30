@@ -9,15 +9,16 @@ import { uploadImage, compressImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { generateUUID } from '@/lib/utils/uuid';
+import { clientConfig } from '@/config/client';
 
 interface Banner {
-  id: string; image_url: string; title: string | null;
+  id: string; image_url: string; title: string | null; link_url: string | null;
   active: boolean; sort_order: number; created_at: string;
 }
 
 const LOCAL_KEY = 'andinho-import_banners_v2';
 const DEFAULT_BANNERS: Banner[] = [
-  { id: '1', image_url: 'https://images.unsplash.com/photo-1696446702183-be9605d12d09?w=1200&q=85&auto=format&fit=crop', title: 'Banner principal', link_url: '', active: true, sort_order: 0 },
+  { id: '1', image_url: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1200&q=85&auto=format&fit=crop', title: 'Banner principal', link_url: '', active: true, sort_order: 0 },
 ];
 const load = (): Banner[] => { try { const r = localStorage.getItem(LOCAL_KEY); const p = r ? JSON.parse(r) : []; return p.length > 0 ? p : DEFAULT_BANNERS; } catch { return DEFAULT_BANNERS; } };
 const save = (b: Banner[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(b)); } catch {} };
@@ -77,15 +78,16 @@ export default function AdminBanners() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ image_url: '', title: '', active: true });
+  const [form, setForm] = useState({ image_url: '', title: '', link_url: '', active: true });
 
   useEffect(() => {
     if (!isOk()) return;
     setLoading(true);
-    supabase.from('banners').select('*').order('sort_order')
+    supabase.from('banners').select('*').eq('client_id', clientConfig.id).order('sort_order')
       .then(({ data, error }) => {
         setLoading(false);
         if (!error && data) { setBanners(data as Banner[]); save(data as Banner[]); }
+        else if (error) { toast.error('Erro ao carregar banners', { description: error.message }); }
       });
   }, []);
 
@@ -94,28 +96,28 @@ export default function AdminBanners() {
     setSaving(true);
     if (isOk()) {
       const { data, error } = await supabase.from('banners')
-        .insert({ image_url: form.image_url, title: form.title || null, active: form.active, sort_order: banners.length })
+        .insert({ client_id: clientConfig.id, image_url: form.image_url, title: form.title || null, link_url: form.link_url || null, active: form.active, sort_order: banners.length })
         .select();
       setSaving(false);
       if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
       const updated = [...banners, data![0] as Banner];
       setBanners(updated); save(updated);
     } else {
-      const updated = [...banners, { id: generateUUID(), image_url: form.image_url, title: form.title || null, active: form.active, sort_order: banners.length, created_at: new Date().toISOString() }];
+      const updated = [...banners, { id: generateUUID(), image_url: form.image_url, title: form.title || null, link_url: form.link_url || null, active: form.active, sort_order: banners.length, created_at: new Date().toISOString() }];
       setBanners(updated); save(updated); setSaving(false);
     }
     toast.success('Banner criado');
-    setOpen(false); setForm({ image_url: '', title: '', active: true });
+    setOpen(false); setForm({ image_url: '', title: '', link_url: '', active: true });
   };
 
   const handleDelete = async (id: string) => {
-    if (isOk()) { const { error } = await supabase.from('banners').delete().eq('id', id); if (error) { toast.error('Erro ao excluir'); return; } }
+    if (isOk()) { const { error } = await supabase.from('banners').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; } }
     const updated = banners.filter(b => b.id !== id);
     setBanners(updated); save(updated); toast.success('Banner removido');
   };
 
   const handleToggle = async (banner: Banner) => {
-    if (isOk()) await supabase.from('banners').update({ active: !banner.active }).eq('id', banner.id);
+    if (isOk()) { const { error } = await supabase.from('banners').update({ active: !banner.active }).eq('id', banner.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; } }
     const updated = banners.map(b => b.id === banner.id ? { ...b, active: !b.active } : b);
     setBanners(updated); save(updated);
   };
@@ -177,6 +179,10 @@ export default function AdminBanners() {
             <div className="space-y-1.5">
               <Label className="text-xs">Título (opcional)</Label>
               <Input placeholder="Promoção de Verão" value={form.title} onChange={e => setForm(p => ({...p, title: e.target.value}))} className="text-sm" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Link ao clicar (opcional)</Label>
+              <Input placeholder="/produtos ou https://..." value={form.link_url} onChange={e => setForm(p => ({...p, link_url: e.target.value}))} className="text-sm" />
             </div>
             <div className="flex items-center justify-between p-3 rounded-xl"
               style={{ background: 'hsla(220,20%,9%,0.8)', border: '1px solid hsla(255,255%,255%,0.06)' }}>

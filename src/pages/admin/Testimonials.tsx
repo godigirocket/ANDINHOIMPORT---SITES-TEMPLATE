@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { generateUUID } from '@/lib/utils/uuid';
+import { clientConfig } from '@/config/client';
 
 interface Testimonial {
   id: string; name: string; text: string;
@@ -39,10 +40,11 @@ export default function AdminTestimonials() {
   useEffect(() => {
     if (!isOk()) return;
     setLoading(true);
-    supabase.from('testimonials').select('*').order('created_at', { ascending: false })
+    supabase.from('testimonials').select('*').eq('client_id', clientConfig.id).order('created_at', { ascending: false })
       .then(({ data, error }) => {
         setLoading(false);
         if (!error && data) { setItems(data as Testimonial[]); save(data as Testimonial[]); }
+        else if (error) { toast.error('Erro ao carregar depoimentos', { description: error.message }); }
       });
   }, []);
 
@@ -51,7 +53,7 @@ export default function AdminTestimonials() {
     setSaving(true);
     if (isOk()) {
       const { data, error } = await supabase.from('testimonials')
-        .insert({ name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
+        .insert({ client_id: clientConfig.id, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
         .select();
       setSaving(false);
       if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
@@ -66,13 +68,13 @@ export default function AdminTestimonials() {
   };
 
   const handleDelete = async (id: string) => {
-    if (isOk()) { const { error } = await supabase.from('testimonials').delete().eq('id', id); if (error) { toast.error('Erro ao excluir'); return; } }
+    if (isOk()) { const { error } = await supabase.from('testimonials').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; } }
     const updated = items.filter(t => t.id !== id);
     setItems(updated); save(updated); toast.success('Removido');
   };
 
   const handleToggle = async (t: Testimonial) => {
-    if (isOk()) await supabase.from('testimonials').update({ active: !t.active }).eq('id', t.id);
+    if (isOk()) { const { error } = await supabase.from('testimonials').update({ active: !t.active }).eq('id', t.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; } }
     const updated = items.map(x => x.id === t.id ? { ...x, active: !x.active } : x);
     setItems(updated); save(updated);
   };
