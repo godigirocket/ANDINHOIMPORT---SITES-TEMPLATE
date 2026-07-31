@@ -21,6 +21,13 @@ CREATE INDEX IF NOT EXISTS idx_instagram_posts_client_id ON instagram_posts(clie
 
 ALTER TABLE instagram_posts ENABLE ROW LEVEL SECURITY;
 
+-- DROP + CREATE (em vez de só CREATE) pra ser seguro rodar de novo caso
+-- uma tentativa anterior tenha parado no meio.
+DROP POLICY IF EXISTS "instagram_posts_select_public" ON instagram_posts;
+DROP POLICY IF EXISTS "instagram_posts_insert_own" ON instagram_posts;
+DROP POLICY IF EXISTS "instagram_posts_update_own" ON instagram_posts;
+DROP POLICY IF EXISTS "instagram_posts_delete_own" ON instagram_posts;
+
 CREATE POLICY "instagram_posts_select_public" ON instagram_posts
   FOR SELECT USING (true);
 
