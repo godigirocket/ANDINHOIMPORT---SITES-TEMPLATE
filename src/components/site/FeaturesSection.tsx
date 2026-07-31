@@ -4,6 +4,7 @@ import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { TiltCard } from '@/components/ui/TiltCard';
 import { PremiumButton } from '@/components/ui/PremiumButton';
+import { useParallax } from '@/hooks/useParallax';
 
 const iconMap: Record<string, LucideIcon> = { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock };
 
@@ -20,16 +21,18 @@ const cardAccents = [
 export function FeaturesSection() {
   const { features } = clientConfig.initialContent;
   const waUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(clientConfig.company.contact.whatsappMessage)}`;
+  const glowRef = useParallax<HTMLDivElement>(0.25);
+  const linesRef = useParallax<HTMLDivElement>(-0.12);
 
   return (
     <section id="features" className="relative py-24 md:py-32 overflow-hidden">
       {/* Background diferente — mais escuro com tom azul-marinho */}
       <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(224,30%,16%) 50%, hsl(240,6%,11%) 100%)' }} />
-      {/* Glow central — estático */}
-      <div className="absolute top-1/2 left-1/2 w-[800px] h-[400px] pointer-events-none"
+      {/* Glow central — parallax de fundo, mais lento que o scroll */}
+      <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[800px] h-[400px] pointer-events-none"
         style={{ marginLeft: '-400px', marginTop: '-200px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.04) 0%, transparent 70%)' }} />
-      {/* Linhas verticais decorativas */}
-      <div className="absolute inset-0 pointer-events-none opacity-20"
+      {/* Linhas verticais decorativas — parallax de primeiro plano, mais rápido que o scroll */}
+      <div ref={linesRef} className="absolute inset-0 pointer-events-none opacity-20"
         style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 120px, hsla(43,96%,52%,0.03) 120px, hsla(43,96%,52%,0.03) 121px)' }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">

@@ -13,7 +13,6 @@ import { captureUTMs } from '@/lib/analytics/track';
 // Abaixo da dobra — carrega sob demanda, não trava o LCP da home
 const ProcessShowcase   = lazy(() => import('@/components/site/ProcessShowcase').then(m => ({ default: m.ProcessShowcase })));
 const FeaturesSection   = lazy(() => import('@/components/site/FeaturesSection').then(m => ({ default: m.FeaturesSection })));
-const FloatingBenefits  = lazy(() => import('@/components/3d/FloatingBenefits').then(m => ({ default: m.FloatingBenefits })));
 const TestimonialsSection = lazy(() => import('@/components/site/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
 const InstagramSection  = lazy(() => import('@/components/site/InstagramSection').then(m => ({ default: m.InstagramSection })));
 const FAQSection        = lazy(() => import('@/components/site/FAQSection').then(m => ({ default: m.FAQSection })));
@@ -215,8 +214,6 @@ const Index = () => {
           <ProcessShowcase />
           <SectionDivider />
           <FeaturesSection />
-          <SectionDivider />
-          <FloatingBenefits />
           <SectionDivider />
           <TestimonialsSection />
           <SectionDivider />

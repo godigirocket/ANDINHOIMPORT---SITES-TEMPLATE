@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
+import { useParallax } from '@/hooks/useParallax';
 
 const FAQ_ITEMS = [
   { q: 'Onde fica a Andinho Import?', a: `Atendemos em ${clientConfig.company.location.city}, ${clientConfig.company.location.state}. Consulte disponibilidade e opções de entrega pelo WhatsApp.` },
@@ -17,10 +18,13 @@ const FAQ_ITEMS = [
 
 export function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const glowRef = useParallax<HTMLDivElement>(0.2);
 
   return (
-    <section className="relative py-20 md:py-28" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(262,20%,16%) 50%, hsl(240,6%,11%) 100%)' }}>
-      <div className="max-w-3xl mx-auto px-4">
+    <section className="relative py-20 md:py-28 overflow-hidden" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(262,20%,16%) 50%, hsl(240,6%,11%) 100%)' }}>
+      <div ref={glowRef} className="absolute top-0 left-1/2 w-[700px] h-[500px] pointer-events-none"
+        style={{ marginLeft: '-350px', background: 'radial-gradient(ellipse, hsla(280,80%,65%,0.05) 0%, transparent 70%)' }} />
+      <div className="relative z-10 max-w-3xl mx-auto px-4">
         <div className="text-center mb-12">
           <RevealText as="h2" className="font-black text-3xl md:text-4xl tracking-tight text-white mb-3">
             Perguntas <span style={{ color: '#F5B700' }}>Frequentes</span>

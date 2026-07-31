@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShieldCheck, CreditCard, Truck, ArrowRight } from 'lucide-react';
+import { ShieldCheck, CreditCard, Truck, ArrowRight, Shield, Package } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -12,13 +12,20 @@ import { PremiumButton } from '@/components/ui/PremiumButton';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Usadas só como último recurso, se ainda não houver 3 fotos reais de produto cadastradas
+// Usadas só como último recurso, se ainda não houver fotos reais de produto cadastradas
 const STOCK_FALLBACK_IMAGES = [
+  clientConfig.brand.heroBgImages[0],
+  clientConfig.brand.heroBgImages[1],
+  'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=1600&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1600&q=85&auto=format&fit=crop',
   clientConfig.brand.heroBgImages[0],
   clientConfig.brand.heroBgImages[1],
   'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=1600&q=85&auto=format&fit=crop',
 ];
 
+// Sequência única e pinada: autenticidade/pagamento/entrega (a jornada de compra)
+// seguida dos números de confiança (antes uma grade separada em FloatingBenefits) —
+// tudo como uma só narrativa contínua ao rolar, um bloco por vez.
 const PANELS = [
   {
     icon: ShieldCheck,
@@ -38,6 +45,30 @@ const PANELS = [
     title: 'Pronta entrega para toda região',
     text: 'A maioria dos modelos já está disponível pra envio imediato, com garantia e suporte pós-venda de verdade — sem robô, sem enrolação.',
   },
+  {
+    icon: CreditCard,
+    kicker: '04 · Números',
+    title: '18x sem juros, sempre',
+    text: 'Parcelamento facilitado no cartão de crédito, sem taxa extra e sem letra miúda.',
+  },
+  {
+    icon: Shield,
+    kicker: '05 · Números',
+    title: '12 meses de garantia',
+    text: 'Todo aparelho sai protegido, com suporte de verdade se alguma coisa fugir do combinado.',
+  },
+  {
+    icon: Package,
+    kicker: '06 · Números',
+    title: '100% de procedência verificada',
+    text: 'Nenhum aparelho sai da loja sem passar por checagem completa de origem e autenticidade.',
+  },
+  {
+    icon: Truck,
+    kicker: '07 · Números',
+    title: 'Entrega rápida pra sua região',
+    text: 'A maioria dos pedidos sai no mesmo dia ou no seguinte, com rastreio do início ao fim.',
+  },
 ];
 
 export function ProcessShowcase() {
@@ -54,7 +85,7 @@ export function ProcessShowcase() {
   const featured = products.filter(p => p.featured && p.image_url).map(p => p.image_url as string);
   const others = products.filter(p => !p.featured && p.image_url).map(p => p.image_url as string);
   const realPhotos = [...featured, ...others];
-  const PANEL_IMAGES = [0, 1, 2].map((i) => realPhotos[i] || STOCK_FALLBACK_IMAGES[i]);
+  const PANEL_IMAGES = PANELS.map((_, i) => realPhotos[i] || STOCK_FALLBACK_IMAGES[i % STOCK_FALLBACK_IMAGES.length]);
 
   useEffect(() => {
     if (!usePinned) return;
