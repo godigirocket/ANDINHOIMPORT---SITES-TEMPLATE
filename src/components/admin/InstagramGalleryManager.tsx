@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { generateUUID } from '@/lib/utils/uuid';
 import { clientConfig } from '@/config/client';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 interface InstagramPost {
   id: string; img: string; url: string | null; caption: string | null;
@@ -134,15 +135,8 @@ export function InstagramGalleryManager() {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>{editId ? 'Editar Post' : 'Novo Post'}</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-2">
-            <div className="space-y-1.5">
-              <Label className="text-xs">URL da Imagem *</Label>
-              <Input placeholder="https://..." value={form.img} onChange={e => setForm(p => ({...p, img: e.target.value}))} className="text-sm" />
-            </div>
-            {form.img && (
-              <div className="aspect-square w-24 rounded-lg overflow-hidden" style={{ border: '1px solid hsla(43,96%,52%,0.25)' }}>
-                <img src={form.img} alt="Preview" className="w-full h-full object-cover" />
-              </div>
-            )}
+            <ImageUploadField label="Imagem do Post *" bucket="banners" subfolder="instagram" aspect="square"
+              value={form.img} onChange={url => setForm(p => ({...p, img: url}))} />
             <div className="space-y-1.5">
               <Label className="text-xs">Link do post (opcional)</Label>
               <Input placeholder="https://www.instagram.com/p/..." value={form.url} onChange={e => setForm(p => ({...p, url: e.target.value}))} className="text-sm" />

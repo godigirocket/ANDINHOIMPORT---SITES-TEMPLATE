@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Loader2, RefreshCw, Info, ImageIcon, Upload, X, Instagram } from 'lucide-react';
+import { Save, Loader2, RefreshCw, Info, ImageIcon, Instagram } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { useContentStore, type SiteContentData } from '@/lib/stores/contentStore';
-import { uploadImage, compressImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BannersManager } from '@/components/admin/BannersManager';
 import { InstagramGalleryManager } from '@/components/admin/InstagramGalleryManager';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 function HelpTip({ text }: { text: string }) {
   return (
@@ -19,65 +19,6 @@ function HelpTip({ text }: { text: string }) {
       style={{ background: 'hsla(43,96%,52%,0.06)', border: '1px solid hsla(43,96%,52%,0.2)' }}>
       <Info className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
       <p className="text-xs" style={{ color: 'hsla(45,20%,96%,0.6)' }}>{text}</p>
-    </div>
-  );
-}
-
-// Upload de imagem para o hero
-function HeroImageUpload({ label, value, onChange }: { label: string; value: string; onChange: (url: string) => void }) {
-  const [uploading, setUploading] = useState(false);
-
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) { toast.error('Apenas imagens'); return; }
-    setUploading(true);
-    try {
-      const compressed = await compressImage(file, 1920, 0.92);
-      const url = await uploadImage('banners', compressed, 'hero');
-      onChange(url);
-      toast.success('Imagem enviada com sucesso');
-    } catch {
-      toast.error('Erro no upload', { description: 'Configure o Supabase Storage ou use uma URL externa' });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <Label className="text-xs">{label}</Label>
-      {/* Preview */}
-      {value && (
-        <div className="relative w-full h-32 rounded-xl overflow-hidden group"
-          style={{ border: '1px solid hsla(43,96%,52%,0.2)' }}>
-          <img src={value} alt="Preview" className="w-full h-full object-cover" />
-          <button onClick={() => onChange('')}
-            className="absolute top-2 right-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ background: 'hsla(0,84%,60%,0.8)' }}>
-            <X className="w-3.5 h-3.5 text-white" />
-          </button>
-        </div>
-      )}
-      {/* Upload zone */}
-      <div className="flex gap-2">
-        <label className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer transition-all"
-          style={{ border: '1px dashed hsla(43,96%,52%,0.3)', background: 'hsla(43,96%,52%,0.04)' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'hsla(43,96%,52%,0.08)')}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'hsla(43,96%,52%,0.04)')}>
-          <input type="file" accept="image/*" className="hidden"
-            onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }} />
-          {uploading
-            ? <><Loader2 className="w-4 h-4 text-primary animate-spin" /><span className="text-xs text-primary">Enviando...</span></>
-            : <><Upload className="w-4 h-4 text-primary" /><span className="text-xs text-primary">Upload (Supabase)</span></>
-          }
-        </label>
-      </div>
-      {/* URL manual */}
-      <Input placeholder="Ou cole uma URL de imagem aqui..." value={value}
-        onChange={e => onChange(e.target.value)}
-        className="text-xs" style={{ background: 'hsla(220,20%,8%,0.8)' }} />
-      <p className="text-[10px]" style={{ color: 'hsla(45,20%,96%,0.35)' }}>
-        💡 Para máxima qualidade: faça upload via Supabase Storage. URLs externas podem ter qualidade reduzida.
-      </p>
     </div>
   );
 }
@@ -151,20 +92,20 @@ export default function AdminContent() {
               <CardContent className="space-y-6">
                 <HelpTip text="Para máxima qualidade: faça upload direto pelo botão abaixo (usa Supabase Storage). Imagens de sites externos (ibb.co, etc.) podem ser bloqueadas ou ter qualidade reduzida." />
 
-                <HeroImageUpload
-                  label="Imagem 1 (principal)"
+                <ImageUploadField
+                  label="Imagem 1 (principal)" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.hero_bg_1}
                   onChange={url => setForm(prev => ({ ...prev, hero_bg_1: url }))}
                 />
 
-                <HeroImageUpload
-                  label="Imagem 2 (slideshow)"
+                <ImageUploadField
+                  label="Imagem 2 (slideshow)" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.hero_bg_2}
                   onChange={url => setForm(prev => ({ ...prev, hero_bg_2: url }))}
                 />
 
-                <HeroImageUpload
-                  label="Foto do Instagram (seção 'Siga no Instagram')"
+                <ImageUploadField
+                  label="Foto do Instagram (seção 'Siga no Instagram')" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.instagram_photo}
                   onChange={url => setForm(prev => ({ ...prev, instagram_photo: url }))}
                 />

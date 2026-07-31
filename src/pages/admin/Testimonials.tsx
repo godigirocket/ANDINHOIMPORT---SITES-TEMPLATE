@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { generateUUID } from '@/lib/utils/uuid';
 import { clientConfig } from '@/config/client';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 interface Testimonial {
   id: string; name: string; text: string;
@@ -160,6 +161,8 @@ export default function AdminTestimonials() {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>{editId ? 'Editar Depoimento' : 'Novo Depoimento'}</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-2">
+            <ImageUploadField label="Foto (opcional)" bucket="testimonials" aspect="square"
+              value={form.avatar_url ?? ''} onChange={url => setForm(p => ({...p, avatar_url: url || null}))} />
             <div className="space-y-1.5">
               <Label className="text-xs">Nome *</Label>
               <Input placeholder="João Silva" value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))} className="text-sm" />

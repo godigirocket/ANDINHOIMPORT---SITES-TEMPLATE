@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, Loader2, Upload, ImageIcon, X, Pencil } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Trash2, Loader2, ImageIcon, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase/client';
-import { uploadImage, compressImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 import { generateUUID } from '@/lib/utils/uuid';
 import { clientConfig } from '@/config/client';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 interface Banner {
   id: string; image_url: string; title: string | null; link_url: string | null;
@@ -20,55 +20,6 @@ const load = (): Banner[] => { try { const r = localStorage.getItem(LOCAL_KEY); 
 const save = (b: Banner[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(b)); } catch {} };
 const isOk = () => { const u = import.meta.env.VITE_SUPABASE_URL as string; return !!u && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co'); };
 const emptyForm = () => ({ image_url: '', title: '', link_url: '', active: true });
-
-function BannerImageUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
-  const [uploading, setUploading] = useState(false);
-  const ref = useRef<HTMLInputElement>(null);
-
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) { toast.error('Apenas imagens'); return; }
-    setUploading(true);
-    try {
-      const c = await compressImage(file, 1920, 0.9);
-      const url = await uploadImage('banners', c);
-      onChange(url); toast.success('Imagem enviada');
-    } catch {
-      onChange(URL.createObjectURL(file));
-      toast.warning('Preview local — configure Supabase Storage');
-    } finally { setUploading(false); }
-  };
-
-  return (
-    <div className="space-y-2">
-      <Label className="text-xs">Imagem do Banner</Label>
-      {value ? (
-        <div className="relative w-full h-32 rounded-xl overflow-hidden group"
-          style={{ border: '1px solid hsla(43,96%,52%,0.25)' }}>
-          <img src={value} alt="Banner" className="w-full h-full object-cover" />
-          <button type="button" onClick={() => onChange('')}
-            className="absolute top-2 right-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ background: 'hsla(0,84%,60%,0.8)' }}>
-            <X className="w-3.5 h-3.5 text-white" />
-          </button>
-        </div>
-      ) : (
-        <div className="w-full h-32 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all"
-          style={{ border: '2px dashed hsla(43,96%,52%,0.3)', background: 'hsla(43,96%,52%,0.04)' }}
-          onClick={() => ref.current?.click()}
-          onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLElement).style.background = 'hsla(43,96%,52%,0.1)'; }}
-          onDragLeave={e => { (e.currentTarget as HTMLElement).style.background = 'hsla(43,96%,52%,0.04)'; }}
-          onDrop={e => { e.preventDefault(); (e.currentTarget as HTMLElement).style.background = 'hsla(43,96%,52%,0.04)'; const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}>
-          {uploading
-            ? <><Loader2 className="w-5 h-5 text-primary animate-spin" /><span className="text-xs text-primary">Enviando...</span></>
-            : <><Upload className="w-5 h-5 text-primary opacity-60" /><span className="text-xs text-primary font-semibold">Arraste ou clique</span></>}
-        </div>
-      )}
-      <input ref={ref} type="file" accept="image/*" className="hidden"
-        onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }} />
-      <Input placeholder="Ou cole uma URL..." value={value} onChange={e => onChange(e.target.value)} className="text-xs" />
-    </div>
-  );
-}
 
 export function BannersManager() {
   const [banners, setBanners] = useState<Banner[]>(load());
@@ -183,7 +134,8 @@ export function BannersManager() {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>{editId ? 'Editar Banner' : 'Novo Banner'}</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-2">
-            <BannerImageUpload value={form.image_url} onChange={url => setForm(p => ({...p, image_url: url}))} />
+            <ImageUploadField label="Imagem do Banner" bucket="banners" aspect="wide"
+              value={form.image_url} onChange={url => setForm(p => ({...p, image_url: url}))} />
             <div className="space-y-1.5">
               <Label className="text-xs">Título (opcional)</Label>
               <Input placeholder="Promoção de Verão" value={form.title} onChange={e => setForm(p => ({...p, title: e.target.value}))} className="text-sm" />
