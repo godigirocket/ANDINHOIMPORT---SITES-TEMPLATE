@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { TiltCard } from '@/components/ui/TiltCard';
 
@@ -23,7 +24,7 @@ export function TestimonialsSection() {
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
     if (!url || url.includes('placeholder')) return;
-    supabase.from('testimonials').select('*').eq('active', true).then(({ data }) => {
+    supabase.from('testimonials').select('*').eq('client_id', clientConfig.id).eq('active', true).then(({ data }) => {
       if (data && data.length > 0) setItems(data as Testimonial[]);
     });
   }, []);

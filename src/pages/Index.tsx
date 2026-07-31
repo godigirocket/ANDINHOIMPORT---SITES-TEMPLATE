@@ -3,6 +3,7 @@ import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
 import { ProductsSection } from '@/components/site/ProductsSection';
 import { BrandsTicker } from '@/components/site/BrandsTicker';
+import { BannerCarousel } from '@/components/site/BannerCarousel';
 import { SectionDivider } from '@/components/site/SectionDivider';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
@@ -206,6 +207,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <BrandsTicker />
+        <BannerCarousel />
         <SectionDivider />
         <ProductsSection />
         <SectionDivider />
