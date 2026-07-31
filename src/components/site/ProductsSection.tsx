@@ -7,7 +7,6 @@ import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { TiltCard } from '@/components/ui/TiltCard';
 import { PremiumButton } from '@/components/ui/PremiumButton';
-import { spawnRipple } from '@/lib/utils/ripple';
 
 export function ProductsSection() {
   const navigate = useNavigate();
@@ -47,7 +46,9 @@ export function ProductsSection() {
           </div>
         ) : products.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {products.map((product, i) => (
+            {products.map((product, i) => {
+              const waUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`;
+              return (
               <motion.div key={product.id}
                 initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -57,10 +58,7 @@ export function ProductsSection() {
                 <TiltCard
                   className="overflow-hidden cursor-pointer group relative"
                   style={{ background: 'hsl(213,20%,19%)', border: '1px solid rgba(245,183,0,0.08)', boxShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
-                  onClick={() => {
-                    const wa = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(`Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`)}`;
-                    window.open(wa, '_blank');
-                  }}
+                  onClick={() => window.open(waUrl, '_blank')}
                 >
                   {/* Imagem */}
                   <div className="aspect-[4/3] overflow-hidden relative flex items-center justify-center" style={{ background: 'hsl(213,18%,16%)' }}>
@@ -104,18 +102,18 @@ export function ProductsSection() {
                     <p className="text-[11px] mb-4" style={{ color: '#888' }}>
                       ou {product.installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price / product.installments)}
                     </p>
-                    <button className="glow-on-hover ripple-container w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all group-hover:shadow-lg"
-                      style={{ background: 'hsl(43,96%,52%)', color: '#050505', boxShadow: '0 4px 12px rgba(245,183,0,0.2)' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        spawnRipple(e.currentTarget, e.clientX, e.clientY);
-                      }}>
+                    <PremiumButton
+                      variant="primary"
+                      className="w-full py-2.5 text-xs"
+                      onClick={(e) => { e.stopPropagation(); window.open(waUrl, '_blank'); }}
+                    >
                       <MessageCircle className="w-3.5 h-3.5" /> Consultar
-                    </button>
+                    </PremiumButton>
                   </div>
                 </TiltCard>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-16">

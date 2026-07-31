@@ -4,14 +4,20 @@ import { Menu, X, MessageCircle } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
 import { BrandLogo } from '@/components/BrandLogo';
+import { PremiumButton } from '@/components/ui/PremiumButton';
 
 export function Header() {
   const [scrollY, setScrollY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { content } = useContentStore();
 
   useEffect(() => {
-    const fn = () => setScrollY(window.scrollY);
+    const fn = () => {
+      setScrollY(window.scrollY);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0);
+    };
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
@@ -53,7 +59,7 @@ export function Header() {
             <motion.div
               animate={{ width: logoSize, height: logoSize }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="relative flex-shrink-0"
+              className="relative flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
             >
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg group-hover:bg-primary/35 transition-all" />
               <BrandLogo size={logoSize} glow className="relative" />
@@ -90,17 +96,24 @@ export function Header() {
 
           {/* CTA */}
           <div className="hidden md:flex">
-            <a href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
-              className="glow-on-hover flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 text-[11px] font-bold text-white/70 hover:text-white hover:border-primary/50 hover:bg-primary/8 transition-all tracking-wide">
+            <PremiumButton href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
+              variant="secondary" className="px-5 py-2 text-[11px] tracking-wide">
               <MessageCircle className="w-3.5 h-3.5" />
               FALE CONOSCO
-            </a>
+            </PremiumButton>
           </div>
 
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 text-white/70 hover:text-white" aria-label="Menu">
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
+        </div>
+
+        {/* Indicador de progresso de scroll — transform-only, sem custo de layout */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] origin-left"
+          style={{ background: 'hsla(43,96%,52%,0.15)' }}>
+          <div className="h-full origin-left"
+            style={{ background: 'hsl(43,96%,52%)', transform: `scaleX(${scrollProgress})`, transition: 'transform 0.1s linear' }} />
         </div>
       </motion.header>
 
@@ -119,14 +132,14 @@ export function Header() {
                   {link.label}
                 </motion.a>
               ))}
-              <motion.a initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.32 }}
-                href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="btn-gold mt-8 flex items-center justify-center gap-2">
-                <MessageCircle className="w-4 h-4" />
-                Falar no WhatsApp
-              </motion.a>
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.32 }} className="mt-8">
+                <PremiumButton href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)} variant="primary" className="w-full">
+                  <MessageCircle className="w-4 h-4" />
+                  Falar no WhatsApp
+                </PremiumButton>
+              </motion.div>
             </div>
           </motion.div>
         )}

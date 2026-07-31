@@ -28,7 +28,7 @@ export function CTASection() {
             Pronto para garantir o seu?
           </p>
 
-          <RevealText as="h2" className="font-black text-4xl md:text-6xl tracking-tight mb-6 leading-[0.95] text-white">
+          <RevealText as="h2" variant="stagger-words" className="font-black text-4xl md:text-6xl tracking-tight mb-6 leading-[0.95] text-white">
             {clientConfig.initialContent.cta.headline}
           </RevealText>
           <p className="text-sm md:text-base mb-12 max-w-md mx-auto" style={{ color: '#999' }}>

@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { type ProductData, getWhatsAppUrl } from '@/data/products';
 import { TiltCard } from '@/components/ui/TiltCard';
-import { spawnRipple } from '@/lib/utils/ripple';
+import { PremiumButton } from '@/components/ui/PremiumButton';
 
 interface Props {
   product: ProductData;
@@ -94,17 +94,17 @@ export function ProductTiltCard({ product, index, onClick }: Props) {
             <span className="text-[10px] font-medium" style={{ color: '#888' }}>
               Garantia {product.warranty}
             </span>
-            <a
+            <PremiumButton
               href={getWhatsAppUrl(product)}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => { e.stopPropagation(); spawnRipple(e.currentTarget, e.clientX, e.clientY); }}
-              className="glow-on-hover ripple-container flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all"
-              style={{ background: 'linear-gradient(135deg, #F5B700, #d4a000)', color: '#050505' }}
+              onClick={(e) => e.stopPropagation()}
+              variant="primary"
+              className="px-3 py-1.5 text-[11px]"
             >
               <MessageCircle className="w-3 h-3" />
               Consultar
-            </a>
+            </PremiumButton>
           </div>
         </div>
       </TiltCard>

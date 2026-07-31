@@ -115,6 +115,30 @@
     transform: translateY(-1px);
   }
   .btn-gold:active { transform: scale(0.98); }
+  .btn-gold:focus-visible, .btn-outline-premium:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(240,6%,11%), 0 0 0 4px hsla(43,96%,52%,0.7);
+  }
+  /* Shine — feixe de luz que atravessa o botão só durante o hover */
+  .btn-gold .btn-shine, .btn-outline-premium .btn-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 40%, hsla(255,255%,255%,0.35) 50%, transparent 60%);
+    transform: translateX(-120%);
+    transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+    pointer-events: none;
+  }
+  .btn-gold:hover .btn-shine, .btn-outline-premium:hover .btn-shine { transform: translateX(120%); }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-gold .btn-shine, .btn-outline-premium .btn-shine { display: none; }
+  }
+  /* Arrow slide — qualquer ícone como último filho desliza no hover */
+  .btn-gold svg:last-child, .btn-outline-premium svg:last-child {
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+  }
+  .btn-gold:hover svg:last-child, .btn-outline-premium:hover svg:last-child {
+    transform: translateX(3px);
+  }
   /* Gradient text */
   .gradient-text {
     @apply bg-clip-text text-transparent;
@@ -204,6 +228,40 @@
 }
 .hover-underline:hover::after { transform: scaleX(1); }
 
+/* ── Light follow mouse — spotlight neutro (não dourado) que segue o
+   cursor dentro do card, atualizado via custom properties (--mx/--my) ── */
+.light-follow {
+  position: relative;
+}
+.light-follow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), hsla(255,255%,255%,0.06), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.light-follow:hover::after { opacity: 1; }
+@media (hover: none) {
+  .light-follow::after { display: none; }
+}
+
+/* ── Hover lift — leve elevação no wrapper externo do TiltCard (nunca no
+   nó que o GSAP controla, pra não brigar com o transform do tilt 3D) ── */
+.tilt-lift {
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.tilt-lift:hover {
+  transform: translateY(-4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt-lift { transition: none; }
+  .tilt-lift:hover { transform: none; }
+}
+
 /* ── Glow sweep — brilho dourado que percorre a borda no hover ── */
 .glow-on-hover {
   position: relative;
@@ -243,7 +301,8 @@
   .iris-reveal-target { clip-path: none; transform: none; transition: none; }
 }
 
-/* ── Masked reveal — texto revelado por uma cortina que desliza ── */
+/* ── Masked reveal — reveal único do site: cortina (clip) + blur-in + scale-in
+   combinados num único movimento. Todo título do site usa este mesmo reveal. ── */
 .mask-reveal {
   position: relative;
   overflow: hidden;
@@ -251,12 +310,32 @@
 }
 .mask-reveal .mask-reveal-inner {
   display: inline-block;
-  transform: translateY(115%);
-  transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  transform: translateY(115%) scale(0.94);
+  filter: blur(6px);
+  transition: transform 0.85s cubic-bezier(0.16,1,0.3,1), filter 0.7s ease-out;
 }
-.mask-reveal.visible .mask-reveal-inner { transform: translateY(0); }
+.mask-reveal.visible .mask-reveal-inner { transform: translateY(0) scale(1); filter: blur(0); }
 @media (prefers-reduced-motion: reduce) {
-  .mask-reveal .mask-reveal-inner { transform: none; transition: none; }
+  .mask-reveal .mask-reveal-inner { transform: none; filter: none; transition: none; }
+}
+
+/* ── Stagger de palavras — usado só no H1 do Hero e no headline do CTA,
+   pra dar hierarquia sem quebrar o design system (mesmo mask+blur+scale,
+   só que por palavra em vez de em bloco) ── */
+.stagger-words .word {
+  display: inline-block;
+  overflow: hidden;
+}
+.stagger-words .word-inner {
+  display: inline-block;
+  transform: translateY(100%) scale(0.94);
+  filter: blur(6px);
+  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.6s ease-out;
+  transition-delay: var(--word-delay, 0ms);
+}
+.stagger-words.visible .word-inner { transform: translateY(0) scale(1); filter: blur(0); }
+@media (prefers-reduced-motion: reduce) {
+  .stagger-words .word-inner { transform: none; filter: none; transition: none; }
 }
 
 /* ── Ícone social com label deslizando no hover (transform-only) ── */

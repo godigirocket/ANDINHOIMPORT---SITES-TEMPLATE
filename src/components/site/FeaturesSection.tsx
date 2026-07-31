@@ -70,7 +70,7 @@ export function FeaturesSection() {
 
                   <div className="relative z-10 flex gap-4">
                     {/* Ícone com cor única */}
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-shadow duration-300 group-hover:shadow-[0_0_16px_var(--accent-glow)]"
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_16px_var(--accent-glow)]"
                       style={{ background: accent.glow, border: `1px solid ${accent.border}`, ['--accent-glow' as string]: accent.icon }}>
                       <Icon className="w-5 h-5" style={{ color: accent.icon }} />
                     </div>

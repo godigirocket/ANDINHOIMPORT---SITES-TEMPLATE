@@ -37,7 +37,7 @@ export default function About() {
           </div>
 
           <div className="p-6 rounded-2xl mb-8" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <h2 className="font-bold text-sm mb-3 text-white">Localização e contato</h2>
+            <RevealText as="h2" className="font-bold text-sm mb-3 text-white">Localização e contato</RevealText>
             <div className="space-y-2 text-sm" style={{ color: '#a6a6aa' }}>
               <p className="flex items-center gap-2"><MapPin className="w-4 h-4" style={{ color: '#F5B700' }} /> {clientConfig.company.location.city}, {clientConfig.company.location.state}</p>
               <p className="flex items-center gap-2"><MessageCircle className="w-4 h-4" style={{ color: '#F5B700' }} /> {clientConfig.company.contact.phone}</p>

@@ -48,6 +48,7 @@ export const PremiumButton = forwardRef<HTMLAnchorElement | HTMLButtonElement, P
           onClick={handleClick}
           {...anchorProps}
         >
+          <span className="btn-shine" aria-hidden="true" />
           {children}
         </a>
       );
@@ -62,6 +63,7 @@ export const PremiumButton = forwardRef<HTMLAnchorElement | HTMLButtonElement, P
         onClick={handleClick}
         {...buttonProps}
       >
+        <span className="btn-shine" aria-hidden="true" />
         {children}
       </button>
     );

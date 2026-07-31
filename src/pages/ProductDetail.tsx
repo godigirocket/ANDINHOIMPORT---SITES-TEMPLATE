@@ -119,10 +119,10 @@ export default function ProductDetail() {
                 { icon: CreditCard, label: `Até ${product.installments}x sem juros` },
                 { icon: Check, label: 'Produto original' },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 p-3 rounded-xl" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                <TiltCard key={label} intensity={4} className="flex items-center gap-2 p-3" style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <Icon className="w-4 h-4 flex-shrink-0" style={{ color: '#F5B700' }} />
                   <span className="text-xs" style={{ color: '#ccc' }}>{label}</span>
-                </div>
+                </TiltCard>
               ))}
             </div>
 

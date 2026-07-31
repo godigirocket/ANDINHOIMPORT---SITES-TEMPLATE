@@ -7,6 +7,7 @@ import { useParallax } from '@/hooks/useParallax';
 import { useTilt3D } from '@/hooks/useTilt3D';
 import { scrollToElement } from '@/lib/utils/scrollTo';
 import { PremiumButton } from '@/components/ui/PremiumButton';
+import { RevealText } from '@/components/ui/RevealText';
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1600&q=85&auto=format&fit=crop',
@@ -69,13 +70,15 @@ export function HeroSection() {
             {content.hero_badge || hero.badge}
           </motion.p>
 
-          <motion.h1 initial={{ y: 28, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.1 }}
-            className="font-black leading-[0.9] tracking-tight mb-6"
+          <h1 className="font-black leading-[0.9] tracking-tight mb-6"
             style={{ fontSize: 'clamp(2.8rem, 8vw, 5.5rem)' }}>
-            <span className="text-white block">{content.hero_title || hero.headline}</span>
-            <span className="gradient-text block">{hero.headlineGold}</span>
-          </motion.h1>
+            <RevealText as="span" variant="stagger-words" className="text-white block">
+              {content.hero_title || hero.headline}
+            </RevealText>
+            <RevealText as="span" className="block" innerClassName="gradient-text">
+              {hero.headlineGold}
+            </RevealText>
+          </h1>
 
           <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.65, delay: 0.18 }}
