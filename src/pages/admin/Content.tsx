@@ -10,6 +10,8 @@ import { useContentStore, type SiteContentData } from '@/lib/stores/contentStore
 import { uploadImage, compressImage } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { BannersManager } from '@/components/admin/BannersManager';
+import { InstagramGalleryManager } from '@/components/admin/InstagramGalleryManager';
 
 function HelpTip({ text }: { text: string }) {
   return (
@@ -178,6 +180,36 @@ export default function AdminContent() {
                     <li>5. Clique em "Salvar" no topo da página</li>
                   </ol>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Instagram className="w-4 h-4 text-primary" />
+                  Galeria do Instagram
+                </CardTitle>
+                <CardDescription>
+                  Fotos que aparecem na seção "Siga no Instagram" do site (opcional — sem posts, usa a foto única acima)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <InstagramGalleryManager />
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-primary" />
+                  Banners Promocionais
+                </CardTitle>
+                <CardDescription>
+                  Carrossel de banners exibido entre o Hero e a lista de produtos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BannersManager />
               </CardContent>
             </Card>
           </TabsContent>

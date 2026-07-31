@@ -12,14 +12,11 @@ import {
   ChevronRight,
   ExternalLink,
   BarChart3,
-  Image,
   MessageSquare,
   MessageCircle,
   CreditCard,
   ShoppingBag,
   Search,
-  Instagram,
-  Palette,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { clientConfig } from '@/config/client';
@@ -34,9 +31,7 @@ const navItems = [
   { label: 'Produtos', icon: Package, path: '/admin/products' },
   { label: 'Pedidos', icon: ShoppingBag, path: '/admin/orders' },
   { label: 'Conteúdo', icon: FileText, path: '/admin/content' },
-  { label: 'Banners', icon: Image, path: '/admin/banners' },
   { label: 'Depoimentos', icon: MessageSquare, path: '/admin/testimonials' },
-  { label: 'Instagram', icon: Instagram, path: '/admin/instagram' },
   { label: 'Chatbot', icon: MessageCircle, path: '/admin/chatbot' },
   { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
   { label: 'SEO & Google', icon: Search, path: '/admin/seo' },

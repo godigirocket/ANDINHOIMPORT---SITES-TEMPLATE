@@ -10,6 +10,7 @@ import { useTilt3D } from '@/hooks/useTilt3D';
 import { useMagnetic } from '@/hooks/useMagnetic';
 import { spawnRipple } from '@/lib/utils/ripple';
 import { TiltCard } from '@/components/ui/TiltCard';
+import { MeshBackground } from '@/components/site/MeshBackground';
 
 const FALLBACK_PHOTO = 'https://images.unsplash.com/photo-1592286927505-1def25115558?w=1000&q=85&auto=format&fit=crop';
 
@@ -46,8 +47,9 @@ export function InstagramSection() {
   // Caso contrário, cai no mockup de foto única (comportamento anterior).
   if (posts.length > 0) {
     return (
-      <section className="relative py-16 md:py-24" style={{ background: 'hsl(28,12%,13%)' }}>
-        <div className="max-w-4xl mx-auto px-4">
+      <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(28,12%,13%)' }}>
+        <MeshBackground />
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
           <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }} className="text-center">
             <div className="flex items-center justify-center gap-3 mb-8">
@@ -97,8 +99,9 @@ export function InstagramSection() {
   }
 
   return (
-    <section className="relative py-16 md:py-24" style={{ background: 'hsl(28,12%,13%)' }}>
-      <div className="max-w-4xl mx-auto px-4">
+    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(28,12%,13%)' }}>
+      <MeshBackground />
+      <div className="relative z-10 max-w-4xl mx-auto px-4">
         <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }} className="text-center">
 

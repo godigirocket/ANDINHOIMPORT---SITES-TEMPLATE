@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { SmoothScrollProvider } from '@/components/scroll/SmoothScroll';
 import { PremiumCursor } from '@/components/site/PremiumCursor';
@@ -21,9 +21,7 @@ const AdminLogin        = lazy(() => import('./pages/admin/Login'));
 const AdminDashboard    = lazy(() => import('./pages/admin/Dashboard'));
 const AdminProducts     = lazy(() => import('./pages/admin/Products'));
 const AdminContent      = lazy(() => import('./pages/admin/Content'));
-const AdminBanners      = lazy(() => import('./pages/admin/Banners'));
 const AdminTestimonials = lazy(() => import('./pages/admin/Testimonials'));
-const AdminInstagram    = lazy(() => import('./pages/admin/Instagram'));
 const AdminChatbot      = lazy(() => import('./pages/admin/Chatbot'));
 const AdminAnalytics    = lazy(() => import('./pages/admin/Analytics'));
 const AdminThemeEditor  = lazy(() => import('./pages/admin/ThemeEditor'));
@@ -80,9 +78,9 @@ const App = () => (
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/admin/content" element={<AdminContent />} />
-            <Route path="/admin/banners" element={<AdminBanners />} />
+            <Route path="/admin/banners" element={<Navigate to="/admin/content" replace />} />
             <Route path="/admin/testimonials" element={<AdminTestimonials />} />
-            <Route path="/admin/instagram" element={<AdminInstagram />} />
+            <Route path="/admin/instagram" element={<Navigate to="/admin/content" replace />} />
             <Route path="/admin/chatbot" element={<AdminChatbot />} />
             <Route path="/admin/payments" element={<AdminPayments />} />
             <Route path="/admin/seo" element={<AdminSEO />} />

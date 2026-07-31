@@ -8,6 +8,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useProductStore } from '@/lib/stores/productStore';
 import { CharHoverText } from './CharHoverText';
+import { PremiumButton } from '@/components/ui/PremiumButton';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -92,8 +93,11 @@ export function ProcessShowcase() {
                 }} />
             </div>
           ))}
+          {/* Overlay reforçado — mesmo tratamento do Hero, garante contraste do texto sobre qualquer foto */}
           <div className="absolute inset-0"
-            style={{ background: 'linear-gradient(90deg, hsla(240,6%,11%,0.96) 0%, hsla(240,6%,11%,0.75) 45%, hsla(240,6%,11%,0.15) 100%)' }} />
+            style={{ background: 'linear-gradient(100deg, hsla(240,6%,9%,0.98) 0%, hsla(240,6%,9%,0.88) 40%, hsla(240,6%,9%,0.45) 75%, hsla(240,6%,9%,0.3) 100%)' }} />
+          <div className="absolute inset-0"
+            style={{ background: 'linear-gradient(to top, hsla(240,6%,9%,0.5) 0%, transparent 35%)' }} />
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
             <div className="max-w-lg">
@@ -132,11 +136,12 @@ export function ProcessShowcase() {
               </AnimatePresence>
               </div>
 
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
-                className="btn-gold inline-flex items-center gap-2 text-sm mt-6">
-                Falar no WhatsApp
-                <ArrowRight className="w-4 h-4" />
-              </a>
+              <div className="mt-6">
+                <PremiumButton href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="primary" className="text-sm">
+                  Falar no WhatsApp
+                  <ArrowRight className="w-4 h-4" />
+                </PremiumButton>
+              </div>
             </div>
           </div>
         </div>

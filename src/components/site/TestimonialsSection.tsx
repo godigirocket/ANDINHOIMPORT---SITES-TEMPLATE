@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { TiltCard } from '@/components/ui/TiltCard';
+import { MeshBackground } from '@/components/site/MeshBackground';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -42,16 +43,17 @@ export function TestimonialsSection() {
   if (!t) return null;
 
   return (
-    <section id="testimonials" className="relative py-16 md:py-24" style={{ background: 'hsl(28,18%,14%)' }}>
-      <div className="relative max-w-2xl mx-auto px-4">
-        <div className="mb-8 text-center">
+    <section id="testimonials" className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(28,18%,14%)' }}>
+      <MeshBackground />
+      <div className="relative z-10 max-w-3xl mx-auto px-4">
+        <div className="mb-10 text-center">
           <RevealText as="h2" className="font-black text-2xl md:text-3xl tracking-tight">
             O que dizem <span className="gradient-text">nossos clientes</span>
           </RevealText>
         </div>
 
         {/* Card de depoimento com profundidade (tilt 3D) — crossfade sobreposto por dentro */}
-        <TiltCard intensity={4} className="relative min-h-[220px] p-8"
+        <TiltCard intensity={4} className="relative min-h-[240px] p-8 md:p-12"
           style={{ background: 'hsla(28,14%,20%,0.6)', border: '1px solid hsla(43,96%,52%,0.12)', backdropFilter: 'blur(12px)' }}>
           <AnimatePresence>
             <motion.div

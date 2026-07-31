@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Star, Loader2, MessageSquare } from 'lucide-react';
+import { Plus, Trash2, Star, Loader2, MessageSquare, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,6 +35,7 @@ export default function AdminTestimonials() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm());
 
   useEffect(() => {
@@ -48,23 +49,39 @@ export default function AdminTestimonials() {
       });
   }, []);
 
-  const handleCreate = async () => {
+  const openCreate = () => { setEditId(null); setForm(emptyForm()); setOpen(true); };
+  const openEdit = (t: Testimonial) => { setEditId(t.id); setForm({ name: t.name, text: t.text, avatar_url: t.avatar_url, rating: t.rating, active: t.active }); setOpen(true); };
+
+  const handleSave = async () => {
     if (!form.name || !form.text) { toast.error('Nome e depoimento são obrigatórios'); return; }
     setSaving(true);
-    if (isOk()) {
-      const { data, error } = await supabase.from('testimonials')
-        .insert({ client_id: clientConfig.id, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
-        .select();
-      setSaving(false);
-      if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
-      const updated = [data![0] as Testimonial, ...items];
+    if (editId) {
+      if (isOk()) {
+        const { error } = await supabase.from('testimonials')
+          .update({ name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
+          .eq('id', editId).eq('client_id', clientConfig.id);
+        setSaving(false);
+        if (error) { toast.error('Erro ao salvar', { description: error.message }); return; }
+      } else setSaving(false);
+      const updated = items.map(t => t.id === editId ? { ...t, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active } : t);
       setItems(updated); save(updated);
+      toast.success('Depoimento atualizado');
     } else {
-      const updated = [{ id: generateUUID(), ...form, created_at: new Date().toISOString() }, ...items];
-      setItems(updated); save(updated); setSaving(false);
+      if (isOk()) {
+        const { data, error } = await supabase.from('testimonials')
+          .insert({ client_id: clientConfig.id, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
+          .select();
+        setSaving(false);
+        if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
+        const updated = [data![0] as Testimonial, ...items];
+        setItems(updated); save(updated);
+      } else {
+        const updated = [{ id: generateUUID(), ...form, created_at: new Date().toISOString() }, ...items];
+        setItems(updated); save(updated); setSaving(false);
+      }
+      toast.success('Depoimento criado');
     }
-    toast.success('Depoimento criado');
-    setOpen(false); setForm(emptyForm());
+    setOpen(false); setForm(emptyForm()); setEditId(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -87,7 +104,7 @@ export default function AdminTestimonials() {
             <h1 className="text-2xl font-black text-white">Depoimentos</h1>
             <p className="text-sm mt-0.5" style={{ color: 'hsla(45,20%,96%,0.45)' }}>{items.length} depoimento(s)</p>
           </div>
-          <button onClick={() => setOpen(true)} className="btn-gold flex items-center gap-2 text-sm">
+          <button onClick={openCreate} className="btn-gold flex items-center gap-2 text-sm">
             <Plus className="w-4 h-4" />Novo Depoimento
           </button>
         </div>
@@ -100,7 +117,7 @@ export default function AdminTestimonials() {
             <MessageSquare className="w-12 h-12 mx-auto mb-3 text-primary opacity-40" />
             <p className="text-white font-bold mb-1">Nenhum depoimento</p>
             <p className="text-sm mb-5" style={{ color: 'hsla(45,20%,96%,0.4)' }}>Adicione avaliações de clientes</p>
-            <button onClick={() => setOpen(true)} className="btn-gold text-sm"><Plus className="w-4 h-4 mr-2 inline" />Adicionar</button>
+            <button onClick={openCreate} className="btn-gold text-sm"><Plus className="w-4 h-4 mr-2 inline" />Adicionar</button>
           </div>
         ) : (
           <div className="space-y-3">
@@ -122,6 +139,11 @@ export default function AdminTestimonials() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <Switch checked={t.active} onCheckedChange={() => handleToggle(t)} />
+                  <button onClick={() => openEdit(t)}
+                    className="p-2 rounded-lg transition-colors hover:text-primary"
+                    style={{ color: 'hsla(45,20%,96%,0.4)' }}>
+                    <Pencil className="w-4 h-4" />
+                  </button>
                   <button onClick={() => handleDelete(t.id)}
                     className="p-2 rounded-lg transition-colors hover:text-red-400"
                     style={{ color: 'hsla(45,20%,96%,0.4)' }}>
@@ -136,7 +158,7 @@ export default function AdminTestimonials() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Novo Depoimento</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editId ? 'Editar Depoimento' : 'Novo Depoimento'}</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="space-y-1.5">
               <Label className="text-xs">Nome *</Label>
@@ -162,8 +184,8 @@ export default function AdminTestimonials() {
                 style={{ border: '1px solid hsla(255,255%,255%,0.1)', color: 'hsla(45,20%,96%,0.6)' }}>
                 Cancelar
               </button>
-              <button onClick={handleCreate} disabled={saving} className="btn-gold flex-1 flex items-center justify-center gap-2 text-sm disabled:opacity-60">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar'}
+              <button onClick={handleSave} disabled={saving} className="btn-gold flex-1 flex items-center justify-center gap-2 text-sm disabled:opacity-60">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editId ? 'Salvar' : 'Criar'}
               </button>
             </div>
           </div>
