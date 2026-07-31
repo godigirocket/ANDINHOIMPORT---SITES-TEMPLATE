@@ -1,9 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, MessageCircle, Minimize2 } from 'lucide-react';
+import { X, Send, MessageCircle, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clientConfig } from '@/config/client';
 import { useChatbotStore } from '@/lib/stores/chatbotStore';
 import { useProductStore } from '@/lib/stores/productStore';
+import { BrandLogo } from '@/components/BrandLogo';
+
+// Remove emojis do texto exibido — o site usa ícones reais (lucide), não emoji.
+// As strings originais (com emoji) continuam intactas por baixo, só a exibição muda,
+// pra não quebrar o switch/case que casa pelas opções literais.
+const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu;
+const stripEmoji = (text: string) => text.replace(EMOJI_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
 
 interface Message {
   id: string;
@@ -28,6 +35,7 @@ export function SimpleChatbot() {
   const { products } = useProductStore();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [input, setInput] = useState('');
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -62,7 +70,7 @@ export function SimpleChatbot() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   // Inicia conversa quando abre
   useEffect(() => {
@@ -81,8 +89,10 @@ export function SimpleChatbot() {
 
   const handleOptionClick = (option: string) => {
     addUserMessage(option);
-    
+    setIsTyping(true);
+
     setTimeout(() => {
+      setIsTyping(false);
       switch (option) {
         case '📱 Ver produtos':
           addBotMessage(
@@ -248,8 +258,10 @@ export function SimpleChatbot() {
     addUserMessage(input);
     const userInput = input.toLowerCase();
     setInput('');
+    setIsTyping(true);
 
     setTimeout(() => {
+      setIsTyping(false);
       // Coleta de dados
       if (step === 'name') {
         setUserName(input);
@@ -378,50 +390,48 @@ export function SimpleChatbot() {
               border: '1px solid hsla(43,96%,52%,0.2)'
             }}
           >
-            {/* Header */}
-            <div className="p-4 flex items-center justify-between"
-              style={{ 
+            {/* Header — estilo app de mensagens: avatar + status online */}
+            <div className="p-4 flex items-center justify-between flex-shrink-0"
+              style={{
                 background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))',
                 borderBottom: '1px solid hsla(0,0%,0%,0.1)'
               }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-black" />
+                <div className="relative flex-shrink-0">
+                  <BrandLogo size={38} className="ring-2 ring-black/10" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full ring-2"
+                    style={{ background: 'hsl(142,71%,45%)', borderColor: 'transparent', boxShadow: '0 0 0 2px hsl(43,96%,52%)' }} />
                 </div>
                 <div>
-                  <p className="font-bold text-black text-sm">Atendimento</p>
-                  <p className="text-xs text-black/70">Online agora</p>
+                  <p className="font-bold text-black text-sm">{clientConfig.company.name} {clientConfig.company.nameHighlight}</p>
+                  <p className="text-xs text-black/70 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-black/60 inline-block" />
+                    Online agora
+                  </p>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-black/10 transition-colors">
-                  <Minimize2 className="w-4 h-4 text-black" />
-                </button>
-                <button onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-black/10 transition-colors">
-                  <X className="w-4 h-4 text-black" />
-                </button>
-              </div>
+              <button onClick={() => setIsOpen(false)} aria-label="Fechar chat"
+                className="p-1.5 rounded-lg hover:bg-black/10 transition-colors">
+                <X className="w-4 h-4 text-black" />
+              </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: 'hsl(240,6%,12%)' }}>
               {messages.map(msg => (
                 <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
-                    msg.sender === 'user'
-                      ? 'bg-primary text-black'
-                      : 'bg-surface text-white'
-                  }`}>
-                    <p className="text-sm whitespace-pre-line">{msg.text}</p>
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${msg.sender === 'user' ? 'rounded-br-md' : 'rounded-bl-md'}`}
+                    style={msg.sender === 'user'
+                      ? { background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))', color: '#0a0a0a' }
+                      : { background: 'hsl(240,6%,18%)', border: '1px solid hsla(255,255%,255%,0.06)', color: '#f0f0f0' }}>
+                    <p className="text-sm whitespace-pre-line leading-relaxed">{stripEmoji(msg.text)}</p>
                     {msg.options && (
-                      <div className="mt-3 space-y-2">
+                      <div className="mt-3 space-y-1.5">
                         {msg.options.map(opt => (
                           <button key={opt}
                             onClick={() => handleOptionClick(opt)}
-                            className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all"
+                            className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all"
                             style={{
                               background: 'hsla(43,96%,52%,0.1)',
                               border: '1px solid hsla(43,96%,52%,0.3)',
@@ -430,7 +440,8 @@ export function SimpleChatbot() {
                             onMouseEnter={e => (e.currentTarget.style.background = 'hsla(43,96%,52%,0.2)')}
                             onMouseLeave={e => (e.currentTarget.style.background = 'hsla(43,96%,52%,0.1)')}
                           >
-                            {opt}
+                            <span>{stripEmoji(opt)}</span>
+                            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
                           </button>
                         ))}
                       </div>
@@ -438,6 +449,19 @@ export function SimpleChatbot() {
                   </div>
                 </div>
               ))}
+
+              {/* Indicador de digitação — 3 pontos pulsando, estilo apps de mensagem reais */}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1"
+                    style={{ background: 'hsl(240,6%,18%)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
+                    {[0, 1, 2].map(i => (
+                      <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce"
+                        style={{ background: 'hsla(45,20%,96%,0.5)', animationDelay: `${i * 0.15}s`, animationDuration: '0.9s' }} />
+                    ))}
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
 
