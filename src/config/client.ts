@@ -91,7 +91,7 @@ export const clientConfig: ClientConfig = {
       { id: 'f2', title: 'Parcelamento Facilitado', description: 'Parcele em até 18x sem juros no cartão de crédito de qualquer banco',                icon: 'CreditCard'  },
       { id: 'f3', title: 'Assistência Técnica',     description: 'Suporte especializado pós-venda e garantia estendida para sua tranquilidade',        icon: 'Wrench'      },
       { id: 'f4', title: 'Entrega Rápida',          description: 'Pronta entrega para a maioria dos modelos com envio para todo Brasil',                icon: 'Truck'       },
-      { id: 'f5', title: 'Avaliação 5 Estrelas',    description: 'Mais de 2.500 clientes satisfeitos. Reputação construída com honestidade e qualidade.',icon: 'Star'        },
+      { id: 'f5', title: 'Depoimentos Reais',       description: 'Avaliações verdadeiras de clientes que já compraram — veja na seção de depoimentos, sem números inflados.', icon: 'Star' },
       { id: 'f6', title: 'Atendimento Rápido',      description: 'Respondemos em minutos pelo WhatsApp. Sem robôs — atendimento humano e personalizado.',icon: 'Clock'       },
     ],
     cta: {

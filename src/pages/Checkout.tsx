@@ -312,6 +312,7 @@ export default function Checkout() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="sr-only">Finalizar Compra — {clientConfig.company.name} {clientConfig.company.nameHighlight}</h1>
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {['Dados', 'Pagamento', 'Confirmação'].map((label, i) => {
