@@ -28,6 +28,12 @@ export const productSchema = z.object({
   category:       z.string().optional(),
   badge:          z.string().optional(),
   featured:       z.boolean().optional(),
+  condition:            z.enum(['novo', 'seminovo']).optional().nullable(),
+  storage_gb:           z.number().positive().optional().nullable(),
+  battery_health_pct:   z.number().min(1).max(100).optional().nullable(),
+  color:                z.string().optional().nullable(),
+  warranty_days:        z.number().positive().optional().nullable(),
+  accessories_included: z.string().optional().nullable(),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
@@ -60,6 +66,13 @@ export interface Product {
   expiration?:    string | null;
   ingredients?:   string | null;
   nutritional_info?: string | null;
+
+  // Condição/especificação do aparelho — todos opcionais, "não informado" quando ausentes
+  condition?:            'novo' | 'seminovo' | null;
+  storage_gb?:           number | null;
+  battery_health_pct?:   number | null;
+  warranty_days?:        number | null;
+  accessories_included?: string | null;
 }
 
 interface ProductStore {
@@ -223,6 +236,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       status: data.status, badge: data.badge ?? null,
       installments: data.installments, sort_order,
       client_id: clientConfig.id,
+      condition: data.condition ?? null, storage_gb: data.storage_gb ?? null,
+      battery_health_pct: data.battery_health_pct ?? null, color: data.color ?? null,
+      warranty_days: data.warranty_days ?? null, accessories_included: data.accessories_included ?? null,
     }).select();
 
     if (error) {
@@ -243,7 +259,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     // Filtrar apenas colunas que existem na tabela
-    const allowedKeys = ['title', 'description', 'price', 'old_price', 'image_url', 'affiliate_link', 'category', 'featured', 'status', 'badge', 'installments', 'sort_order'];
+    const allowedKeys = ['title', 'description', 'price', 'old_price', 'image_url', 'affiliate_link', 'category', 'featured', 'status', 'badge', 'installments', 'sort_order', 'condition', 'storage_gb', 'battery_health_pct', 'color', 'warranty_days', 'accessories_included'];
     const filtered: Record<string, unknown> = { updated_at: new Date().toISOString() };
     for (const key of allowedKeys) {
       if (key in data) filtered[key] = (data as Record<string, unknown>)[key];

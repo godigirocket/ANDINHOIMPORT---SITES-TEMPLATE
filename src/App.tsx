@@ -14,6 +14,7 @@ const NotFound          = lazy(() => import('./pages/NotFound'));
 const Checkout          = lazy(() => import('./pages/Checkout'));
 const ProductDetail     = lazy(() => import('./pages/ProductDetail'));
 const Products          = lazy(() => import('./pages/Products'));
+const Compare           = lazy(() => import('./pages/Compare'));
 const About             = lazy(() => import('./pages/About'));
 const Contact           = lazy(() => import('./pages/Contact'));
 const Services          = lazy(() => import('./pages/Services'));
@@ -68,6 +69,7 @@ const App = () => (
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/produtos/:slug" element={<ProductDetail />} />
             <Route path="/produtos" element={<Products />} />
+            <Route path="/comparar" element={<Compare />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/contato" element={<Contact />} />
             <Route path="/assistencia-tecnica" element={<Services />} />

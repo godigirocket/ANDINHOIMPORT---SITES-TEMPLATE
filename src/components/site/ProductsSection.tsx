@@ -7,6 +7,7 @@ import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { TiltCard } from '@/components/ui/TiltCard';
 import { PremiumButton } from '@/components/ui/PremiumButton';
+import { safeImageUrl, priceLabel, conditionLabel } from '@/lib/utils/productFallbacks';
 
 export function ProductsSection() {
   const navigate = useNavigate();
@@ -60,21 +61,22 @@ export function ProductsSection() {
                   style={{ background: 'hsl(213,18%,15%)', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
                   onClick={() => window.open(waUrl, '_blank')}
                 >
-                  {/* Imagem — retrato, o aparelho é o protagonista do card */}
+                  {/* Imagem — retrato, o aparelho é o protagonista do card. safeImageUrl nunca deixa
+                      passar um hotlink frágil (ex: thumbnail do Google Shopping) pro <img>. */}
                   <div className="aspect-[3/4] overflow-hidden relative flex items-center justify-center" style={{ background: 'hsl(213,16%,13%)' }}>
-                    {product.image_url ? (
-                      <img src={product.image_url} alt={product.title}
-                        className="product-reflect w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-[1.04]"
-                        loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'hsl(213,16%,15%)' }}>
-                        <span className="text-xs" style={{ color: '#666' }}>Sem imagem</span>
-                      </div>
-                    )}
+                    <img src={safeImageUrl(product.image_url)} alt={product.title}
+                      className="product-reflect w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-[1.04]"
+                      loading="lazy" />
                     {product.badge && (
                       <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide backdrop-blur-sm"
                         style={{ background: 'hsla(43,96%,52%,0.92)', color: '#050505' }}>
                         {product.badge.replace(/[^\w\sÀ-ú]/g, '').trim()}
+                      </span>
+                    )}
+                    {product.condition && (
+                      <span className="absolute top-3 right-3 px-2 py-1 rounded-full text-[9px] font-semibold backdrop-blur-sm"
+                        style={{ background: 'hsla(240,6%,10%,0.75)', color: '#ddd', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        {conditionLabel(product)}
                       </span>
                     )}
                   </div>
@@ -85,16 +87,16 @@ export function ProductsSection() {
                     </h3>
                     <div className="flex items-baseline gap-2 mb-0.5">
                       <span className="text-xl font-black" style={{ color: 'hsl(43,96%,52%)' }}>
-                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                        {priceLabel(product.price)}
                       </span>
                       {product.old_price && (
                         <span className="text-xs line-through" style={{ color: '#666' }}>
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.old_price)}
+                          {priceLabel(product.old_price)}
                         </span>
                       )}
                     </div>
                     <p className="text-[11px] mb-3" style={{ color: '#888' }}>
-                      ou {product.installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price / product.installments)}
+                      ou {product.installments}x de {priceLabel(product.price / product.installments)}
                     </p>
                     <PremiumButton
                       variant="primary"

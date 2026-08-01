@@ -33,7 +33,18 @@ const BADGE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>
   'OFERTA': Gift,
 };
 
-const emptyForm = (): ProductFormData => ({
+// Campos "por nicho" (size/color/brand/...) não fazem parte do productSchema
+// (nem toda categoria de negócio usa todos) — tipados à parte em vez de cair
+// num Record<string, unknown> genérico, que fazia o TS perder o tipo `string`
+// esperado pelo `value` dos inputs.
+interface NicheFormFields {
+  size?: string; color?: string; brand?: string; model?: string;
+  weight?: string; volume?: string; flavor?: string; expiration?: string;
+  ingredients?: string; nutritional_info?: string;
+}
+type ProductFormState = ProductFormData & NicheFormFields;
+
+const emptyForm = (): ProductFormState => ({
   title:'', description:'', price:0, old_price:null,
   installments:12, image_url:null, affiliate_link:null,
   status:'active', category:'', badge:'', featured:false,
@@ -239,7 +250,7 @@ export default function AdminProducts() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selected, setSelected] = useState<Product | null>(null);
-  const [form, setForm] = useState<ProductFormData & Record<string, unknown>>(emptyForm());
+  const [form, setForm] = useState<ProductFormState>(emptyForm());
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -286,7 +297,13 @@ export default function AdminProducts() {
         expiration: product.expiration ?? '',
         ingredients: product.ingredients ?? '',
         nutritional_info: product.nutritional_info ?? '',
-      } as ProductFormData & Record<string, unknown>);
+        // Condição/especificação do aparelho
+        condition: product.condition ?? null,
+        storage_gb: product.storage_gb ?? null,
+        battery_health_pct: product.battery_health_pct ?? null,
+        warranty_days: product.warranty_days ?? null,
+        accessories_included: product.accessories_included ?? '',
+      });
     } else { setSelected(null); setForm(emptyForm()); }
     setFormErrors({});
     setIsModalOpen(true);
@@ -441,6 +458,45 @@ export default function AdminProducts() {
                 <Label className="text-xs">Categoria</Label>
                 <Input placeholder="apple, xiaomi..." {...f('category')} />
                 {formErrors.category && <p className="text-xs text-destructive">{formErrors.category}</p>}
+              </div>
+            </div>
+
+            {/* Condição/especificação — alimenta os filtros e a comparação no catálogo público.
+                Tudo opcional: o que não for preenchido aparece como "Não informado", nunca inventado. */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs">Condição</Label>
+                <select value={form.condition ?? ''} onChange={e => setForm(p => ({ ...p, condition: (e.target.value || null) as ProductFormState['condition'] }))}
+                  className="w-full h-9 px-3 rounded-md text-sm bg-background border border-input">
+                  <option value="">Não informado</option>
+                  <option value="novo">Novo lacrado</option>
+                  <option value="seminovo">Seminovo</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Armazenamento (GB)</Label>
+                <Input type="number" placeholder="128" value={form.storage_gb ?? ''}
+                  onChange={e => setForm(p => ({ ...p, storage_gb: e.target.value ? Number(e.target.value) : null }))} className="text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Saúde da bateria (%)</Label>
+                <Input type="number" min={1} max={100} placeholder="92" value={form.battery_health_pct ?? ''}
+                  onChange={e => setForm(p => ({ ...p, battery_health_pct: e.target.value ? Number(e.target.value) : null }))} className="text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Cor</Label>
+                <Input placeholder="Titânio Natural" value={form.color ?? ''}
+                  onChange={e => setForm(p => ({ ...p, color: e.target.value || null }))} className="text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Garantia (dias)</Label>
+                <Input type="number" placeholder="365" value={form.warranty_days ?? ''}
+                  onChange={e => setForm(p => ({ ...p, warranty_days: e.target.value ? Number(e.target.value) : null }))} className="text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Acessórios inclusos</Label>
+                <Input placeholder="Carregador, caixa original" value={form.accessories_included ?? ''}
+                  onChange={e => setForm(p => ({ ...p, accessories_included: e.target.value || null }))} className="text-sm" />
               </div>
             </div>
 
