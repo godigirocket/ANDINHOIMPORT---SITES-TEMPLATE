@@ -6,6 +6,7 @@ import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { TiltCard } from '@/components/ui/TiltCard';
 import { MeshBackground } from '@/components/site/MeshBackground';
+import { usePinnedSequence } from '@/hooks/usePinnedSequence';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -18,9 +19,43 @@ const DEFAULT: Testimonial[] = [
   { id: '4', name: 'Juliana K.', rating: 5, avatar_url: null, text: 'Apple Watch lacrado com nota fiscal. Pix com 5% de desconto, super tranquilo.' },
 ];
 
+function TestimonialCard({ t }: { t: Testimonial }) {
+  return (
+    <motion.div
+      key={t.id}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.5 }}
+      className="absolute inset-0 flex flex-col items-center justify-center text-center w-full px-8"
+    >
+      <div className="flex justify-center gap-1 mb-4">
+        {Array.from({ length: t.rating }).map((_, i) => (
+          <Star key={i} className="w-4 h-4 fill-current" style={{ color: 'hsl(43,96%,52%)' }} />
+        ))}
+      </div>
+      <p className="text-base md:text-lg leading-relaxed mb-5 italic" style={{ color: '#ddd' }}>
+        "{t.text}"
+      </p>
+      <div className="flex items-center justify-center gap-3">
+        {t.avatar_url ? (
+          <img src={t.avatar_url} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+        ) : (
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+            style={{ background: 'hsla(43,96%,52%,0.15)', color: 'hsl(43,96%,52%)' }}>
+            {t.name.charAt(0)}
+          </div>
+        )}
+        <span className="text-sm font-semibold text-white">{t.name}</span>
+      </div>
+    </motion.div>
+  );
+}
+
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);
   const [current, setCurrent] = useState(0);
+  const { wrapperRef, active, isPinned } = usePinnedSequence(items.length);
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -30,17 +65,51 @@ export function TestimonialsSection() {
     });
   }, []);
 
-  // Auto-rotate: 1 por vez com fade
+  // No modo pinado, o índice vem do scroll. Fora dele (mobile/reduced-motion),
+  // continua o auto-rotate por tempo de antes.
   useEffect(() => {
-    if (items.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrent(prev => (prev + 1) % items.length);
-    }, 4000);
+    if (isPinned || items.length <= 1) return;
+    const interval = setInterval(() => setCurrent(prev => (prev + 1) % items.length), 4000);
     return () => clearInterval(interval);
-  }, [items.length]);
+  }, [isPinned, items.length]);
 
-  const t = items[current];
+  const activeIdx = isPinned ? active : current;
+  const t = items[activeIdx];
   if (!t) return null;
+
+  if (isPinned) {
+    return (
+      <section ref={wrapperRef} id="testimonials" className="relative" style={{ height: `${items.length * 100}vh` }}>
+        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center" style={{ background: 'hsl(28,18%,14%)' }}>
+          <MeshBackground />
+          <div className="relative z-10 max-w-3xl mx-auto px-4 w-full">
+            <div className="mb-10 text-center">
+              <RevealText as="h2" className="font-black text-2xl md:text-3xl tracking-tight">
+                O que dizem <span className="gradient-text">nossos clientes</span>
+              </RevealText>
+            </div>
+
+            <TiltCard intensity={4} className="relative min-h-[240px] p-8 md:p-12"
+              style={{ background: 'hsla(28,14%,20%,0.6)', border: '1px solid hsla(43,96%,52%,0.12)', backdropFilter: 'blur(12px)' }}>
+              <AnimatePresence mode="wait">
+                <TestimonialCard key={t.id} t={t} />
+              </AnimatePresence>
+            </TiltCard>
+
+            {/* Progresso — mesmo padrão do ProcessShowcase, um segmento por depoimento */}
+            <div className="flex gap-2 mt-6 max-w-xs mx-auto">
+              {items.map((_, i) => (
+                <div key={i} className="h-[3px] flex-1 rounded-full overflow-hidden" style={{ background: 'hsla(255,255%,255%,0.12)' }}>
+                  <div className="h-full rounded-full transition-transform duration-300 origin-left"
+                    style={{ background: 'hsl(43,96%,52%)', transform: `scaleX(${i <= active ? 1 : 0})` }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="testimonials" className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(28,18%,14%)' }}>
@@ -52,47 +121,13 @@ export function TestimonialsSection() {
           </RevealText>
         </div>
 
-        {/* Card de depoimento com profundidade (tilt 3D) — crossfade sobreposto por dentro */}
         <TiltCard intensity={4} className="relative min-h-[240px] p-8 md:p-12"
           style={{ background: 'hsla(28,14%,20%,0.6)', border: '1px solid hsla(43,96%,52%,0.12)', backdropFilter: 'blur(12px)' }}>
           <AnimatePresence>
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex flex-col items-center justify-center text-center w-full px-8"
-            >
-              {/* Stars */}
-              <div className="flex justify-center gap-1 mb-4">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" style={{ color: 'hsl(43,96%,52%)' }} />
-                ))}
-              </div>
-
-              {/* Text */}
-              <p className="text-base md:text-lg leading-relaxed mb-5 italic" style={{ color: '#ddd' }}>
-                "{t.text}"
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center justify-center gap-3">
-                {t.avatar_url ? (
-                  <img src={t.avatar_url} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
-                ) : (
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-                    style={{ background: 'hsla(43,96%,52%,0.15)', color: 'hsl(43,96%,52%)' }}>
-                    {t.name.charAt(0)}
-                  </div>
-                )}
-                <span className="text-sm font-semibold text-white">{t.name}</span>
-              </div>
-            </motion.div>
+            <TestimonialCard key={t.id} t={t} />
           </AnimatePresence>
         </TiltCard>
 
-        {/* Dots indicator */}
         <div className="flex justify-center gap-1.5 mt-6">
           {items.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)}

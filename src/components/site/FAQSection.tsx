@@ -35,10 +35,10 @@ export function FAQSection() {
           {FAQ_ITEMS.map((item, i) => (
             <motion.div
               key={i}
-              initial={{ y: 16, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
+              initial={{ y: 32, opacity: 0, filter: 'blur(4px)' }}
+              whileInView={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+              viewport={{ once: true, margin: '-15% 0px -15% 0px' }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <button
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
