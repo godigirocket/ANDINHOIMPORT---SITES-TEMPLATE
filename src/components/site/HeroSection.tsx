@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MessageCircle, ChevronDown, ShieldCheck, Zap, Award } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
@@ -8,6 +10,8 @@ import { useTilt3D } from '@/hooks/useTilt3D';
 import { scrollToElement } from '@/lib/utils/scrollTo';
 import { PremiumButton } from '@/components/ui/PremiumButton';
 import { RevealText } from '@/components/ui/RevealText';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1600&q=85&auto=format&fit=crop',
@@ -22,6 +26,23 @@ export function HeroSection() {
   const [bgIdx, setBgIdx] = useState(0);
   const bgParallaxRef = useParallax<HTMLDivElement>(0.14);
   const contentTiltRef = useTilt3D<HTMLDivElement>(3.5);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Primeira transformação do scroll: o produto se aproxima (zoom controlado)
+  // em vez de só desaparecer com fade — a cena se transforma, não só some.
+  useEffect(() => {
+    const section = sectionRef.current;
+    const bg = bgParallaxRef.current;
+    if (!section || !bg) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const tween = gsap.to(bg, {
+      scale: 1.22,
+      ease: 'none',
+      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom top', scrub: true },
+    });
+    return () => { tween.scrollTrigger?.kill(); tween.kill(); };
+  }, [bgParallaxRef]);
 
   const bgImages = [
     content.hero_bg_1 || FALLBACK_IMAGES[0],
@@ -37,7 +58,7 @@ export function HeroSection() {
   const msg = encodeURIComponent(clientConfig.company.contact.whatsappMessage);
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
+    <section ref={sectionRef} id="hero" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background images com crossfade + parallax real (GSAP, funciona no iOS) */}
       <div ref={bgParallaxRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
         {bgImages.map((src, i) => (
@@ -50,15 +71,17 @@ export function HeroSection() {
         ))}
       </div>
 
-      {/* Orbe de luz flutuante — estático, sem custo de scroll */}
+      {/* Orbes de luz — dourado à esquerda, aço frio à direita, quebra a dependência de uma única cor */}
       <div className="absolute -top-24 right-[8%] w-[420px] h-[420px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.14) 0%, transparent 70%)', filter: 'blur(20px)' }} />
+        style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.1) 0%, transparent 70%)', filter: 'blur(20px)' }} />
+      <div className="absolute bottom-[-10%] right-[18%] w-[520px] h-[520px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, hsla(205,45%,55%,0.1) 0%, transparent 70%)', filter: 'blur(30px)' }} />
 
-      {/* Overlay */}
+      {/* Overlay — mais leve à direita, o produto precisa aparecer de verdade */}
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(105deg, hsla(240,6%,11%,0.95) 0%, hsla(240,6%,11%,0.75) 50%, hsla(240,6%,11%,0.2) 100%)' }} />
+        style={{ background: 'linear-gradient(100deg, hsla(240,6%,9%,0.97) 0%, hsla(240,6%,9%,0.82) 42%, hsla(240,6%,9%,0.38) 68%, hsla(240,6%,9%,0.12) 100%)' }} />
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(to top, hsl(240,6%,11%) 0%, transparent 30%)' }} />
+        style={{ background: 'linear-gradient(to top, hsl(240,6%,9%) 0%, transparent 22%)' }} />
 
       {/* Conteúdo */}
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full pt-28 pb-24" style={{ perspective: '1200px' }}>

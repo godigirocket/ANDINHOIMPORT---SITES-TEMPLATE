@@ -57,40 +57,34 @@ export function ProductsSection() {
               >
                 <TiltCard
                   className="overflow-hidden cursor-pointer group relative"
-                  style={{ background: 'hsl(213,20%,19%)', border: '1px solid rgba(245,183,0,0.08)', boxShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
+                  style={{ background: 'hsl(213,18%,15%)', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
                   onClick={() => window.open(waUrl, '_blank')}
                 >
-                  {/* Imagem */}
-                  <div className="aspect-[4/3] overflow-hidden relative flex items-center justify-center" style={{ background: 'hsl(213,18%,16%)' }}>
+                  {/* Imagem — retrato, o aparelho é o protagonista do card */}
+                  <div className="aspect-[3/4] overflow-hidden relative flex items-center justify-center" style={{ background: 'hsl(213,16%,13%)' }}>
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.title}
-                        className="product-reflect w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="product-reflect w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-[1.04]"
                         loading="lazy" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ background: 'hsl(213,16%,15%)' }}>
                         <span className="text-xs" style={{ color: '#666' }}>Sem imagem</span>
                       </div>
                     )}
-                    {/* Shimmer on hover */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                      style={{ background: 'linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.05) 50%, transparent 80%)' }} />
                     {product.badge && (
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide"
-                        style={{ background: 'hsl(43,96%,52%)', color: '#050505', boxShadow: '0 2px 8px rgba(245,183,0,0.3)' }}>
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide backdrop-blur-sm"
+                        style={{ background: 'hsla(43,96%,52%,0.92)', color: '#050505' }}>
                         {product.badge.replace(/[^\w\sÀ-ú]/g, '').trim()}
                       </span>
                     )}
                   </div>
-                  {/* Info */}
-                  <div className="p-5">
-                    <h3 className="text-sm font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                  {/* Info — preço domina a hierarquia, CTA sempre visível (nunca escondido atrás de hover) */}
+                  <div className="p-4">
+                    <h3 className="text-sm font-bold text-white mb-2 line-clamp-1">
                       {product.title}
                     </h3>
-                    {product.description && (
-                      <p className="text-xs mb-3 line-clamp-1" style={{ color: '#999' }}>{product.description}</p>
-                    )}
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-lg font-black" style={{ color: 'hsl(43,96%,52%)' }}>
+                    <div className="flex items-baseline gap-2 mb-0.5">
+                      <span className="text-xl font-black" style={{ color: 'hsl(43,96%,52%)' }}>
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                       </span>
                       {product.old_price && (
@@ -99,12 +93,12 @@ export function ProductsSection() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] mb-4" style={{ color: '#888' }}>
+                    <p className="text-[11px] mb-3" style={{ color: '#888' }}>
                       ou {product.installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price / product.installments)}
                     </p>
                     <PremiumButton
                       variant="primary"
-                      className="w-full py-2.5 text-xs"
+                      className="w-full py-2 text-xs"
                       onClick={(e) => { e.stopPropagation(); window.open(waUrl, '_blank'); }}
                     >
                       <MessageCircle className="w-3.5 h-3.5" /> Consultar
