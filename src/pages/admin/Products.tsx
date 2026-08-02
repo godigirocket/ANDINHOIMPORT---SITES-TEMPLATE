@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Search, Edit, Trash2, MoreVertical, Eye, EyeOff, Loader2, Star, GripVertical, ImageIcon, ChevronDown, Flame, Sparkles, Gift, Tag, Gem, Target, Rocket, DollarSign, Lock, PackageCheck, Award, Zap } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, MoreVertical, Eye, EyeOff, Loader2, Star, GripVertical, ImageIcon, ChevronDown, Flame, Sparkles, Gift, Tag, Gem, Target, Rocket, DollarSign, Lock, PackageCheck, Award, Zap, Settings2, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,8 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useProductStore, type ProductFormData, productSchema, type Product } from '@/lib/stores/productStore';
+import { useTaxonomyStore } from '@/lib/stores/taxonomyStore';
 import { getNicheConfig } from '@/config/niche';
 import { uploadImage, compressImage, deleteImage, replaceImage } from '@/lib/supabase/storage';
+import { conditionLabel } from '@/lib/utils/productFallbacks';
 import { toast } from 'sonner';
 import { clientConfig } from '@/config/client';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -49,6 +51,51 @@ const emptyForm = (): ProductFormState => ({
   installments:12, image_url:null, affiliate_link:null,
   status:'active', category:'', badge:'', featured:false,
 });
+
+/** Gerencia as opções de "condição" (novo, seminovo, usado, recondicionado...) — editável aqui, sem mexer em código. */
+function ConditionOptionsManager() {
+  const { conditionOptions, addCondition, removeCondition } = useTaxonomyStore();
+  const [open, setOpen] = useState(false);
+  const [newLabel, setNewLabel] = useState('');
+
+  const handleAdd = () => {
+    if (!newLabel.trim()) return;
+    addCondition(newLabel);
+    setNewLabel('');
+  };
+
+  return (
+    <div className="mt-1.5">
+      <button type="button" onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+        <Settings2 className="w-3 h-3" /> Gerenciar opções de condição
+      </button>
+      {open && (
+        <div className="mt-2 p-2.5 rounded-md border border-input space-y-2">
+          <div className="flex flex-wrap gap-1.5">
+            {conditionOptions.map(opt => (
+              <span key={opt} className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] bg-muted">
+                {opt}
+                <button type="button" onClick={() => removeCondition(opt)} aria-label={`Remover ${opt}`}>
+                  <X className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                </button>
+              </span>
+            ))}
+          </div>
+          <div className="flex gap-1.5">
+            <Input value={newLabel} onChange={e => setNewLabel(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAdd(); } }}
+              placeholder="ex: usado, recondicionado" className="h-7 text-xs" />
+            <button type="button" onClick={handleAdd}
+              className="px-2.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground flex-shrink-0">
+              Adicionar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ImagePreview({ src }: { src: string }) {
   const [error, setError] = useState(false);
@@ -246,6 +293,7 @@ function useDragSort(items: Product[], onReorder: (ids: string[]) => void) {
 
 export default function AdminProducts() {
   const { products, fetchProducts, createProduct, updateProduct, deleteProduct, toggleStatus, searchProducts, reorderProducts } = useProductStore();
+  const { conditionOptions } = useTaxonomyStore();
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -466,12 +514,14 @@ export default function AdminProducts() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Condição</Label>
-                <select value={form.condition ?? ''} onChange={e => setForm(p => ({ ...p, condition: (e.target.value || null) as ProductFormState['condition'] }))}
+                <select value={form.condition ?? ''} onChange={e => setForm(p => ({ ...p, condition: e.target.value || null }))}
                   className="w-full h-9 px-3 rounded-md text-sm bg-background border border-input">
                   <option value="">Não informado</option>
-                  <option value="novo">Novo lacrado</option>
-                  <option value="seminovo">Seminovo</option>
+                  {conditionOptions.map(opt => (
+                    <option key={opt} value={opt}>{conditionLabel({ condition: opt })}</option>
+                  ))}
                 </select>
+                <ConditionOptionsManager />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Armazenamento (GB)</Label>

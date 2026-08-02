@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scroll dirigido seção-por-seção é feito via JS (useSectionSnap.ts, com
+   Lenis) — CSS scroll-snap não engata de forma confiável junto com o
+   smooth-scroll do site, então não é usado aqui. */
+main > section {
+  scroll-margin-top: 80px;
+}
+
 @layer base {
   :root {
     /* ── ANDINHO IMPORT — Chumbo escuro com accent dourado ── */
@@ -94,24 +101,8 @@
     color: hsl(0,0%,3%);
     box-shadow: 0 4px 20px hsla(43,96%,52%,0.2);
   }
-  .btn-gold::before {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    z-index: -1;
-    border-radius: inherit;
-    background: conic-gradient(from 0deg, transparent 0%, hsla(255,255%,255%,0.9) 12%, transparent 24%);
-    opacity: 0;
-    animation: glow-sweep-rotate 1.8s linear infinite;
-    animation-play-state: paused;
-    transition: opacity 0.3s ease;
-  }
-  .btn-gold:hover::before { opacity: 1; animation-play-state: running; }
-  @media (prefers-reduced-motion: reduce) {
-    .btn-gold::before { display: none; }
-  }
   .btn-gold:hover {
-    box-shadow: 0 4px 30px hsla(43,96%,52%,0.35);
+    box-shadow: 0 4px 24px hsla(43,96%,52%,0.3);
     transform: translateY(-1px);
   }
   .btn-gold:active { transform: scale(0.98); }
@@ -119,19 +110,7 @@
     outline: none;
     box-shadow: 0 0 0 2px hsl(240,6%,11%), 0 0 0 4px hsla(43,96%,52%,0.7);
   }
-  /* Shine — feixe de luz que atravessa o botão só durante o hover */
-  .btn-gold .btn-shine, .btn-outline-premium .btn-shine {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(115deg, transparent 40%, hsla(255,255%,255%,0.35) 50%, transparent 60%);
-    transform: translateX(-120%);
-    transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
-    pointer-events: none;
-  }
-  .btn-gold:hover .btn-shine, .btn-outline-premium:hover .btn-shine { transform: translateX(120%); }
-  @media (prefers-reduced-motion: reduce) {
-    .btn-gold .btn-shine, .btn-outline-premium .btn-shine { display: none; }
-  }
+  .btn-gold .btn-shine, .btn-outline-premium .btn-shine { display: none; }
   /* Arrow slide — qualquer ícone como último filho desliza no hover */
   .btn-gold svg:last-child, .btn-outline-premium svg:last-child {
     transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -262,29 +241,17 @@
   .tilt-lift:hover { transform: none; }
 }
 
-/* ── Glow sweep — brilho dourado que percorre a borda no hover ── */
+/* ── Hover — leve realce de borda, sem sweep girando ── */
 .glow-on-hover {
   position: relative;
   z-index: 0;
-  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
-.glow-on-hover::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  z-index: -1;
-  border-radius: inherit;
-  background: conic-gradient(from 0deg, transparent 0%, hsla(43,96%,52%,0.9) 15%, transparent 30%);
-  opacity: 0;
-  animation: glow-sweep-rotate 2.2s linear infinite;
-  animation-play-state: paused;
-  transition: opacity 0.3s ease;
+.glow-on-hover:hover {
+  border-color: hsla(43,96%,52%,0.35);
+  box-shadow: 0 4px 20px hsla(0,0%,0%,0.25);
 }
-.glow-on-hover:hover::before { opacity: 1; animation-play-state: running; }
 @keyframes glow-sweep-rotate { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) {
-  .glow-on-hover::before { display: none; }
-}
 
 /* ── Iris reveal — foto que "abre" ao entrar na viewport (IntersectionObserver,
    imune a bug de posição de scroll calculada antes de imagens carregarem) ── */

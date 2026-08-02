@@ -9,10 +9,19 @@ export function whatsappUrlForProduct(p: Pick<Product, 'title'>): string {
 /** Texto único pra qualquer campo opcional ausente — nunca inventa o dado. */
 export const NAO_INFORMADO = 'Não informado';
 
+// Rótulos bonitos pras opções padrão — qualquer opção nova criada no admin
+// (usado, recondicionado...) aparece com a primeira letra maiúscula, sem precisar
+// de código novo pra cada uma.
+const CONDITION_LABELS: Record<string, string> = {
+  novo: 'Novo lacrado',
+  seminovo: 'Seminovo',
+};
+
 export function conditionLabel(p: Pick<Product, 'condition'>): string {
-  if (p.condition === 'novo') return 'Novo lacrado';
-  if (p.condition === 'seminovo') return 'Seminovo';
-  return NAO_INFORMADO;
+  if (!p.condition) return NAO_INFORMADO;
+  const known = CONDITION_LABELS[p.condition.toLowerCase()];
+  if (known) return known;
+  return p.condition.charAt(0).toUpperCase() + p.condition.slice(1);
 }
 
 export function storageLabel(p: Pick<Product, 'storage_gb'>): string {

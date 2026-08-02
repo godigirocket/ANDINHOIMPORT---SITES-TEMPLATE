@@ -3,7 +3,7 @@
  */
 export function SectionDivider() {
   return (
-    <div className="relative py-6 flex items-center justify-center">
+    <div className="relative py-2 flex items-center justify-center">
       {/* Glow blur background */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-64 h-12 rounded-full" style={{ background: 'rgba(245,183,0,0.04)', filter: 'blur(30px)' }} />

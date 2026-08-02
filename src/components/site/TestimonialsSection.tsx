@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Star, Quote as QuoteIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
-import { TiltCard } from '@/components/ui/TiltCard';
-import { MeshBackground } from '@/components/site/MeshBackground';
-import { usePinnedSequence } from '@/hooks/usePinnedSequence';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -19,34 +16,37 @@ const DEFAULT: Testimonial[] = [
   { id: '4', name: 'Juliana K.', rating: 5, avatar_url: null, text: 'Apple Watch lacrado com nota fiscal. Pix com 5% de desconto, super tranquilo.' },
 ];
 
-function TestimonialCard({ t }: { t: Testimonial }) {
+function Quote({ t }: { t: Testimonial }) {
   return (
     <motion.div
       key={t.id}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.5 }}
-      className="absolute inset-0 flex flex-col items-center justify-center text-center w-full px-8"
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.4 }}
+      className="absolute inset-0"
     >
-      <div className="flex justify-center gap-1 mb-4">
-        {Array.from({ length: t.rating }).map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-current" style={{ color: 'hsl(43,96%,52%)' }} />
-        ))}
-      </div>
-      <p className="text-base md:text-lg leading-relaxed mb-5 italic" style={{ color: '#ddd' }}>
-        "{t.text}"
+      <QuoteIcon className="mb-4 w-8 h-8" style={{ color: 'hsla(43,96%,52%,0.4)' }} strokeWidth={2.5} />
+      <p className="font-display font-bold leading-[1.2] mb-8 text-white" style={{ fontSize: 'clamp(1.35rem, 2.4vw, 1.9rem)' }}>
+        {t.text}
       </p>
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center gap-4">
         {t.avatar_url ? (
-          <img src={t.avatar_url} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+          <img src={t.avatar_url} alt={t.name} className="w-11 h-11 rounded-full object-cover" />
         ) : (
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+          <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
             style={{ background: 'hsla(43,96%,52%,0.15)', color: 'hsl(43,96%,52%)' }}>
             {t.name.charAt(0)}
           </div>
         )}
-        <span className="text-sm font-semibold text-white">{t.name}</span>
+        <div>
+          <p className="text-sm font-bold text-white">{t.name}</p>
+          <div className="flex gap-0.5 mt-0.5">
+            {Array.from({ length: t.rating }).map((_, i) => (
+              <Star key={i} className="w-3 h-3 fill-current" style={{ color: 'hsl(43,96%,52%)' }} />
+            ))}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -55,7 +55,6 @@ function TestimonialCard({ t }: { t: Testimonial }) {
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);
   const [current, setCurrent] = useState(0);
-  const { wrapperRef, active, isPinned } = usePinnedSequence(items.length);
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -65,74 +64,38 @@ export function TestimonialsSection() {
     });
   }, []);
 
-  // No modo pinado, o índice vem do scroll. Fora dele (mobile/reduced-motion),
-  // continua o auto-rotate por tempo de antes.
   useEffect(() => {
-    if (isPinned || items.length <= 1) return;
-    const interval = setInterval(() => setCurrent(prev => (prev + 1) % items.length), 4000);
+    if (items.length <= 1) return;
+    const interval = setInterval(() => setCurrent(prev => (prev + 1) % items.length), 5500);
     return () => clearInterval(interval);
-  }, [isPinned, items.length]);
+  }, [items.length]);
 
-  const activeIdx = isPinned ? active : current;
-  const t = items[activeIdx];
+  const t = items[current];
   if (!t) return null;
 
-  if (isPinned) {
-    return (
-      <section ref={wrapperRef} id="testimonials" className="relative" style={{ height: `${items.length * 100}vh` }}>
-        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center" style={{ background: 'hsl(28,18%,14%)' }}>
-          <MeshBackground />
-          <div className="relative z-10 max-w-3xl mx-auto px-4 w-full">
-            <div className="mb-10 text-center">
-              <RevealText as="h2" className="font-black text-2xl md:text-3xl tracking-tight">
-                O que dizem <span className="gradient-text">nossos clientes</span>
-              </RevealText>
-            </div>
-
-            <TiltCard intensity={4} className="relative min-h-[240px] p-8 md:p-12"
-              style={{ background: 'hsla(28,14%,20%,0.6)', border: '1px solid hsla(43,96%,52%,0.12)', backdropFilter: 'blur(12px)' }}>
-              <AnimatePresence mode="wait">
-                <TestimonialCard key={t.id} t={t} />
-              </AnimatePresence>
-            </TiltCard>
-
-            {/* Progresso — mesmo padrão do ProcessShowcase, um segmento por depoimento */}
-            <div className="flex gap-2 mt-6 max-w-xs mx-auto">
-              {items.map((_, i) => (
-                <div key={i} className="h-[3px] flex-1 rounded-full overflow-hidden" style={{ background: 'hsla(255,255%,255%,0.12)' }}>
-                  <div className="h-full rounded-full transition-transform duration-300 origin-left"
-                    style={{ background: 'hsl(43,96%,52%)', transform: `scaleX(${i <= active ? 1 : 0})` }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section id="testimonials" className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(28,18%,14%)' }}>
-      <MeshBackground />
-      <div className="relative z-10 max-w-3xl mx-auto px-4">
-        <div className="mb-10 text-center">
-          <RevealText as="h2" className="font-black text-2xl md:text-3xl tracking-tight">
-            O que dizem <span className="gradient-text">nossos clientes</span>
+    <section id="testimonials" className="relative py-14 md:py-20 overflow-hidden" style={{ background: 'hsl(240,6%,10%)' }}>
+      <div className="relative z-10 max-w-2xl mx-auto px-6">
+        <div className="mb-10 md:mb-14">
+          <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'hsl(43,96%,52%)' }}>
+            Depoimento verificado
+          </p>
+          <RevealText as="h2" className="font-display font-black tracking-tight text-white">
+            <span style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2rem)' }}>Quem já comprou, confirma</span>
           </RevealText>
         </div>
 
-        <TiltCard intensity={4} className="relative min-h-[240px] p-8 md:p-12"
-          style={{ background: 'hsla(28,14%,20%,0.6)', border: '1px solid hsla(43,96%,52%,0.12)', backdropFilter: 'blur(12px)' }}>
-          <AnimatePresence>
-            <TestimonialCard key={t.id} t={t} />
+        <div className="relative min-h-[200px]">
+          <AnimatePresence mode="wait">
+            <Quote key={t.id} t={t} />
           </AnimatePresence>
-        </TiltCard>
+        </div>
 
-        <div className="flex justify-center gap-1.5 mt-6">
+        <div className="flex gap-1.5 mt-10">
           {items.map((_, i) => (
-            <button key={i} onClick={() => setCurrent(i)}
-              className="w-1.5 h-1.5 rounded-full transition-all"
-              style={{ background: i === current ? 'hsl(43,96%,52%)' : 'rgba(255,255,255,0.2)' }}
+            <button key={i} onClick={() => setCurrent(i)} aria-label={`Depoimento ${i + 1}`}
+              className="h-[3px] rounded-full transition-all"
+              style={{ width: i === current ? '28px' : '14px', background: i === current ? 'hsl(43,96%,52%)' : 'rgba(255,255,255,0.15)' }}
             />
           ))}
         </div>

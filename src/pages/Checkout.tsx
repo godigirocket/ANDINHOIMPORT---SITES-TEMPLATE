@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { generatePixPayload, formatPixKeyForPayload } from '@/lib/pix/brcode';
 import { trackEvent } from '@/lib/analytics/track';
 import { saveOrder } from '@/lib/orders/orderStore';
-import { RevealText } from '@/components/ui/RevealText';
 import { PremiumButton } from '@/components/ui/PremiumButton';
 import { spawnRipple } from '@/lib/utils/ripple';
 
@@ -109,10 +108,10 @@ export default function Checkout() {
 
   if (items.length === 0 && step !== 'success') {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#fff' }}>
         <div className="text-center space-y-4">
-          <ShoppingBag className="w-12 h-12 mx-auto text-primary/40" />
-          <p className="text-white font-bold">Carrinho vazio</p>
+          <ShoppingBag className="w-12 h-12 mx-auto" style={{ color: '#ddd' }} />
+          <p className="font-bold" style={{ color: '#111' }}>Carrinho vazio</p>
           <PremiumButton onClick={() => navigate('/')} variant="primary" className="text-sm">
             <ArrowLeft className="w-4 h-4" />Voltar à loja
           </PremiumButton>
@@ -296,17 +295,17 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 bg-card/90 backdrop-blur-xl border-b border-border/30">
+    <div className="min-h-screen" style={{ background: '#fff' }}>
+      <header className="sticky top-0 z-40" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #eee' }}>
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <button onClick={() => step === 'info' ? navigate('/') : (step === 'payment' && method ? setMethod(null) : setStep('info'))}
-            className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors">
+            className="flex items-center gap-2 text-sm transition-colors" style={{ color: '#666' }}>
             <ArrowLeft className="w-4 h-4" />
             {step === 'info' ? 'Voltar à loja' : 'Voltar'}
           </button>
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-4 h-4 text-primary" />
-            <span className="text-sm font-bold text-white">{getItemCount()} item(s) · {fmt(total)}</span>
+            <ShoppingBag className="w-4 h-4" style={{ color: 'hsl(43,96%,45%)' }} />
+            <span className="text-sm font-display font-bold" style={{ color: '#111' }}>{getItemCount()} item(s) · {fmt(total)}</span>
           </div>
         </div>
       </header>
@@ -320,11 +319,12 @@ export default function Checkout() {
             const isActive = i <= stepIdx;
             return (
               <div key={label} className="flex items-center gap-2">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${isActive ? 'bg-primary text-background' : 'bg-white/10 text-white/40'}`}>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                  style={{ background: isActive ? 'hsl(43,96%,52%)' : '#f0f0f0', color: isActive ? '#050505' : '#aaa' }}>
                   {i + 1}
                 </div>
-                <span className={`text-xs font-semibold hidden sm:block ${isActive ? 'text-primary' : 'text-white/30'}`}>{label}</span>
-                {i < 2 && <div className={`w-8 h-px ${isActive ? 'bg-primary' : 'bg-white/10'}`} />}
+                <span className="text-xs font-semibold hidden sm:block" style={{ color: isActive ? 'hsl(43,96%,40%)' : '#bbb' }}>{label}</span>
+                {i < 2 && <div className="w-8 h-px" style={{ background: isActive ? 'hsl(43,96%,52%)' : '#eee' }} />}
               </div>
             );
           })}
@@ -334,8 +334,8 @@ export default function Checkout() {
         {step === 'info' && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <div className="rounded-2xl p-6 space-y-5"
-              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(43,96%,52%,0.1)' }}>
-              <RevealText as="h2" className="text-lg font-bold text-white">Seus dados</RevealText>
+              style={{ background: '#fafafa', border: '1px solid #eee' }}>
+              <h2 className="text-lg font-bold" style={{ color: '#111' }}>Seus dados</h2>
               <form onSubmit={handleInfoSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
@@ -361,17 +361,17 @@ export default function Checkout() {
                 </div>
 
                 <div className="p-4 rounded-xl space-y-2"
-                  style={{ background: 'hsla(240,6%,20%,0.85)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
-                  <p className="text-xs font-bold text-white/60 mb-3">Resumo do pedido</p>
+                  style={{ background: '#fff', border: '1px solid #eee' }}>
+                  <p className="text-xs font-bold mb-3" style={{ color: '#888' }}>Resumo do pedido</p>
                   {items.map(item => (
                     <div key={item.product.id} className="flex items-center justify-between text-xs">
-                      <span className="text-white/70">{item.quantity}x {item.product.title}</span>
-                      <span className="text-primary font-bold">{fmt(item.product.price * item.quantity)}</span>
+                      <span style={{ color: '#555' }}>{item.quantity}x {item.product.title}</span>
+                      <span className="font-bold" style={{ color: '#111' }}>{fmt(item.product.price * item.quantity)}</span>
                     </div>
                   ))}
-                  <div className="border-t border-white/10 pt-2 mt-2 flex justify-between">
-                    <span className="text-sm font-bold text-white">Total</span>
-                    <span className="text-lg font-black text-primary">{fmt(total)}</span>
+                  <div className="pt-2 mt-2 flex justify-between" style={{ borderTop: '1px solid #eee' }}>
+                    <span className="text-sm font-bold" style={{ color: '#111' }}>Total</span>
+                    <span className="text-lg font-display font-black" style={{ color: '#111' }}>{fmt(total)}</span>
                   </div>
                 </div>
 
@@ -387,69 +387,69 @@ export default function Checkout() {
         {step === 'payment' && !method && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div className="rounded-2xl p-6"
-              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(43,96%,52%,0.1)' }}>
-              <RevealText as="h2" className="text-lg font-bold text-white mb-2">Escolha o pagamento</RevealText>
-              <p className="text-xs text-white/40 mb-5">Total: <span className="text-primary font-bold">{fmt(total)}</span></p>
+              style={{ background: '#fafafa', border: '1px solid #eee' }}>
+              <h2 className="text-lg font-bold mb-2" style={{ color: '#111' }}>Escolha o pagamento</h2>
+              <p className="text-xs mb-5" style={{ color: '#888' }}>Total: <span className="font-display font-bold" style={{ color: '#111' }}>{fmt(total)}</span></p>
 
               <div className="space-y-3">
                 {paymentConfig.pix_enabled && paymentConfig.pix_key && (
                   <button onClick={(e) => { spawnRipple(e.currentTarget, e.clientX, e.clientY); setMethod('pix'); }} disabled={processing}
-                    className="ripple-container glow-on-hover w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
-                    style={{ background: 'hsla(142,71%,45%,0.08)', border: '1px solid hsla(142,71%,45%,0.25)' }}>
+                    className="ripple-container w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
+                    style={{ background: 'hsla(142,71%,45%,0.06)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{ background: 'hsla(142,71%,45%,0.15)' }}>
-                      <QrCode className="w-6 h-6 text-green-400" />
+                      style={{ background: 'hsla(142,71%,45%,0.12)' }}>
+                      <QrCode className="w-6 h-6" style={{ color: 'hsl(142,71%,38%)' }} />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-sm">Pix</p>
-                      <p className="text-xs text-white/40">Pagamento instantâneo · Sem taxas</p>
+                      <p className="font-bold text-sm" style={{ color: '#111' }}>Pix</p>
+                      <p className="text-xs" style={{ color: '#888' }}>Pagamento instantâneo · Sem taxas</p>
                     </div>
-                    <span className="ml-auto text-xs font-bold text-green-400 px-2 py-1 rounded-full"
-                      style={{ background: 'hsla(142,71%,45%,0.15)' }}>Recomendado</span>
+                    <span className="ml-auto text-xs font-bold px-2 py-1 rounded-full"
+                      style={{ background: 'hsla(142,71%,45%,0.15)', color: 'hsl(142,71%,32%)' }}>Recomendado</span>
                   </button>
                 )}
 
                 {paymentConfig.stripe_enabled && paymentConfig.stripe_public_key && (
                   <button onClick={(e) => { spawnRipple(e.currentTarget, e.clientX, e.clientY); handleStripePayment(); }} disabled={processing}
-                    className="ripple-container glow-on-hover w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
-                    style={{ background: 'hsla(200,100%,60%,0.06)', border: '1px solid hsla(200,100%,60%,0.2)' }}>
+                    className="ripple-container w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
+                    style={{ background: 'hsla(200,100%,50%,0.05)', border: '1px solid hsla(200,100%,45%,0.25)' }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{ background: 'hsla(200,100%,60%,0.12)' }}>
-                      <CreditCard className="w-6 h-6 text-blue-400" />
+                      style={{ background: 'hsla(200,100%,50%,0.1)' }}>
+                      <CreditCard className="w-6 h-6" style={{ color: 'hsl(200,100%,42%)' }} />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-sm">Cartão de Crédito</p>
-                      <p className="text-xs text-white/40">Visa, Mastercard, Elo · Stripe</p>
+                      <p className="font-bold text-sm" style={{ color: '#111' }}>Cartão de Crédito</p>
+                      <p className="text-xs" style={{ color: '#888' }}>Visa, Mastercard, Elo · Stripe</p>
                     </div>
                   </button>
                 )}
 
                 {paymentConfig.mercadopago_enabled && paymentConfig.mercadopago_public_key && (
                   <button onClick={(e) => { spawnRipple(e.currentTarget, e.clientX, e.clientY); handleMercadoPagoPayment(); }} disabled={processing}
-                    className="ripple-container glow-on-hover w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
-                    style={{ background: 'hsla(200,100%,50%,0.06)', border: '1px solid hsla(200,100%,50%,0.2)' }}>
+                    className="ripple-container w-full flex items-center gap-4 p-4 rounded-xl text-left transition-transform hover:scale-[1.01]"
+                    style={{ background: 'hsla(200,100%,45%,0.05)', border: '1px solid hsla(200,100%,40%,0.25)' }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{ background: 'hsla(200,100%,50%,0.12)' }}>
-                      <CreditCard className="w-6 h-6 text-sky-400" />
+                      style={{ background: 'hsla(200,100%,45%,0.1)' }}>
+                      <CreditCard className="w-6 h-6" style={{ color: 'hsl(200,100%,38%)' }} />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-sm">Mercado Pago</p>
-                      <p className="text-xs text-white/40">Cartão, boleto, saldo MP</p>
+                      <p className="font-bold text-sm" style={{ color: '#111' }}>Mercado Pago</p>
+                      <p className="text-xs" style={{ color: '#888' }}>Cartão, boleto, saldo MP</p>
                     </div>
                   </button>
                 )}
 
                 {!paymentConfig.pix_enabled && !paymentConfig.stripe_enabled && !paymentConfig.mercadopago_enabled && (
                   <div className="p-4 rounded-xl flex items-center gap-3"
-                    style={{ background: 'hsla(0,84%,60%,0.06)', border: '1px solid hsla(0,84%,60%,0.2)' }}>
-                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                    <p className="text-xs text-red-400">Nenhum método de pagamento configurado. Acesse o admin para configurar.</p>
+                    style={{ background: 'hsla(0,84%,60%,0.05)', border: '1px solid hsla(0,84%,55%,0.25)' }}>
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: 'hsl(0,84%,50%)' }} />
+                    <p className="text-xs" style={{ color: 'hsl(0,84%,42%)' }}>Nenhum método de pagamento configurado. Acesse o admin para configurar.</p>
                   </div>
                 )}
               </div>
 
               {processing && (
-                <div className="flex items-center justify-center gap-2 mt-6 text-primary">
+                <div className="flex items-center justify-center gap-2 mt-6" style={{ color: 'hsl(43,96%,42%)' }}>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span className="text-sm font-semibold">Processando...</span>
                 </div>
@@ -462,28 +462,28 @@ export default function Checkout() {
         {step === 'payment' && method === 'pix' && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <div className="rounded-2xl p-6 space-y-5"
-              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(142,71%,45%,0.15)' }}>
+              style={{ background: '#fafafa', border: '1px solid hsla(142,71%,45%,0.25)' }}>
               <div className="text-center">
                 <div className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                  style={{ background: 'hsla(142,71%,45%,0.15)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
-                  <QrCode className="w-7 h-7 text-green-400" />
+                  style={{ background: 'hsla(142,71%,45%,0.12)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
+                  <QrCode className="w-7 h-7" style={{ color: 'hsl(142,71%,38%)' }} />
                 </div>
-                <RevealText as="h2" className="text-lg font-bold text-white">Pague com Pix</RevealText>
-                <p className="text-xs text-white/40 mt-1">Escaneie o QR ou copie o código</p>
+                <h2 className="text-lg font-bold" style={{ color: '#111' }}>Pague com Pix</h2>
+                <p className="text-xs mt-1" style={{ color: '#888' }}>Escaneie o QR ou copie o código</p>
               </div>
 
               {pixError ? (
                 <div className="p-4 rounded-xl flex items-center gap-3"
-                  style={{ background: 'hsla(0,84%,60%,0.06)', border: '1px solid hsla(0,84%,60%,0.2)' }}>
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                  <p className="text-xs text-red-400">{pixError}</p>
+                  style={{ background: 'hsla(0,84%,60%,0.05)', border: '1px solid hsla(0,84%,55%,0.25)' }}>
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: 'hsl(0,84%,50%)' }} />
+                  <p className="text-xs" style={{ color: 'hsl(0,84%,42%)' }}>{pixError}</p>
                 </div>
               ) : (
                 <>
                   {/* QR Code */}
                   {qrDataUrl && (
                     <div className="flex justify-center">
-                      <div className="p-3 rounded-2xl bg-white">
+                      <div className="p-3 rounded-2xl" style={{ background: '#fff', border: '1px solid #eee' }}>
                         <img src={qrDataUrl} alt="QR Code Pix" className="w-56 h-56" />
                       </div>
                     </div>
@@ -491,22 +491,22 @@ export default function Checkout() {
 
                   {/* Valor */}
                   <div className="text-center p-4 rounded-xl"
-                    style={{ background: 'hsla(142,71%,45%,0.08)', border: '1px solid hsla(142,71%,45%,0.2)' }}>
-                    <p className="text-xs text-green-400/70">Valor a pagar</p>
-                    <p className="text-2xl font-black text-green-400">{fmt(total)}</p>
+                    style={{ background: 'hsla(142,71%,45%,0.06)', border: '1px solid hsla(142,71%,45%,0.25)' }}>
+                    <p className="text-xs" style={{ color: 'hsl(142,71%,38%)' }}>Valor a pagar</p>
+                    <p className="text-2xl font-display font-black" style={{ color: 'hsl(142,71%,32%)' }}>{fmt(total)}</p>
                   </div>
 
                   {/* Pix Copia e Cola */}
                   <div className="space-y-2">
-                    <Label className="text-xs text-white/60">Pix Copia e Cola</Label>
+                    <Label className="text-xs" style={{ color: '#888' }}>Pix Copia e Cola</Label>
                     <div className="relative">
                       <div className="p-3 pr-24 rounded-xl text-[10px] font-mono break-all max-h-24 overflow-y-auto"
-                        style={{ background: 'hsla(240,6%,20%,0.85)', border: '1px solid hsla(255,255%,255%,0.1)', color: 'hsla(45,20%,96%,0.7)' }}>
+                        style={{ background: '#fff', border: '1px solid #eee', color: '#555' }}>
                         {pixCode}
                       </div>
                       <button onClick={copyPix}
                         className="absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                        style={{ background: copied ? 'hsla(142,71%,45%,0.2)' : 'hsla(43,96%,52%,0.15)', border: `1px solid ${copied ? 'hsla(142,71%,45%,0.4)' : 'hsla(43,96%,52%,0.3)'}`, color: copied ? 'hsl(142,71%,45%)' : 'hsl(43,96%,52%)' }}>
+                        style={{ background: copied ? 'hsla(142,71%,45%,0.15)' : 'hsla(43,96%,52%,0.12)', border: `1px solid ${copied ? 'hsla(142,71%,45%,0.4)' : 'hsla(43,96%,52%,0.3)'}`, color: copied ? 'hsl(142,71%,32%)' : 'hsl(43,96%,40%)' }}>
                         {copied ? <><Check className="w-3 h-3" />Copiado</> : <><Copy className="w-3 h-3" />Copiar</>}
                       </button>
                     </div>
@@ -514,9 +514,9 @@ export default function Checkout() {
 
                   {/* Info */}
                   <div className="p-3 rounded-xl text-xs space-y-1"
-                    style={{ background: 'hsla(43,96%,52%,0.06)', border: '1px solid hsla(43,96%,52%,0.15)' }}>
-                    <p className="text-white/60"><strong className="text-white/80">Destinatário:</strong> {paymentConfig.pix_recipient_name}</p>
-                    <p className="text-white/60"><strong className="text-white/80">Pedido:</strong> #{orderId}</p>
+                    style={{ background: 'hsla(43,96%,52%,0.05)', border: '1px solid hsla(43,96%,52%,0.2)' }}>
+                    <p style={{ color: '#777' }}><strong style={{ color: '#333' }}>Destinatário:</strong> {paymentConfig.pix_recipient_name}</p>
+                    <p style={{ color: '#777' }}><strong style={{ color: '#333' }}>Pedido:</strong> #{orderId}</p>
                   </div>
 
                   <PremiumButton onClick={() => handlePaymentSuccess('pix')} variant="primary" className="w-full text-sm">
@@ -533,19 +533,19 @@ export default function Checkout() {
         {step === 'success' && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
             <div className="rounded-2xl p-8 text-center space-y-5"
-              style={{ background: 'hsla(240,6%,16%,0.85)', border: '1px solid hsla(142,71%,45%,0.2)' }}>
+              style={{ background: '#fafafa', border: '1px solid hsla(142,71%,45%,0.3)' }}>
               <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-                style={{ background: 'hsla(142,71%,45%,0.15)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
-                <CheckCircle2 className="w-8 h-8 text-green-400" />
+                style={{ background: 'hsla(142,71%,45%,0.12)', border: '1px solid hsla(142,71%,45%,0.3)' }}>
+                <CheckCircle2 className="w-8 h-8" style={{ color: 'hsl(142,71%,38%)' }} />
               </div>
-              <RevealText as="h2" className="text-xl font-black text-white">Pedido Confirmado!</RevealText>
-              <p className="text-sm text-white/50">
-                Pedido <span className="text-primary font-bold">#{orderId}</span> registrado com sucesso.
+              <h2 className="text-xl font-black" style={{ color: '#111' }}>Pedido Confirmado!</h2>
+              <p className="text-sm" style={{ color: '#777' }}>
+                Pedido <span className="font-bold" style={{ color: 'hsl(43,96%,40%)' }}>#{orderId}</span> registrado com sucesso.
               </p>
 
               {paymentConfig.redirect_whatsapp_after_payment && (
                 <div className="space-y-3 pt-4">
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs" style={{ color: '#999' }}>
                     Envie o comprovante pelo WhatsApp para agilizar a entrega:
                   </p>
                   <PremiumButton onClick={redirectWhatsApp} variant="primary" className="w-full text-sm">
@@ -556,7 +556,7 @@ export default function Checkout() {
               )}
 
               <PremiumButton onClick={() => navigate('/')} variant="secondary"
-                className="w-full py-2.5 text-sm font-semibold text-white/60 hover:text-white">
+                className="w-full py-2.5 text-sm font-semibold">
                 Voltar à loja
               </PremiumButton>
             </div>

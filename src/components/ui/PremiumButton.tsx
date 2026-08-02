@@ -1,5 +1,4 @@
 import { forwardRef, type MouseEvent, type ReactNode } from 'react';
-import { useMagnetic } from '@/hooks/useMagnetic';
 import { spawnRipple } from '@/lib/utils/ripple';
 
 interface PremiumButtonBaseProps {
@@ -15,16 +14,12 @@ type PremiumButtonProps = PremiumButtonBaseProps &
   );
 
 /**
- * Botão único do site: magnético (segue o cursor sutilmente), glow na borda
- * só durante o hover, e ripple só durante o clique — nada roda em idle.
- * variant="primary" = dourado preenchido; "secondary" = outline com glass.
+ * Botão único do site: leve elevação no hover e ripple só durante o clique
+ * — nada roda em idle. variant="primary" = dourado preenchido; "secondary" = outline com glass.
  */
 export const PremiumButton = forwardRef<HTMLAnchorElement | HTMLButtonElement, PremiumButtonProps>(
   ({ variant = 'primary', className = '', children, onClick, ...props }, forwardedRef) => {
-    const magneticRef = useMagnetic<HTMLAnchorElement | HTMLButtonElement>(0.2);
-
     const setRefs = (node: HTMLAnchorElement | HTMLButtonElement | null) => {
-      magneticRef.current = node;
       if (typeof forwardedRef === 'function') forwardedRef(node);
       else if (forwardedRef) forwardedRef.current = node;
     };

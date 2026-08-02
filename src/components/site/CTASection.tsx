@@ -2,25 +2,18 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Clock, Headphones } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useContentStore } from '@/lib/stores/contentStore';
-import { useTilt3D } from '@/hooks/useTilt3D';
 import { PremiumButton } from '@/components/ui/PremiumButton';
 import { RevealText } from '@/components/ui/RevealText';
-import { MeshBackground } from '@/components/site/MeshBackground';
 
 export function CTASection() {
   const { content } = useContentStore();
   const whatsappUrl = content.whatsapp_link || `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   const msg = encodeURIComponent(clientConfig.company.contact.whatsappMessage);
-  const tiltRef = useTilt3D<HTMLDivElement>(4);
 
   return (
-    <section id="cta" className="relative py-28 md:py-36 overflow-hidden">
-      {/* Background com mesh gradient + spotlight + noise */}
-      <div className="absolute inset-0" style={{ background: 'hsl(240,6%,11%)' }} />
-      <MeshBackground />
-
-      <div className="relative z-10" style={{ perspective: '1000px' }}>
-      <div ref={tiltRef} className="max-w-3xl mx-auto px-5 text-center" style={{ transformStyle: 'preserve-3d' }}>
+    <section id="cta" className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(240,6%,11%)' }}>
+      <div className="relative z-10">
+      <div className="max-w-3xl mx-auto px-5 text-center">
         <motion.div initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }} transition={{ duration: 0.7 }}>
 
@@ -28,7 +21,8 @@ export function CTASection() {
             Pronto para garantir o seu?
           </p>
 
-          <RevealText as="h2" variant="stagger-words" className="font-black text-4xl md:text-6xl tracking-tight mb-6 leading-[0.95] text-white">
+          <RevealText as="h2" variant="stagger-words"
+            className="font-display font-black tracking-tight mb-6 leading-[1] text-white text-[clamp(1.9rem,3.4vw,3rem)]">
             {clientConfig.initialContent.cta.headline}
           </RevealText>
           <p className="text-sm md:text-base mb-12 max-w-md mx-auto" style={{ color: '#999' }}>

@@ -1,7 +1,8 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
-import { ProductsSection } from '@/components/site/ProductsSection';
+import { CategoryNav } from '@/components/site/CategoryNav';
+import { SimpleCatalogSection } from '@/components/site/SimpleCatalogSection';
 import { BrandsTicker } from '@/components/site/BrandsTicker';
 import { BannerCarousel } from '@/components/site/BannerCarousel';
 import { SectionDivider } from '@/components/site/SectionDivider';
@@ -9,6 +10,7 @@ import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
 import { captureUTMs } from '@/lib/analytics/track';
+import { useSectionSnap } from '@/hooks/useSectionSnap';
 
 // Abaixo da dobra — carrega sob demanda, não trava o LCP da home
 const ProcessShowcase   = lazy(() => import('@/components/site/ProcessShowcase').then(m => ({ default: m.ProcessShowcase })));
@@ -26,6 +28,7 @@ const SimpleChatbot     = lazy(() => import('@/components/SimpleChatbot').then(m
 const Index = () => {
   const { fetchContent, content } = useContentStore();
   const { products } = useProductStore();
+  useSectionSnap();
 
   useEffect(() => {
     fetchContent();
@@ -205,10 +208,10 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <CategoryNav />
+        <SimpleCatalogSection />
         <BrandsTicker />
         <BannerCarousel />
-        <SectionDivider />
-        <ProductsSection />
         <SectionDivider />
         <Suspense fallback={null}>
           <ProcessShowcase />

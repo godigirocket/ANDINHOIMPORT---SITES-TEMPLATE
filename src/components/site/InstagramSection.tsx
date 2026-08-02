@@ -81,13 +81,19 @@ export function InstagramSection() {
     return () => clearInterval(t);
   }, [isPinned, posts.length]);
 
-  // Prioridade: post do admin (rotativo) > foto única configurada > produto em destaque > stock
-  const featuredProductPhoto = products.find(p => p.featured && p.image_url)?.image_url
-    || products.find(p => p.image_url)?.image_url;
+  // Prioridade: post do admin (rotativo) > foto única configurada > produto em destaque > stock.
+  // Se uma delas estiver quebrada (URL morta, hotlink bloqueado), cai pra próxima em vez de deixar a caixa vazia.
   const activeIdx = isPinned ? active : current;
   const activePost = posts[activeIdx];
-  const photoSrc = activePost?.img || content.instagram_photo || featuredProductPhoto || FALLBACK_PHOTO;
+  const featuredProductPhoto = products.find(p => p.featured && p.image_url)?.image_url
+    || products.find(p => p.image_url)?.image_url;
+  const photoCandidates = [activePost?.img, content.instagram_photo, featuredProductPhoto, FALLBACK_PHOTO]
+    .filter((s): s is string => !!s);
+  const [brokenCount, setBrokenCount] = useState(0);
+  const photoSrc = photoCandidates[Math.min(brokenCount, photoCandidates.length - 1)];
   const photoLink = activePost?.url || instagramUrl;
+
+  useEffect(() => { setBrokenCount(0); }, [activeIdx]);
 
   const Photo = (
     <a href={photoLink} target="_blank" rel="noopener noreferrer"
@@ -105,6 +111,7 @@ export function InstagramSection() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6 }}
+                onError={() => setBrokenCount(n => Math.min(n + 1, photoCandidates.length - 1))}
                 className="absolute inset-0 w-full h-full object-cover animate-kenburns"
               />
             </AnimatePresence>
@@ -138,7 +145,7 @@ export function InstagramSection() {
   }
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: 'hsl(28,12%,13%)' }}>
+    <section className="relative py-12 md:py-16 overflow-hidden" style={{ background: 'hsl(28,12%,13%)' }}>
       <MeshBackground />
       <div className="relative z-10 max-w-4xl mx-auto px-4">
         <motion.div initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}

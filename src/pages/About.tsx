@@ -23,6 +23,18 @@ export default function About() {
             facilitadas de pagamento.
           </p>
 
+          <div className="flex flex-col sm:flex-row items-center gap-5 mb-10 p-5 rounded-2xl"
+            style={{ background: 'hsl(240,6%,16%)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <img src="/731175346_17983530711007965_3386313320971034665_n.jpg" alt="Andinho, fundador da Andinho Import"
+              className="w-24 h-24 rounded-full object-cover flex-shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-white mb-1">Quem atende você</p>
+              <p className="text-xs leading-relaxed" style={{ color: '#a6a6aa' }}>
+                Loja de verdade, atendimento direto — sem robô, sem intermediário. Quem responde no WhatsApp é quem cuida do estoque.
+              </p>
+            </div>
+          </div>
+
           <div className="grid sm:grid-cols-3 gap-4 mb-12">
             {[
               { icon: Shield, label: 'Produtos originais com garantia' },

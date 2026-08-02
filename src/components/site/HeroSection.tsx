@@ -1,159 +1,79 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MessageCircle, ChevronDown, ShieldCheck, Zap, Award } from 'lucide-react';
 import { clientConfig } from '@/config/client';
-import { useContentStore } from '@/lib/stores/contentStore';
-import { useParallax } from '@/hooks/useParallax';
-import { useTilt3D } from '@/hooks/useTilt3D';
-import { scrollToElement } from '@/lib/utils/scrollTo';
-import { PremiumButton } from '@/components/ui/PremiumButton';
-import { RevealText } from '@/components/ui/RevealText';
-
-gsap.registerPlugin(ScrollTrigger);
-
-const FALLBACK_IMAGES = [
-  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1600&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1600&q=85&auto=format&fit=crop',
-];
-
-const iconMap: Record<string, React.ElementType> = { ShieldCheck, Zap, Award };
+import { useProductStore } from '@/lib/stores/productStore';
+import { slugify } from '@/lib/utils/slugify';
+import { safeImageUrl, priceLabel } from '@/lib/utils/productFallbacks';
 
 export function HeroSection() {
-  const { content } = useContentStore();
-  const { hero } = clientConfig.initialContent;
-  const [bgIdx, setBgIdx] = useState(0);
-  const bgParallaxRef = useParallax<HTMLDivElement>(0.14);
-  const contentTiltRef = useTilt3D<HTMLDivElement>(3.5);
-  const sectionRef = useRef<HTMLElement>(null);
+  const { products, fetchProducts } = useProductStore();
 
-  // Primeira transformação do scroll: o produto se aproxima (zoom controlado)
-  // em vez de só desaparecer com fade — a cena se transforma, não só some.
-  useEffect(() => {
-    const section = sectionRef.current;
-    const bg = bgParallaxRef.current;
-    if (!section || !bg) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-    const tween = gsap.to(bg, {
-      scale: 1.22,
-      ease: 'none',
-      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom top', scrub: true },
-    });
-    return () => { tween.scrollTrigger?.kill(); tween.kill(); };
-  }, [bgParallaxRef]);
+  const active = products.filter(p => p.status === 'active');
+  const product = active.find(p => p.featured) || active[0];
 
-  const bgImages = [
-    content.hero_bg_1 || FALLBACK_IMAGES[0],
-    content.hero_bg_2 || FALLBACK_IMAGES[1],
-  ];
-
-  useEffect(() => {
-    const t = setInterval(() => setBgIdx(i => (i + 1) % bgImages.length), 7000);
-    return () => clearInterval(t);
-  }, [bgImages.length]);
-
-  const whatsappUrl = content.whatsapp_link || `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
-  const msg = encodeURIComponent(clientConfig.company.contact.whatsappMessage);
+  const whatsappUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
+  const msg = product
+    ? `Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`
+    : clientConfig.company.contact.whatsappMessage;
 
   return (
-    <section ref={sectionRef} id="hero" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background images com crossfade + parallax real (GSAP, funciona no iOS) */}
-      <div ref={bgParallaxRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
-        {bgImages.map((src, i) => (
-          <motion.div key={i}
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-[1.16]"
-            style={{ backgroundImage: `url('${src}')` }}
-            animate={{ opacity: i === bgIdx ? 1 : 0 }}
-            transition={{ duration: 1.8, ease: 'easeInOut' }}
-          />
-        ))}
-      </div>
+    <section id="hero" className="relative overflow-hidden" style={{ background: '#000' }}>
+      <div className="relative z-10 flex flex-col items-center text-center px-5 pt-32 pb-16 md:pt-40 md:pb-20">
+        <motion.span initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5 }}
+          className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-6"
+          style={{ background: 'hsla(43,96%,52%,0.12)', color: 'hsl(43,96%,52%)', border: '1px solid hsla(43,96%,52%,0.3)' }}>
+          Até {clientConfig.features.maxInstallments}x sem juros
+        </motion.span>
 
-      {/* Orbes de luz — dourado à esquerda, aço frio à direita, quebra a dependência de uma única cor */}
-      <div className="absolute -top-24 right-[8%] w-[420px] h-[420px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, hsla(43,96%,52%,0.1) 0%, transparent 70%)', filter: 'blur(20px)' }} />
-      <div className="absolute bottom-[-10%] right-[18%] w-[520px] h-[520px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, hsla(205,45%,55%,0.1) 0%, transparent 70%)', filter: 'blur(30px)' }} />
+        <motion.h1 initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.1 }}
+          className="font-display font-black tracking-tight text-white leading-[1.05] mb-3"
+          style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)' }}>
+          {product ? product.title : 'iPhone e Xiaomi originais'}
+        </motion.h1>
 
-      {/* Overlay — mais leve à direita, o produto precisa aparecer de verdade */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(100deg, hsla(240,6%,9%,0.97) 0%, hsla(240,6%,9%,0.82) 42%, hsla(240,6%,9%,0.38) 68%, hsla(240,6%,9%,0.12) 100%)' }} />
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(to top, hsl(240,6%,9%) 0%, transparent 22%)' }} />
+        <motion.p initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.18 }}
+          className="text-base md:text-lg mb-7" style={{ color: 'hsla(0,0%,100%,0.6)' }}>
+          {product ? 'Pronta entrega, com garantia e nota fiscal.' : 'Pronta entrega em Estância Velha, RS.'}
+        </motion.p>
 
-      {/* Conteúdo */}
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full pt-28 pb-24" style={{ perspective: '1200px' }}>
-        <div ref={contentTiltRef} className="max-w-lg" style={{ transformStyle: 'preserve-3d' }}>
-          <motion.p initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-[10px] font-bold tracking-[0.2em] uppercase mb-4"
-            style={{ color: 'hsl(43,96%,52%)' }}>
-            {content.hero_badge || hero.badge}
-          </motion.p>
-
-          <h1 className="font-black leading-[0.9] tracking-tight mb-6"
-            style={{ fontSize: 'clamp(2.8rem, 8vw, 5.5rem)' }}>
-            <RevealText as="span" variant="stagger-words" className="text-white block">
-              {content.hero_title || hero.headline}
-            </RevealText>
-            <RevealText as="span" className="block" innerClassName="gradient-text">
-              {hero.headlineGold}
-            </RevealText>
-          </h1>
-
-          <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.18 }}
-            className="text-sm md:text-base max-w-md mb-8 leading-relaxed"
-            style={{ color: 'hsla(45,20%,96%,0.65)', borderLeft: '2px solid hsla(43,96%,52%,0.6)', paddingLeft: '14px' }}>
-            {content.hero_subtitle || hero.subheadline}
-          </motion.p>
-
-          {/* Badges */}
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.26 }}
-            className="flex flex-wrap gap-2.5 mb-10">
-            {hero.badges.map((b) => {
-              const Icon = iconMap[b.icon] || ShieldCheck;
-              return (
-                <div key={b.label} className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                  style={{ background: 'hsla(240,6%,17%,0.85)', border: '1px solid hsla(43,96%,52%,0.22)' }}>
-                  <Icon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                  <div>
-                    <p className="text-[9px] font-black text-white leading-none tracking-wide">{b.label}</p>
-                    <p className="text-[8px] text-primary leading-none mt-0.5 font-semibold">{b.sub}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </motion.div>
-
-          {/* CTAs */}
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.65, delay: 0.34 }}
-            className="flex flex-wrap gap-3">
-            <PremiumButton href={`${whatsappUrl}?text=${msg}`} target="_blank" rel="noopener noreferrer"
-              variant="primary" className="text-sm">
-              <MessageCircle className="w-4 h-4" />
-              {content.cta_primary_text || hero.ctaPrimary}
-            </PremiumButton>
-            <PremiumButton onClick={() => scrollToElement('#products')} variant="secondary" className="text-sm">
-              {content.cta_secondary_text || hero.ctaSecondary}
-              <ChevronDown className="w-4 h-4" />
-            </PremiumButton>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-        <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 1.6, repeat: Infinity }}
-          style={{ color: 'hsla(45,20%,96%,0.3)' }}>
-          <ChevronDown className="w-5 h-5" />
+        <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.24 }}
+          className="flex items-center gap-6 mb-10">
+          {product && (
+            <Link to={`/produtos/${slugify(product.title)}`} className="hover-underline text-sm font-semibold text-white">
+              Ver detalhes
+            </Link>
+          )}
+          <a href={`${whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"
+            className="hover-underline text-sm font-semibold" style={{ color: 'hsl(43,96%,52%)' }}>
+            Falar no WhatsApp
+          </a>
         </motion.div>
-      </motion.div>
+
+        {product ? (
+          <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-2xl">
+            <div className="absolute inset-0 rounded-[32px]" style={{ background: 'radial-gradient(ellipse at center, hsla(43,96%,52%,0.14) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+            <div className="relative rounded-[28px] overflow-hidden aspect-[4/3]" style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}>
+              <img src={safeImageUrl(product.image_url)} alt={product.title}
+                className="w-full h-full object-cover animate-kenburns" />
+            </div>
+            <div className="mt-7 text-center">
+              <span className="font-display text-2xl font-black" style={{ color: 'hsl(43,96%,52%)' }}>{priceLabel(product.price)}</span>
+              <span className="text-sm ml-2" style={{ color: 'hsla(0,0%,100%,0.5)' }}>
+                ou {product.installments}x de {priceLabel(product.price / product.installments)}
+              </span>
+            </div>
+          </motion.div>
+        ) : (
+          <div className="w-full max-w-2xl aspect-[4/3] rounded-[28px] flex items-center justify-center" style={{ background: 'hsl(0,0%,8%)' }}>
+            <p className="text-sm" style={{ color: 'hsla(0,0%,100%,0.3)' }}>Carregando catálogo…</p>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

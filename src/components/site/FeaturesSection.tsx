@@ -1,103 +1,64 @@
 import { motion } from 'framer-motion';
-import { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock, LucideIcon } from 'lucide-react';
+import { CreditCard, ShieldCheck, Truck, Headphones } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
-import { TiltCard } from '@/components/ui/TiltCard';
 import { PremiumButton } from '@/components/ui/PremiumButton';
 import { useParallax } from '@/hooks/useParallax';
 
-const iconMap: Record<string, LucideIcon> = { ShieldCheck, CreditCard, Wrench, Truck, Star, Clock };
-
-// Cores únicas por card
-const cardAccents = [
-  { border: 'hsla(43,96%,52%,0.25)',  glow: 'hsla(43,96%,52%,0.08)',  icon: 'hsla(43,96%,52%,1)'  },
-  { border: 'hsla(200,100%,60%,0.2)', glow: 'hsla(200,100%,60%,0.06)', icon: 'hsla(200,100%,60%,1)' },
-  { border: 'hsla(280,80%,65%,0.2)',  glow: 'hsla(280,80%,65%,0.06)',  icon: 'hsla(280,80%,65%,1)'  },
-  { border: 'hsla(142,71%,45%,0.2)',  glow: 'hsla(142,71%,45%,0.06)',  icon: 'hsla(142,71%,45%,1)'  },
-  { border: 'hsla(43,96%,52%,0.25)',  glow: 'hsla(43,96%,52%,0.08)',  icon: 'hsla(43,96%,52%,1)'  },
-  { border: 'hsla(200,100%,60%,0.2)', glow: 'hsla(200,100%,60%,0.06)', icon: 'hsla(200,100%,60%,1)' },
+// Frame 6 — Confiança: números reais da operação, banda editorial em vez de
+// seis ícones em card. Cada número é uma afirmação verificável, não um adjetivo.
+const stats = [
+  { icon: CreditCard,  value: `${clientConfig.features.maxInstallments}x`,  label: 'sem juros no cartão, qualquer banco' },
+  { icon: ShieldCheck, value: '100%', label: 'dos aparelhos testados antes de anunciar' },
+  { icon: Truck,       value: '2', label: 'dias úteis em média até o envio sair' },
+  { icon: Headphones,  value: '0', label: 'robôs — quem responde conhece o estoque' },
 ];
 
 export function FeaturesSection() {
-  const { features } = clientConfig.initialContent;
   const waUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(clientConfig.company.contact.whatsappMessage)}`;
   const glowRef = useParallax<HTMLDivElement>(0.25);
-  const linesRef = useParallax<HTMLDivElement>(-0.12);
 
   return (
-    <section id="features" className="relative py-24 md:py-32 overflow-hidden">
-      {/* Background diferente — mais escuro com tom azul-marinho */}
+    <section id="features" className="relative py-16 md:py-20 overflow-hidden">
       <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(224,30%,16%) 50%, hsl(240,6%,11%) 100%)' }} />
-      {/* Glow central — parallax de fundo, mais lento que o scroll */}
       <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[800px] h-[400px] pointer-events-none"
-        style={{ marginLeft: '-400px', marginTop: '-200px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.04) 0%, transparent 70%)' }} />
-      {/* Linhas verticais decorativas — parallax de primeiro plano, mais rápido que o scroll */}
-      <div ref={linesRef} className="absolute inset-0 pointer-events-none opacity-20"
-        style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 120px, hsla(43,96%,52%,0.03) 120px, hsla(43,96%,52%,0.03) 121px)' }} />
+        style={{ marginLeft: '-400px', marginTop: '-200px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.05) 0%, transparent 70%)' }} />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-14">
-          <RevealText as="h2" className="font-black text-4xl md:text-5xl tracking-tight mb-3">
-            Por que escolher a{' '}
-            <span className="gradient-text">{clientConfig.company.name} {clientConfig.company.nameHighlight}?</span>
+      <div className="relative z-10 max-w-[1320px] mx-auto px-5 sm:px-6">
+        <div className="mb-14 max-w-lg">
+          <RevealText as="h2" className="font-display font-black tracking-tight mb-3 text-white"
+            >
+            <span style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2.1rem)' }}>
+              Números que você pode conferir, não promessas
+            </span>
           </RevealText>
           <motion.p initial={{ y: 12, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }} transition={{ delay: 0.3 }}
-            className="text-sm max-w-md" style={{ color: 'hsla(45,20%,96%,0.45)' }}>
-            Trabalhamos com transparência e qualidade para garantir sua satisfação
+            className="text-sm" style={{ color: 'hsla(45,20%,96%,0.5)' }}>
+            Cada número aqui é verificável direto com quem já comprou — sem estatística inflada.
           </motion.p>
         </div>
 
-        {/* Grid 3x2 com cards coloridos */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {features.map((feature, i) => {
-            const Icon = iconMap[feature.icon] || ShieldCheck;
-            const accent = cardAccents[i % cardAccents.length];
-            return (
-              <motion.div key={feature.id}
-                initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-                whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}>
-                <TiltCard
-                  className="group relative p-6"
-                  style={{
-                    background: 'linear-gradient(145deg, hsla(224,26%,19%,0.9) 0%, hsla(224,22%,15%,0.95) 100%)',
-                    border: `1px solid ${accent.border}`,
-                    boxShadow: '0 4px 20px hsla(0,0%,0%,0.3)',
-                  }}
-                >
-                  {/* Glow de fundo no hover (cor única por card) */}
-                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                    style={{ background: `radial-gradient(ellipse at 30% 30%, ${accent.glow}, transparent 70%)` }} />
-
-                  <div className="relative z-10 flex gap-4">
-                    {/* Ícone com cor única */}
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_16px_var(--accent-glow)]"
-                      style={{ background: accent.glow, border: `1px solid ${accent.border}`, ['--accent-glow' as string]: accent.icon }}>
-                      <Icon className="w-5 h-5" style={{ color: accent.icon }} />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-sm mb-1.5 text-white transition-colors duration-200"
-                        style={{ ['--hover-color' as string]: accent.icon }}
-                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = accent.icon)}
-                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'white')}>
-                        {feature.title}
-                      </h3>
-                      <p className="text-xs leading-relaxed" style={{ color: 'hsla(45,20%,96%,0.5)' }}>
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
-                </TiltCard>
-              </motion.div>
-            );
-          })}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mb-16">
+          {stats.map((s, i) => (
+            <motion.div key={s.label}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}
+              className="border-t pt-5" style={{ borderColor: 'hsla(43,96%,52%,0.2)' }}>
+              <s.icon className="w-4 h-4 mb-4" style={{ color: 'hsl(43,96%,52%)' }} />
+              <p className="font-display font-black leading-none mb-2 text-white" style={{ fontSize: 'clamp(2rem, 2.8vw, 2.6rem)' }}>
+                {s.value}
+              </p>
+              <p className="text-xs leading-relaxed max-w-[16ch]" style={{ color: 'hsla(45,20%,96%,0.55)' }}>
+                {s.label}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
-        {/* CTA inline premium */}
         <motion.div initial={{ y: 16, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} transition={{ delay: 0.5 }}
+          viewport={{ once: true }} transition={{ delay: 0.4 }}
           className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl"
           style={{ background: 'linear-gradient(135deg, hsla(43,96%,52%,0.08) 0%, hsla(43,96%,52%,0.04) 100%)', border: '1px solid hsla(43,96%,52%,0.2)' }}>
           <div>

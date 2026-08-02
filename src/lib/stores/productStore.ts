@@ -28,7 +28,7 @@ export const productSchema = z.object({
   category:       z.string().optional(),
   badge:          z.string().optional(),
   featured:       z.boolean().optional(),
-  condition:            z.enum(['novo', 'seminovo']).optional().nullable(),
+  condition:            z.string().optional().nullable(),
   storage_gb:           z.number().positive().optional().nullable(),
   battery_health_pct:   z.number().min(1).max(100).optional().nullable(),
   color:                z.string().optional().nullable(),
@@ -67,8 +67,9 @@ export interface Product {
   ingredients?:   string | null;
   nutritional_info?: string | null;
 
-  // Condição/especificação do aparelho — todos opcionais, "não informado" quando ausentes
-  condition?:            'novo' | 'seminovo' | null;
+  // Condição/especificação do aparelho — todos opcionais, "não informado" quando ausentes.
+  // String livre (não enum fixo) — as opções disponíveis vêm do admin (useTaxonomyStore).
+  condition?:            string | null;
   storage_gb?:           number | null;
   battery_health_pct?:   number | null;
   warranty_days?:        number | null;

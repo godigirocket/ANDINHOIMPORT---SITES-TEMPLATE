@@ -74,12 +74,12 @@ export const clientConfig: ClientConfig = {
   features: { products: true, testimonials: true, installments: true, maxInstallments: 18 },
   initialContent: {
     hero: {
-      badge: 'CURADORIA CRITERIOSA',
-      headline: 'ANDINHO',
+      badge: 'APPLE · XIAOMI · ORIGINAIS',
+      headline: 'O iPhone que você quer, direto pra sua mão.',
       headlineGold: 'IMPORT',
-      subheadline: 'Cada aparelho é revisado e testado antes de chegar até você. Procedência verificada, garantia real e parcelamento em até 18x — sem letra miúda.',
-      ctaPrimary: 'Garante Agora',
-      ctaSecondary: 'Explorar Catálogo',
+      subheadline: 'iPhones e Xiaomi originais, com pronta entrega e parcelamento em até 18x sem juros.',
+      ctaPrimary: 'Falar sobre este aparelho',
+      ctaSecondary: 'Ver catálogo completo',
       badges: [
         { icon: 'ShieldCheck', label: '100% TESTADOS', sub: 'Antes da venda' },
         { icon: 'Zap',         label: 'PRONTA ENTREGA', sub: 'Sem espera' },
@@ -89,14 +89,14 @@ export const clientConfig: ClientConfig = {
     features: [
       { id: 'f1', title: 'Bateria e tela testadas',  description: 'Antes de anunciar, checamos saúde da bateria, tela, câmeras e botões. Se algo não passa no teste, não entra no catálogo.', icon: 'ShieldCheck' },
       { id: 'f2', title: 'Procedência verificada',   description: 'Sem risco de aparelho de origem duvidosa. Você sabe exatamente o que está levando antes de fechar negócio.',                icon: 'Wrench'      },
-      { id: 'f3', title: 'Parcelamento sem pegadinha', description: 'Até 18x sem juros no cartão de qualquer banco — o valor parcelado é o mesmo da vista.',                                   icon: 'CreditCard'  },
+      { id: 'f3', title: 'Parcelamento transparente', description: 'Até 18x sem juros no cartão de qualquer banco — o valor parcelado é o mesmo da vista.',                                   icon: 'CreditCard'  },
       { id: 'f4', title: 'Entrega rastreada',        description: 'Pronta entrega para a maioria dos modelos, com envio e rastreio para todo o Brasil.',                                       icon: 'Truck'       },
       { id: 'f5', title: 'Depoimentos reais',        description: 'Avaliações verdadeiras de clientes que já compraram — veja na seção de depoimentos, sem números inflados.',                 icon: 'Star'        },
       { id: 'f6', title: 'Atendimento direto',       description: 'Respondemos em minutos pelo WhatsApp. Sem robô de atendimento — quem responde é gente que conhece o estoque.',              icon: 'Clock'       },
     ],
     cta: {
-      headline: 'Quer garantir seu próximo celular com segurança?',
-      subheadline: 'Atendimento rápido, preços justos e produtos originais',
+      headline: 'O próximo iPhone não precisa ser uma aposta.',
+      subheadline: 'Manda o modelo que você quer e a gente confirma estoque, condição e preço na hora — direto pelo WhatsApp.',
       buttonText: 'Falar com a Andinho Import no WhatsApp',
     },
     footer: { copyright: '© 2025 Andinho Import · Todos os direitos reservados' },

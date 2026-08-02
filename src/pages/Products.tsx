@@ -1,27 +1,28 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MessageCircle, Search, X, GitCompareArrows, PackageSearch } from 'lucide-react';
 import { useProductStore } from '@/lib/stores/productStore';
-import { ProductTiltCard } from '@/components/3d/ProductTiltCard';
+import { SimpleProductCard } from '@/components/site/SimpleProductCard';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
 import { clientConfig } from '@/config/client';
-import { RevealText } from '@/components/ui/RevealText';
 import { PremiumButton } from '@/components/ui/PremiumButton';
 import { slugify } from '@/lib/utils/slugify';
+import { conditionLabel } from '@/lib/utils/productFallbacks';
 
 type SortKey = 'relevance' | 'price-asc' | 'price-desc';
 
 const CATEGORY_LABELS: Record<string, string> = {
-  apple: 'Apple', xiaomi: 'Xiaomi', smartwatch: 'Smartwatches', accessory: 'Acessórios',
+  apple: 'iPhone', xiaomi: 'Xiaomi', smartwatch: 'Smartwatches', accessory: 'Acessórios',
 };
 
 export default function Products() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { fetchProducts, getActiveProducts, isLoading } = useProductStore();
-  const [category, setCategory] = useState('all');
-  const [condition, setCondition] = useState<'all' | 'novo' | 'seminovo'>('all');
+  const [category, setCategory] = useState(() => searchParams.get('categoria')?.toLowerCase().trim() || 'all');
+  const [condition, setCondition] = useState('all');
   const [sort, setSort] = useState<SortKey>('relevance');
   const [query, setQuery] = useState('');
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -40,12 +41,19 @@ export default function Products() {
     return Array.from(present);
   }, [allProducts]);
 
-  const hasConditionData = allProducts.some(p => p.condition);
+  // Mesma lógica — as opções de condição vêm do que os produtos de fato têm cadastrado,
+  // não de uma lista fixa (o admin pode ter criado "usado", "recondicionado" etc.).
+  const conditions = useMemo(() => {
+    const present = new Set(allProducts.map(p => p.condition?.toLowerCase().trim()).filter(Boolean) as string[]);
+    return Array.from(present);
+  }, [allProducts]);
+
+  const hasConditionData = conditions.length > 0;
 
   const filtered = useMemo(() => {
     let list = allProducts;
     if (category !== 'all') list = list.filter(p => p.category?.toLowerCase().trim() === category);
-    if (condition !== 'all') list = list.filter(p => p.condition === condition);
+    if (condition !== 'all') list = list.filter(p => p.condition?.toLowerCase().trim() === condition);
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter(p => p.title.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q));
@@ -65,21 +73,20 @@ export default function Products() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'hsl(240,6%,11%)', color: '#f7f7f7' }}>
+    <div className="min-h-screen" style={{ background: '#fff', color: '#111' }}>
       <Header />
-      <main className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
+      <main className="pt-24 pb-20 px-5 sm:px-6 max-w-[1320px] mx-auto">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <nav className="text-xs mb-6" style={{ color: '#888' }}>
-            <a href="/" className="hover:text-white transition-colors">Início</a>
+            <a href="/" className="hover:text-black transition-colors">Início</a>
             <span className="mx-2">/</span>
-            <span style={{ color: '#F5B700' }}>Produtos</span>
+            <span style={{ color: '#111' }}>Produtos</span>
           </nav>
 
-          <RevealText as="h1" className="text-3xl md:text-4xl font-black mb-3">
-            <span className="text-white">Nossos </span>
-            <span className="gradient-text">Produtos</span>
-          </RevealText>
-          <p className="text-sm mb-8 max-w-lg" style={{ color: '#a6a6aa' }}>
+          <h1 className="font-display font-black tracking-tight mb-3 text-[clamp(1.8rem,3vw,2.6rem)]" style={{ color: '#111' }}>
+            Catálogo disponível agora
+          </h1>
+          <p className="text-sm mb-8 max-w-lg" style={{ color: '#666' }}>
             iPhones, smartphones Xiaomi, smartwatches e acessórios originais
             com garantia, parcelamento facilitado e atendimento direto em {clientConfig.company.location.city}.
           </p>
@@ -87,17 +94,17 @@ export default function Products() {
           {/* Busca + ordenação */}
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#666' }} />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#999' }} />
               <input
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Buscar modelo..."
                 className="w-full pl-10 pr-9 py-2.5 rounded-full text-sm focus:outline-none transition-colors"
-                style={{ background: 'hsla(213,18%,16%,0.8)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff' }}
+                style={{ background: '#fafafa', border: '1px solid #e5e5e5', color: '#111' }}
               />
               {query && (
                 <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Limpar busca">
-                  <X className="w-3.5 h-3.5" style={{ color: '#888' }} />
+                  <X className="w-3.5 h-3.5" style={{ color: '#999' }} />
                 </button>
               )}
             </div>
@@ -105,7 +112,7 @@ export default function Products() {
               value={sort}
               onChange={e => setSort(e.target.value as SortKey)}
               className="px-4 py-2.5 rounded-full text-xs font-semibold focus:outline-none"
-              style={{ background: 'hsla(213,18%,16%,0.8)', border: '1px solid rgba(255,255,255,0.08)', color: '#ccc' }}
+              style={{ background: '#fafafa', border: '1px solid #e5e5e5', color: '#444' }}
             >
               <option value="relevance">Relevância</option>
               <option value="price-asc">Menor preço</option>
@@ -117,24 +124,29 @@ export default function Products() {
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <button onClick={() => setCategory('all')}
               className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
-              style={{ background: category === 'all' ? '#F5B700' : 'rgba(255,255,255,0.04)', color: category === 'all' ? '#050505' : '#a6a6aa', border: `1px solid ${category === 'all' ? '#F5B700' : 'rgba(255,255,255,0.08)'}` }}>
+              style={{ background: category === 'all' ? '#111' : '#fff', color: category === 'all' ? '#fff' : '#555', border: `1px solid ${category === 'all' ? '#111' : '#e5e5e5'}` }}>
               Todos
             </button>
             {categories.map(cat => (
               <button key={cat} onClick={() => setCategory(cat)}
                 className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
-                style={{ background: category === cat ? '#F5B700' : 'rgba(255,255,255,0.04)', color: category === cat ? '#050505' : '#a6a6aa', border: `1px solid ${category === cat ? '#F5B700' : 'rgba(255,255,255,0.08)'}` }}>
+                style={{ background: category === cat ? '#111' : '#fff', color: category === cat ? '#fff' : '#555', border: `1px solid ${category === cat ? '#111' : '#e5e5e5'}` }}>
                 {CATEGORY_LABELS[cat] ?? cat}
               </button>
             ))}
             {hasConditionData && (
               <>
-                <span className="w-px h-4 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                {(['all', 'novo', 'seminovo'] as const).map(c => (
+                <span className="w-px h-4 mx-1" style={{ background: '#e5e5e5' }} />
+                <button onClick={() => setCondition('all')}
+                  className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
+                  style={{ background: condition === 'all' ? '#f2f2f2' : '#fff', color: condition === 'all' ? '#111' : '#888', border: `1px solid ${condition === 'all' ? '#ccc' : '#e5e5e5'}` }}>
+                  Qualquer condição
+                </button>
+                {conditions.map(c => (
                   <button key={c} onClick={() => setCondition(c)}
                     className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
-                    style={{ background: condition === c ? 'hsla(43,96%,52%,0.15)' : 'rgba(255,255,255,0.04)', color: condition === c ? '#F5B700' : '#a6a6aa', border: `1px solid ${condition === c ? 'hsla(43,96%,52%,0.4)' : 'rgba(255,255,255,0.08)'}` }}>
-                    {c === 'all' ? 'Novo e seminovo' : c === 'novo' ? 'Novo lacrado' : 'Seminovo'}
+                    style={{ background: condition === c ? '#f2f2f2' : '#fff', color: condition === c ? '#111' : '#888', border: `1px solid ${condition === c ? '#ccc' : '#e5e5e5'}` }}>
+                    {conditionLabel({ condition: c })}
                   </button>
                 ))}
               </>
@@ -146,42 +158,33 @@ export default function Products() {
             )}
           </div>
 
-          <p className="text-xs mb-8" style={{ color: '#666' }}>
+          <p className="text-xs mb-8" style={{ color: '#999' }}>
             {isLoading ? 'Carregando...' : `${filtered.length} ${filtered.length === 1 ? 'produto encontrado' : 'produtos encontrados'}`}
           </p>
 
           {/* Grid */}
           {isLoading ? (
             <div className="text-center py-20">
-              <p className="text-sm" style={{ color: '#888' }}>Carregando catálogo...</p>
+              <p className="text-sm" style={{ color: '#999' }}>Carregando catálogo...</p>
             </div>
           ) : filtered.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {filtered.map((product, i) => (
-                <div key={product.id} className="relative">
-                  <ProductTiltCard
-                    product={product}
-                    index={i}
-                    onClick={() => navigate(`/produtos/${slugify(product.title)}`)}
-                  />
-                  <label className="absolute bottom-[13px] left-4 z-10 flex items-center gap-1.5 text-[10px] font-semibold cursor-pointer select-none"
-                    style={{ color: compareIds.includes(product.id) ? '#F5B700' : '#888' }}
-                    onClick={e => e.stopPropagation()}>
-                    <input type="checkbox" checked={compareIds.includes(product.id)}
-                      onChange={() => toggleCompare(product.id)}
-                      disabled={!compareIds.includes(product.id) && compareIds.length >= 3}
-                      className="w-3.5 h-3.5 accent-[#F5B700]" />
-                    Comparar
-                  </label>
-                </div>
+              {filtered.map((product) => (
+                <SimpleProductCard
+                  key={product.id}
+                  product={product}
+                  compareChecked={compareIds.includes(product.id)}
+                  onCompareToggle={() => toggleCompare(product.id)}
+                  compareDisabled={compareIds.length >= 3}
+                />
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 rounded-2xl" style={{ background: 'hsla(213,18%,16%,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <PackageSearch className="w-10 h-10 mx-auto mb-3" style={{ color: '#555' }} />
-              <p className="text-sm font-bold text-white mb-1">Nenhum produto encontrado</p>
+            <div className="text-center py-20 rounded-2xl" style={{ background: '#fafafa', border: '1px solid #e5e5e5' }}>
+              <PackageSearch className="w-10 h-10 mx-auto mb-3" style={{ color: '#ccc' }} />
+              <p className="text-sm font-bold mb-1" style={{ color: '#111' }}>Nenhum produto encontrado</p>
               <p className="text-xs mb-5" style={{ color: '#888' }}>Tente outro termo ou remova alguns filtros.</p>
-              <button onClick={clearFilters} className="hover-underline text-xs font-semibold" style={{ color: '#F5B700' }}>
+              <button onClick={clearFilters} className="hover-underline text-xs font-semibold" style={{ color: '#111' }}>
                 Limpar filtros
               </button>
             </div>
@@ -211,8 +214,8 @@ export default function Products() {
         {compareIds.length > 0 && (
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 flex items-center justify-center gap-4"
-            style={{ background: 'hsla(240,6%,9%,0.97)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(245,183,0,0.15)' }}>
-            <span className="text-xs font-semibold" style={{ color: '#ccc' }}>
+            style={{ background: '#fff', backdropFilter: 'blur(12px)', borderTop: '1px solid #e5e5e5', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}>
+            <span className="text-xs font-semibold" style={{ color: '#444' }}>
               {compareIds.length} {compareIds.length === 1 ? 'produto selecionado' : 'produtos selecionados'} (até 3)
             </span>
             <PremiumButton
