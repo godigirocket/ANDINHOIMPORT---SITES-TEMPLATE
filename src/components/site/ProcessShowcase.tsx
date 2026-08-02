@@ -81,7 +81,7 @@ export function ProcessShowcase() {
           <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'hsl(43,96%,52%)' }}>
             Inspeção antes da venda
           </p>
-          <RevealText as="h2" className="font-display font-black tracking-tight text-white text-[clamp(1.6rem,2.4vw,2.2rem)]">
+          <RevealText as="h2" className="font-display font-bold tracking-tight text-white text-[clamp(1.6rem,2.4vw,2.2rem)]">
             O que a gente confere antes de anunciar
           </RevealText>
         </div>
@@ -110,7 +110,7 @@ export function ProcessShowcase() {
                 </div>
                 <div>
                   <p className="text-[10px] font-bold tracking-[0.16em] uppercase mb-1.5" style={{ color: 'hsl(43,96%,52%)' }}>{panel.kicker}</p>
-                  <h3 className="font-display font-black text-[15px] text-white mb-1.5 leading-snug">{panel.title}</h3>
+                  <h3 className="font-display font-bold text-[15px] text-white mb-1.5 leading-snug">{panel.title}</h3>
                   <p className="text-[13px] leading-relaxed" style={{ color: 'hsla(45,20%,96%,0.6)' }}>{panel.text}</p>
                 </div>
               </motion.div>

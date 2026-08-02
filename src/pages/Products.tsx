@@ -83,7 +83,7 @@ export default function Products() {
             <span style={{ color: '#111' }}>Produtos</span>
           </nav>
 
-          <h1 className="font-display font-black tracking-tight mb-3 text-[clamp(1.8rem,3vw,2.6rem)]" style={{ color: '#111' }}>
+          <h1 className="font-display font-bold tracking-tight mb-3 text-[clamp(1.8rem,3vw,2.6rem)]" style={{ color: '#111' }}>
             Catálogo disponível agora
           </h1>
           <p className="text-sm mb-8 max-w-lg" style={{ color: '#666' }}>

@@ -80,7 +80,7 @@ export function TestimonialsSection() {
           <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-3" style={{ color: 'hsl(43,96%,52%)' }}>
             Depoimento verificado
           </p>
-          <RevealText as="h2" className="font-display font-black tracking-tight text-white">
+          <RevealText as="h2" className="font-display font-bold tracking-tight text-white">
             <span style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2rem)' }}>Quem já comprou, confirma</span>
           </RevealText>
         </div>

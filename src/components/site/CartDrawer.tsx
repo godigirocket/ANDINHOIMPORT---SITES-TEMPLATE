@@ -120,7 +120,7 @@ export function CartDrawer() {
               <div className="p-5 space-y-4" style={{ borderTop: '1px solid #eee' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm" style={{ color: '#666' }}>Total</span>
-                  <span className="text-xl font-display font-black" style={{ color: '#111' }}>{fmt(getTotal())}</span>
+                  <span className="text-xl font-display font-bold" style={{ color: '#111' }}>{fmt(getTotal())}</span>
                 </div>
                 <button onClick={handleCheckout}
                   className="btn-gold w-full flex items-center justify-center gap-2 text-sm">

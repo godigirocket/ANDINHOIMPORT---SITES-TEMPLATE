@@ -107,7 +107,7 @@ export default function ProductDetail() {
 
           {/* Info */}
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-6">
-            <h1 className="font-display font-black tracking-tight text-[clamp(1.8rem,3.2vw,2.6rem)]" style={{ color: '#111' }}>
+            <h1 className="font-display font-bold tracking-tight text-[clamp(1.8rem,3.2vw,2.6rem)]" style={{ color: '#111' }}>
               {product.title}
             </h1>
 
@@ -180,7 +180,7 @@ export default function ProductDetail() {
         {/* Relacionados — só produtos reais da mesma categoria */}
         {related.length > 0 && (
           <div className="mt-20">
-            <h2 className="font-display font-black tracking-tight mb-6 text-[clamp(1.4rem,2vw,1.8rem)]" style={{ color: '#111' }}>Modelos relacionados</h2>
+            <h2 className="font-display font-bold tracking-tight mb-6 text-[clamp(1.4rem,2vw,1.8rem)]" style={{ color: '#111' }}>Modelos relacionados</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {related.map((p) => (
                 <SimpleProductCard key={p.id} product={p} />

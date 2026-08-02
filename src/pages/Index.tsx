@@ -10,7 +10,6 @@ import { useContentStore } from '@/lib/stores/contentStore';
 import { useProductStore } from '@/lib/stores/productStore';
 import { clientConfig } from '@/config/client';
 import { captureUTMs } from '@/lib/analytics/track';
-import { useSectionSnap } from '@/hooks/useSectionSnap';
 
 // Abaixo da dobra — carrega sob demanda, não trava o LCP da home
 const ProcessShowcase   = lazy(() => import('@/components/site/ProcessShowcase').then(m => ({ default: m.ProcessShowcase })));
@@ -28,7 +27,6 @@ const SimpleChatbot     = lazy(() => import('@/components/SimpleChatbot').then(m
 const Index = () => {
   const { fetchContent, content } = useContentStore();
   const { products } = useProductStore();
-  useSectionSnap();
 
   useEffect(() => {
     fetchContent();

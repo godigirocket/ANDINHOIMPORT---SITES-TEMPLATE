@@ -53,12 +53,9 @@ export default function Compare() {
           <span style={{ color: '#F5B700' }}>Comparar</span>
         </nav>
 
-        <RevealText as="h1" className="font-display font-black tracking-tight mb-3 text-white text-[clamp(1.8rem,3vw,2.6rem)]">
+        <RevealText as="h1" className="font-display font-bold tracking-tight mb-10 text-white text-[clamp(1.8rem,3vw,2.6rem)]">
           Comparar modelos lado a lado
         </RevealText>
-        <p className="text-sm mb-10 max-w-lg" style={{ color: '#a6a6aa' }}>
-          Só mostramos campos que a loja realmente preencheu — quando algo não foi informado, dizemos isso em vez de inventar uma especificação.
-        </p>
 
         {isLoading ? (
           <p className="text-sm" style={{ color: '#888' }}>Carregando...</p>

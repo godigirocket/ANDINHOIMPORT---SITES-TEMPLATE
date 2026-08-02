@@ -371,7 +371,7 @@ export default function Checkout() {
                   ))}
                   <div className="pt-2 mt-2 flex justify-between" style={{ borderTop: '1px solid #eee' }}>
                     <span className="text-sm font-bold" style={{ color: '#111' }}>Total</span>
-                    <span className="text-lg font-display font-black" style={{ color: '#111' }}>{fmt(total)}</span>
+                    <span className="text-lg font-display font-bold" style={{ color: '#111' }}>{fmt(total)}</span>
                   </div>
                 </div>
 
@@ -493,7 +493,7 @@ export default function Checkout() {
                   <div className="text-center p-4 rounded-xl"
                     style={{ background: 'hsla(142,71%,45%,0.06)', border: '1px solid hsla(142,71%,45%,0.25)' }}>
                     <p className="text-xs" style={{ color: 'hsl(142,71%,38%)' }}>Valor a pagar</p>
-                    <p className="text-2xl font-display font-black" style={{ color: 'hsl(142,71%,32%)' }}>{fmt(total)}</p>
+                    <p className="text-2xl font-display font-bold" style={{ color: 'hsl(142,71%,32%)' }}>{fmt(total)}</p>
                   </div>
 
                   {/* Pix Copia e Cola */}

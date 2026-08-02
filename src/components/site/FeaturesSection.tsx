@@ -26,7 +26,7 @@ export function FeaturesSection() {
 
       <div className="relative z-10 max-w-[1320px] mx-auto px-5 sm:px-6">
         <div className="mb-14 max-w-lg">
-          <RevealText as="h2" className="font-display font-black tracking-tight mb-3 text-white"
+          <RevealText as="h2" className="font-display font-bold tracking-tight mb-3 text-white"
             >
             <span style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2.1rem)' }}>
               Números que você pode conferir, não promessas
@@ -47,7 +47,7 @@ export function FeaturesSection() {
               viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}
               className="border-t pt-5" style={{ borderColor: 'hsla(43,96%,52%,0.2)' }}>
               <s.icon className="w-4 h-4 mb-4" style={{ color: 'hsl(43,96%,52%)' }} />
-              <p className="font-display font-black leading-none mb-2 text-white" style={{ fontSize: 'clamp(2rem, 2.8vw, 2.6rem)' }}>
+              <p className="font-display font-bold leading-none mb-2 text-white" style={{ fontSize: 'clamp(2rem, 2.8vw, 2.6rem)' }}>
                 {s.value}
               </p>
               <p className="text-xs leading-relaxed max-w-[16ch]" style={{ color: 'hsla(45,20%,96%,0.55)' }}>

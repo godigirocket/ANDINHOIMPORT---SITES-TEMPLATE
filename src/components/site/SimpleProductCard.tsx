@@ -18,11 +18,14 @@ export function SimpleProductCard({ product, compareChecked, onCompareToggle, co
   const specs = [conditionLabel(product), storageLabel(product)].filter(s => s !== 'Não informado');
 
   return (
-    <div className="rounded-xl overflow-hidden transition-colors" style={{ border: '1px solid #e5e5e5', background: '#fff' }}>
+    <div className="group rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+      style={{ border: '1px solid #e5e5e5', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 28px rgba(0,0,0,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = '#ddd'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)'; (e.currentTarget as HTMLElement).style.borderColor = '#e5e5e5'; }}>
       <Link to={`/produtos/${slugify(product.title)}`} className="block">
-        <div className="aspect-square flex items-center justify-center p-4" style={{ background: '#fafafa' }}>
+        <div className="aspect-square flex items-center justify-center p-4 overflow-hidden" style={{ background: '#fafafa' }}>
           <img src={safeImageUrl(product.image_url)} alt={product.title}
-            className="w-full h-full object-contain" loading="lazy" />
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" />
         </div>
         <div className="px-3 pt-3">
           <p className="text-sm font-semibold mb-1 line-clamp-1" style={{ color: '#111' }}>{product.title}</p>

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -54,6 +55,18 @@ function RouteFallback() {
   );
 }
 
+// Fade simples ao trocar de página — sem AnimatePresence/exit (que brigam
+// com o Suspense das rotas lazy), só um fade-in leve a cada troca de rota.
+function PageFade({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  return (
+    <motion.div key={location.pathname}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.22, ease: 'easeOut' }}>
+      {children}
+    </motion.div>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -63,6 +76,7 @@ const App = () => (
           <SmoothScrollProvider>
           <StorefrontCursor />
           <Suspense fallback={<RouteFallback />}>
+          <PageFade>
           <Routes>
             {/* Public */}
             <Route path="/" element={<Index />} />
@@ -93,6 +107,7 @@ const App = () => (
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </PageFade>
           </Suspense>
           </SmoothScrollProvider>
         </BrowserRouter>

@@ -93,16 +93,17 @@ main > section {
     background: hsla(220,14%,16%,0.8);
     border-color: hsla(220,10%,28%,0.5);
   }
-  /* Pill glow button */
+  /* Pill button — preto sólido (estilo Apple), dourado fica só pra preço e destaques pontuais */
   .btn-gold {
-    @apply font-bold rounded-full px-7 py-3 transition-all focus:outline-none relative overflow-hidden;
+    @apply font-semibold rounded-full px-7 py-3 transition-all focus:outline-none relative overflow-hidden;
     z-index: 0;
-    background: linear-gradient(135deg, hsl(43,96%,52%) 0%, hsl(38,92%,44%) 100%);
-    color: hsl(0,0%,3%);
-    box-shadow: 0 4px 20px hsla(43,96%,52%,0.2);
+    background: #111;
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
   }
   .btn-gold:hover {
-    box-shadow: 0 4px 24px hsla(43,96%,52%,0.3);
+    background: #000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.22);
     transform: translateY(-1px);
   }
   .btn-gold:active { transform: scale(0.98); }
@@ -180,12 +181,17 @@ main > section {
   0%,100% { transform: scale(1); }
   50%     { transform: scale(1.08); }
 }
+@keyframes heroGlow {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%     { opacity: 1; transform: scale(1.06); }
+}
 
 .animate-glow-pulse    { animation: glow-pulse 2.5s ease-in-out infinite; }
 .animate-kenburns      { animation: kenburns 14s ease-in-out infinite; }
+.animate-heroGlow      { animation: heroGlow 6s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-kenburns { animation: none !important; }
+  .animate-kenburns, .animate-heroGlow { animation: none !important; }
 }
 
 /* ── Hover underline — traço que desenha da esquerda pra direita ── */
@@ -334,17 +340,19 @@ main > section {
 
 /* ══════════════════ Design system — camada premium ══════════════════ */
 
-/* Botão outline (variante secundária do PremiumButton) */
+/* Botão outline (variante secundária do PremiumButton) — cor própria, fixa,
+   pra ficar legível tanto em seção clara quanto escura, já que o site
+   alterna entre as duas (não depende de herdar cor do fundo). */
 .btn-outline-premium {
-  @apply font-bold rounded-full px-7 py-3 transition-all relative overflow-hidden;
-  border: 1px solid hsla(255,255%,255%,0.15);
-  color: hsla(45,20%,96%,0.85);
-  background: hsla(240,6%,16%,0.5);
+  @apply font-semibold rounded-full px-7 py-3 transition-all relative overflow-hidden;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  color: #111;
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(8px);
 }
 .btn-outline-premium:hover {
-  border-color: hsla(43,96%,52%,0.4);
-  color: white;
+  background: #fff;
+  border-color: rgba(0,0,0,0.2);
   transform: translateY(-1px);
 }
 .btn-outline-premium:active { transform: scale(0.98); }
