@@ -27,7 +27,7 @@ function InstagramHeader() {
       </div>
       <div className="text-left">
         <p className="text-sm font-bold text-white">@andinhoimport</p>
-        <p className="text-xs" style={{ color: '#888' }}>Siga no Instagram</p>
+        <p className="text-xs text-white/60">Siga no Instagram</p>
       </div>
     </div>
   );
@@ -41,7 +41,7 @@ function FollowButton({ instagramUrl }: { instagramUrl: string }) {
       href={instagramUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="ripple-container inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-transform"
+      className="ripple-container inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white transition-transform"
       style={{ background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', color: '#fff' }}
       onClick={(e) => spawnRipple(e.currentTarget, e.clientX, e.clientY)}
     >

@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Product } from '@/lib/stores/productStore';
 import { slugify } from '@/lib/utils/slugify';
-import { safeImageUrl, priceLabel, conditionLabel, storageLabel } from '@/lib/utils/productFallbacks';
-import { ElectricBorder } from '@/components/effects/ElectricBorder';
+import { conditionLabel, priceLabel, safeImageUrl, storageLabel } from '@/lib/utils/productFallbacks';
 
 interface SimpleProductCardProps {
   product: Product;
@@ -14,77 +12,85 @@ interface SimpleProductCardProps {
   compareDisabled?: boolean;
 }
 
-/**
- * Cartão de produto — foto domina, sobe ao passar o mouse e ganha uma borda
- * elétrica animada (canvas) enquanto hover — só monta o canvas nesse momento
- * pra não rodar dezenas de animações simultâneas no catálogo inteiro.
- */
 export function SimpleProductCard({ product, index = 0, compareChecked, onCompareToggle, compareDisabled }: SimpleProductCardProps) {
-  const [hovered, setHovered] = useState(false);
-  const specs = [conditionLabel(product), storageLabel(product)].filter(s => s !== 'Não informado');
+  const specs = [conditionLabel(product), storageLabel(product)].filter(s => s !== 'Nao informado');
 
-  const cardBody = (
-    <div className="rounded-2xl overflow-hidden" style={{ background: '#fff' }}>
-      <Link to={`/produtos/${slugify(product.title)}`} className="block">
-        <div className="aspect-[4/5] relative overflow-hidden" style={{ background: '#f4f4f4' }}>
-          <img src={safeImageUrl(product.image_url)} alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07]" loading="lazy" />
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 18, rotateX: 5 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      viewport={{ once: true, margin: '-40px', amount: 0.2 }}
+      transition={{ duration: 0.45, delay: Math.min(index, 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      className="neon-product-card group relative min-w-0 overflow-hidden rounded-xl transition-transform duration-300 hover:-translate-y-1"
+      style={{
+        background: 'linear-gradient(152deg, rgba(18,18,23,0.97), rgba(8,8,10,0.99))',
+        border: '1px solid rgba(245,183,0,0.18)',
+        boxShadow: '0 18px 46px rgba(0,0,0,0.34), 0 0 32px rgba(245,183,0,0.1)',
+        transformStyle: 'preserve-3d',
+      }}
+    >
+      <Link to={`/produtos/${slugify(product.title)}`} className="block min-w-0">
+        <div className="relative aspect-[4/3] overflow-hidden bg-[#08080a] sm:aspect-[4/5]">
+          <img
+            src={safeImageUrl(product.image_url)}
+            alt={product.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.065]"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/76" />
+          <div className="absolute inset-x-3 bottom-3 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+
           {product.badge && (
-            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide"
-              style={{ background: 'rgba(255,255,255,0.92)', color: '#111', backdropFilter: 'blur(4px)' }}>
+            <span
+              className="absolute left-2 top-2 max-w-[calc(100%-16px)] truncate rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide"
+              style={{
+                background: 'rgba(245,183,0,0.94)',
+                color: '#08080a',
+                backdropFilter: 'blur(6px)',
+                boxShadow: '0 0 18px rgba(245,183,0,0.35)',
+              }}
+            >
               {product.badge.replace(/[^\w\sÀ-ú]/g, '').trim()}
             </span>
           )}
         </div>
-        <div className="px-4 pt-3.5">
-          <p className="text-sm font-semibold mb-1 line-clamp-1" style={{ color: '#111' }}>{product.title}</p>
+
+        <div className="min-w-0 px-3 py-3 sm:px-4 sm:py-3.5">
+          <p className="mb-1 line-clamp-1 min-w-0 text-[12px] font-bold text-white sm:text-sm">{product.title}</p>
           {specs.length > 0 && (
-            <p className="text-xs mb-2" style={{ color: '#999' }}>{specs.join(' · ')}</p>
+            <p className="mb-2 truncate text-[11px] text-white/42">{specs.join(' · ')}</p>
           )}
-          <div className="flex items-baseline gap-2">
-            <p className="text-lg font-bold" style={{ color: '#111' }}>{priceLabel(product.price)}</p>
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <p className="whitespace-nowrap text-[0.98rem] font-black leading-tight text-primary drop-shadow-[0_0_12px_rgba(245,183,0,0.35)] sm:text-lg">
+              {priceLabel(product.price)}
+            </p>
             {product.old_price && (
-              <p className="text-xs line-through" style={{ color: '#bbb' }}>{priceLabel(product.old_price)}</p>
+              <p className="whitespace-nowrap text-[11px] text-white/30 line-through">{priceLabel(product.old_price)}</p>
             )}
           </div>
-          <p className="text-xs" style={{ color: '#999' }}>
+          <p className="truncate text-[10.5px] text-cyan-200/55 sm:text-xs">
             {product.installments}x de {priceLabel(product.price / product.installments)}
           </p>
         </div>
       </Link>
+
       {onCompareToggle && (
-        <div className="px-4 pb-3.5 pt-2">
-          <label className="flex items-center gap-1.5 text-[11px] font-medium cursor-pointer select-none"
-            style={{ color: compareChecked ? '#111' : '#aaa' }}>
-            <input type="checkbox" checked={!!compareChecked}
+        <div className="px-3.5 pb-3.5 pt-0 sm:px-4">
+          <label
+            className="flex cursor-pointer select-none items-center gap-1.5 text-[11px] font-medium"
+            style={{ color: compareChecked ? 'hsl(43,96%,52%)' : 'rgba(255,255,255,0.5)' }}
+          >
+            <input
+              type="checkbox"
+              checked={!!compareChecked}
               onChange={onCompareToggle}
               disabled={!compareChecked && compareDisabled}
-              className="w-3.5 h-3.5" />
+              className="h-3.5 w-3.5"
+            />
             Comparar
           </label>
         </div>
       )}
-    </div>
-  );
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px', amount: 0.2 }}
-      transition={{ duration: 0.45, delay: Math.min(index, 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative rounded-2xl transition-all duration-300 hover:-translate-y-1.5"
-      style={{ boxShadow: hovered ? '0 20px 32px -8px rgba(0,0,0,0.14), 0 4px 8px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {hovered ? (
-        <ElectricBorder color="#FAB70F" speed={1.3} chaos={0.4} borderRadius={16}>
-          {cardBody}
-        </ElectricBorder>
-      ) : (
-        <div style={{ borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)' }}>{cardBody}</div>
-      )}
-    </motion.div>
+    </motion.article>
   );
 }

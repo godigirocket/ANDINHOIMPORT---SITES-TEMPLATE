@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { SmoothScrollProvider } from '@/components/scroll/SmoothScroll';
-import { PremiumCursor } from '@/components/site/PremiumCursor';
 import Index from './pages/Index';
 
 // Rotas fora da home carregam sob demanda — reduz o JS que o visitante
@@ -42,9 +41,25 @@ const queryClient = new QueryClient({
 });
 
 function StorefrontCursor() {
-  const location = useLocation();
-  if (location.pathname.startsWith('/admin')) return null;
-  return <PremiumCursor />;
+  // Cursor customizado fica desligado por padrao: em notebooks e celulares ele
+  // custa mousemove continuo e deixa a rolagem parecer mais pesada.
+  return null;
+}
+
+function ScrollEdgeBlur() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-12"
+      style={{
+        background: 'linear-gradient(180deg, transparent, rgba(8,8,10,0.28))',
+        backdropFilter: 'blur(3px)',
+        WebkitBackdropFilter: 'blur(3px)',
+        maskImage: 'linear-gradient(180deg, transparent, black 72%)',
+        WebkitMaskImage: 'linear-gradient(180deg, transparent, black 72%)',
+      }}
+    />
+  );
 }
 
 function RouteFallback() {
@@ -76,6 +91,7 @@ const App = () => (
         <BrowserRouter>
           <SmoothScrollProvider>
           <StorefrontCursor />
+          <ScrollEdgeBlur />
           <Suspense fallback={<RouteFallback />}>
           <PageFade>
           <Routes>

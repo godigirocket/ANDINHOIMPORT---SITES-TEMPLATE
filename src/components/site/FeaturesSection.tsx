@@ -1,56 +1,104 @@
-import { motion } from 'framer-motion';
-import { CreditCard, ShieldCheck, Truck, Headphones } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { CreditCard, FileCheck2, Headphones, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { RevealText } from '@/components/ui/RevealText';
 import { PremiumButton } from '@/components/ui/PremiumButton';
 import { useParallax } from '@/hooks/useParallax';
 
-// Frame 6 — Confiança: números reais da operação, banda editorial em vez de
-// seis ícones em card. Cada número é uma afirmação verificável, não um adjetivo.
-const stats = [
-  { icon: CreditCard,  value: `${clientConfig.features.maxInstallments}x`,  label: 'sem juros no cartão, qualquer banco' },
-  { icon: ShieldCheck, value: '100%', label: 'dos aparelhos testados antes de anunciar' },
-  { icon: Truck,       value: '2', label: 'dias úteis em média até o envio sair' },
-  { icon: Headphones,  value: '0', label: 'robôs — quem responde conhece o estoque' },
+interface StatItem {
+  icon: LucideIcon;
+  value: number;
+  suffix?: string;
+  label: string;
+}
+
+const stats: StatItem[] = [
+  { icon: CreditCard, value: clientConfig.features.maxInstallments, suffix: 'x', label: 'sem juros no cartao' },
+  { icon: ShieldCheck, value: 100, suffix: '%', label: 'produtos originais' },
+  { icon: FileCheck2, value: 1, label: 'nota fiscal em todo aparelho' },
+  { icon: Headphones, value: 1, label: 'atendimento humano direto' },
 ];
+
+function CountUp({ value, suffix = '' }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const [display, setDisplay] = useState(value);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || value === 0) {
+      setDisplay(value);
+      return;
+    }
+
+    let frame = 0;
+    const duration = 950;
+    const startedAt = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.max(1, Math.round(value * eased)));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [isInView, value]);
+
+  return <span ref={ref}>{display}{suffix}</span>;
+}
 
 export function FeaturesSection() {
   const waUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(clientConfig.company.contact.whatsappMessage)}`;
   const glowRef = useParallax<HTMLDivElement>(0.25);
 
   return (
-    <section id="features" className="relative py-16 md:py-20 overflow-hidden">
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(224,30%,16%) 50%, hsl(240,6%,11%) 100%)' }} />
-      <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[800px] h-[400px] pointer-events-none"
-        style={{ marginLeft: '-400px', marginTop: '-200px', background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.05) 0%, transparent 70%)' }} />
+    <section id="features" className="relative py-14 md:py-20 overflow-hidden">
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(240,6%,11%) 0%, hsl(224,24%,14%) 52%, hsl(240,6%,11%) 100%)' }} />
+      <div ref={glowRef} className="absolute top-1/2 left-1/2 w-[min(760px,92vw)] h-[360px] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        style={{ background: 'radial-gradient(ellipse, hsla(43,96%,52%,0.08) 0%, transparent 70%)' }} />
 
-      <div className="relative z-10 max-w-[1320px] mx-auto px-5 sm:px-6">
-        <div className="mb-14 max-w-lg">
-          <RevealText as="h2" className="font-display font-bold tracking-tight mb-3 text-white"
-            >
-            <span style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2.1rem)' }}>
-              Números que você pode conferir, não promessas
+      <div className="relative z-10 max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div className="mb-10 max-w-xl">
+          <RevealText as="h2" className="font-display font-bold tracking-tight mb-3 text-white">
+            <span style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2.1rem)' }}>
+            Compra clara, produto original
             </span>
           </RevealText>
           <motion.p initial={{ y: 12, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }} transition={{ delay: 0.3 }}
-            className="text-sm" style={{ color: 'hsla(45,20%,96%,0.5)' }}>
-            Cada número aqui é verificável direto com quem já comprou — sem estatística inflada.
+            className="text-sm leading-relaxed" style={{ color: 'hsla(45,20%,96%,0.58)' }}>
+            Condicoes simples, nota fiscal e atendimento direto para confirmar modelo, cor e estoque.
           </motion.p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-12">
           {stats.map((s, i) => (
             <motion.div key={s.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="border-t pt-5" style={{ borderColor: 'hsla(43,96%,52%,0.2)' }}>
-              <s.icon className="w-4 h-4 mb-4" style={{ color: 'hsl(43,96%,52%)' }} />
-              <p className="font-display font-bold leading-none mb-2 text-white" style={{ fontSize: 'clamp(2rem, 2.8vw, 2.6rem)' }}>
-                {s.value}
+              initial={{ opacity: 0, y: 22, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+              className="relative overflow-hidden rounded-xl p-5 min-h-[168px]"
+              style={{
+                background: 'linear-gradient(145deg, hsla(220,16%,18%,0.96), hsla(240,6%,12%,0.98))',
+                border: '1px solid hsla(43,96%,52%,0.14)',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.22)',
+              }}>
+              <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsla(43,96%,52%,0.75), transparent)' }} />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-5"
+                style={{ background: 'hsla(43,96%,52%,0.1)', border: '1px solid hsla(43,96%,52%,0.18)' }}>
+                <s.icon className="w-4 h-4" style={{ color: 'hsl(43,96%,52%)' }} />
+              </div>
+              <p className="font-display font-black leading-none mb-3 text-white tabular-nums" style={{ fontSize: 'clamp(2.15rem, 4vw, 3rem)' }}>
+                {s.label.includes('nota fiscal') || s.label.includes('atendimento')
+                  ? <span>{s.label.includes('nota fiscal') ? 'NF' : '1:1'}</span>
+                  : <CountUp value={s.value} suffix={s.suffix} />}
               </p>
-              <p className="text-xs leading-relaxed max-w-[16ch]" style={{ color: 'hsla(45,20%,96%,0.55)' }}>
+              <p className="text-sm leading-relaxed max-w-[22ch]" style={{ color: 'hsla(45,20%,96%,0.58)' }}>
                 {s.label}
               </p>
             </motion.div>
@@ -58,12 +106,12 @@ export function FeaturesSection() {
         </div>
 
         <motion.div initial={{ y: 16, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }} transition={{ delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl"
-          style={{ background: 'linear-gradient(135deg, hsla(43,96%,52%,0.08) 0%, hsla(43,96%,52%,0.04) 100%)', border: '1px solid hsla(43,96%,52%,0.2)' }}>
-          <div>
-            <p className="font-bold text-base text-white">Ficou com dúvidas?</p>
-            <p className="text-sm" style={{ color: 'hsla(45,20%,96%,0.5)' }}>Fale diretamente com a gente no WhatsApp</p>
+          viewport={{ once: true }} transition={{ delay: 0.25 }}
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-xl"
+          style={{ background: 'hsla(43,96%,52%,0.07)', border: '1px solid hsla(43,96%,52%,0.16)' }}>
+          <div className="min-w-0">
+            <p className="font-bold text-base text-white">Quer consultar um modelo?</p>
+            <p className="text-sm" style={{ color: 'hsla(45,20%,96%,0.55)' }}>Chame no WhatsApp e confirme estoque, cor e parcelamento.</p>
           </div>
           <PremiumButton href={waUrl} target="_blank" rel="noopener noreferrer"
             variant="primary" className="text-sm flex-shrink-0">

@@ -127,6 +127,54 @@ main > section {
   .gradient-primary { background: linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%)); }
   .gradient-accent  { background: linear-gradient(135deg, hsl(43,96%,52%), hsl(48,100%,65%)); }
   .shadow-glow      { box-shadow: 0 0 30px hsla(43,96%,52%,0.2); }
+
+  .site-shimmer-text {
+    background: linear-gradient(90deg, #fff 0%, #f5b700 38%, #8bdfff 56%, #fff 78%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: siteTextShimmer 5.8s ease-in-out infinite;
+  }
+
+  .neon-product-card::before,
+  .neon-category-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.12) 45%, transparent 70%);
+    opacity: 0;
+    transform: translateX(-80%);
+    transition: opacity 0.3s ease;
+  }
+
+  .neon-product-card:hover::before,
+  .neon-category-card:hover::before {
+    opacity: 1;
+    animation: cardLightSweep 1.15s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  .neon-product-card::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(245,183,0,0.16), transparent 36%),
+      radial-gradient(circle at 82% 18%, rgba(87,212,255,0.12), transparent 34%);
+    opacity: 0.8;
+  }
+
+  .neon-product-card > *,
+  .neon-category-card > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 @layer utilities {
@@ -185,13 +233,21 @@ main > section {
   0%,100% { opacity: 0.7; transform: scale(1); }
   50%     { opacity: 1; transform: scale(1.06); }
 }
+@keyframes siteTextShimmer {
+  0%, 58%, 100% { background-position: 0% 50%; }
+  72% { background-position: 100% 50%; }
+}
+@keyframes cardLightSweep {
+  from { transform: translateX(-80%); }
+  to { transform: translateX(120%); }
+}
 
 .animate-glow-pulse    { animation: glow-pulse 2.5s ease-in-out infinite; }
 .animate-kenburns      { animation: kenburns 14s ease-in-out infinite; }
 .animate-heroGlow      { animation: heroGlow 6s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-kenburns, .animate-heroGlow { animation: none !important; }
+  .animate-kenburns, .animate-heroGlow, .site-shimmer-text { animation: none !important; }
 }
 
 /* ── Hover underline — traço que desenha da esquerda pra direita ── */
@@ -445,4 +501,57 @@ body.has-premium-cursor, body.has-premium-cursor * { cursor: none !important; }
    degrada bem em navegadores sem suporte, sem quebrar nada) */
 .product-reflect {
   -webkit-box-reflect: below 2px linear-gradient(to bottom, transparent, transparent 55%, hsla(255,255%,255%,0.12));
+}
+
+.section-blur-end::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(72px, 12vw, 150px);
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(to bottom, transparent, hsla(240,6%,11%,0.72) 62%, hsl(240,6%,11%));
+  backdrop-filter: blur(2px);
+}
+
+.animated-container {
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.animated-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 46px rgba(0,0,0,0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-container,
+  .animated-container:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Mobile containment: prevent decorative canvases/glows from widening the page. */
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+*,
+*::before,
+*::after {
+  min-width: 0;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body,
+  #root {
+    overflow-x: hidden;
+  }
 }

@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ChevronDown, MessageCircle, ShieldCheck, Truck, BadgeCheck } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { useProductStore } from '@/lib/stores/productStore';
-import { slugify } from '@/lib/utils/slugify';
-import { safeImageUrl, priceLabel } from '@/lib/utils/productFallbacks';
-import { DotGrid } from '@/components/effects/DotGrid';
+import { safeImageUrl } from '@/lib/utils/productFallbacks';
 
 export function HeroSection() {
   const { products, fetchProducts } = useProductStore();
@@ -14,84 +13,117 @@ export function HeroSection() {
 
   const active = products.filter(p => p.status === 'active');
   const product = active.find(p => p.featured) || active[0];
-
+  const heroImage = safeImageUrl(product?.image_url);
   const whatsappUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   const msg = product
-    ? `Olá! Tenho interesse no ${product.title}. Pode me passar mais informações?`
+    ? `Ola! Tenho interesse no ${product.title}. Pode me passar mais informacoes?`
     : clientConfig.company.contact.whatsappMessage;
 
+  const badges = [
+    { icon: ShieldCheck, label: 'Produtos originais', sub: 'garantido' },
+    { icon: Truck, label: 'Pronta entrega', sub: 'garantido' },
+    { icon: BadgeCheck, label: 'Garantia total', sub: 'garantido' },
+  ];
+
   return (
-    <section id="hero" className="relative overflow-hidden" style={{ background: '#07070a' }}>
-      {/* Textura de fundo animada — reage a proximidade/velocidade do mouse */}
-      <div className="absolute inset-0 z-0">
-        <DotGrid
-          dotSize={3.5}
-          gap={24}
-          baseColor="#232327"
-          activeColor="#FAB70F"
-          proximity={130}
-          shockRadius={220}
-          shockStrength={3}
-          resistance={800}
-          returnDuration={1.2}
-          style={{ width: '100%', height: '100%', opacity: 0.7 }}
-        />
-      </div>
+    <section id="hero" className="section-blur-end relative min-h-screen overflow-hidden bg-[#090a0f]">
+      <motion.img
+        src={heroImage}
+        alt=""
+        aria-hidden="true"
+        initial={{ scale: 1.08, opacity: 0 }}
+        animate={{ scale: 1, opacity: 0.52 }}
+        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-0 h-full w-full object-cover object-[68%_50%]"
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(90deg, rgba(6,8,14,0.96) 0%, rgba(8,10,18,0.74) 38%, rgba(10,12,20,0.44) 70%, rgba(8,8,12,0.74) 100%)',
+        }}
+      />
+      <div className="absolute inset-0 opacity-40" style={{ background: 'radial-gradient(circle at 18% 62%, rgba(250,183,15,0.16), transparent 34%)' }} />
 
-      <div className="relative z-10 flex flex-col items-center text-center px-5 pt-32 pb-16 md:pt-40 md:pb-20">
-        <motion.span initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5 }}
-          className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-6"
-          style={{ background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}>
-          Até {clientConfig.features.maxInstallments}x sem juros
-        </motion.span>
+      <div className="relative z-10 flex min-h-screen items-center px-5 pb-20 pt-28 sm:px-8 lg:px-12">
+        <div className="w-full max-w-[1220px] mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-2xl"
+          >
+            <p className="mb-6 text-[11px] font-black uppercase tracking-[0.32em] text-primary sm:text-xs">
+              Novos modelos disponiveis
+            </p>
+            <h1 className="font-display text-[clamp(4rem,11vw,8.8rem)] font-black uppercase leading-[0.78] tracking-tight">
+              <span className="block text-[#f2eee2] drop-shadow-[0_10px_30px_rgba(0,0,0,0.38)]">Andinho</span>
+              <span className="block text-primary drop-shadow-[0_14px_34px_rgba(250,183,15,0.2)]">Import</span>
+            </h1>
+            <p className="mt-8 max-w-xl border-l-2 border-primary pl-5 text-base font-medium leading-relaxed text-white/78 sm:text-xl">
+              Apple, Xiaomi e Smartwatches com garantia, parcelamento em ate 18x e entrega rapida para toda regiao Sul
+            </p>
 
-        <motion.h1 initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-display font-bold tracking-tight leading-[1.08] mb-3"
-          style={{ fontSize: 'clamp(1.9rem, 4.2vw, 3.1rem)', color: '#fff' }}>
-          {product ? product.title : 'iPhone e Xiaomi originais'}
-        </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18, duration: 0.58 }}
+              className="mt-8 flex flex-wrap gap-3"
+            >
+              {badges.map(item => (
+                <div
+                  key={item.label}
+                  className="animated-container flex items-center gap-2 rounded-full px-4 py-2 text-left"
+                  style={{ background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.16)', backdropFilter: 'blur(14px)' }}
+                >
+                  <item.icon className="h-4 w-4 text-primary" />
+                  <span className="text-[10px] font-black uppercase leading-none tracking-wide text-white">
+                    {item.label}
+                    <span className="block pt-1 text-[9px] text-white/54">{item.sub}</span>
+                  </span>
+                </div>
+              ))}
+            </motion.div>
 
-        <motion.p initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.18 }}
-          className="text-base md:text-lg mb-7" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          {product ? 'Pronta entrega, com garantia e nota fiscal.' : 'Pronta entrega em Estância Velha, RS.'}
-        </motion.p>
-
-        <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.24 }}
-          className="flex items-center gap-6 mb-10">
-          {product && (
-            <Link to={`/produtos/${slugify(product.title)}`} className="hover-underline text-sm font-semibold" style={{ color: '#fff' }}>
-              Ver detalhes
-            </Link>
-          )}
-          <a href={`${whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"
-            className="hover-underline text-sm font-semibold" style={{ color: 'hsl(43,96%,58%)' }}>
-            Falar no WhatsApp
-          </a>
-        </motion.div>
-
-        {product ? (
-          <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-2xl">
-            {/* Halo suave e contínuo atrás do produto — CSS puro, leve */}
-            <div className="absolute inset-0 rounded-[32px] animate-heroGlow" style={{ background: 'radial-gradient(ellipse at center, hsla(43,96%,60%,0.22) 0%, transparent 70%)', filter: 'blur(50px)' }} />
-            <div className="relative rounded-[28px] overflow-hidden aspect-[4/3]" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <img src={safeImageUrl(product.image_url)} alt={product.title}
-                className="w-full h-full object-cover animate-kenburns" />
-            </div>
-            <div className="mt-7 text-center">
-              <span className="font-display text-2xl font-bold" style={{ color: '#fff' }}>{priceLabel(product.price)}</span>
-              <span className="text-sm ml-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                ou {product.installments}x de {priceLabel(product.price / product.installments)}
-              </span>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28, duration: 0.58 }}
+              className="mt-10 flex flex-wrap items-center gap-4"
+            >
+              <a
+                href={`${whatsappUrl}?text=${encodeURIComponent(msg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="animated-container inline-flex items-center gap-3 rounded-full bg-primary px-7 py-4 text-sm font-black text-black shadow-[0_18px_42px_rgba(250,183,15,0.24)] transition-transform hover:-translate-y-1"
+                style={{ background: '#FAB70F', color: '#050505' }}
+              >
+                <MessageCircle className="h-5 w-5" />
+                Garanta Agora
+              </a>
+              <Link
+                to="/produtos"
+                className="animated-container inline-flex items-center gap-3 rounded-full px-7 py-4 text-sm font-black text-white transition-transform hover:-translate-y-1"
+                style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.16)', backdropFilter: 'blur(14px)' }}
+              >
+                Explorar Catalogo
+                <ChevronDown className="h-4 w-4" />
+              </Link>
+            </motion.div>
           </motion.div>
-        ) : (
-          <div className="w-full max-w-2xl aspect-[4/3] rounded-[28px] flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Carregando catálogo…</p>
-          </div>
-        )}
+        </div>
       </div>
+
+      <motion.a
+        href="#products"
+        aria-label="Rolar para produtos"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+        className="absolute bottom-8 left-1/2 z-20 hidden -translate-x-1/2 rounded-full p-3 text-white/70 md:block"
+      >
+        <ChevronDown className="h-5 w-5 animate-bounce" />
+      </motion.a>
     </section>
   );
 }

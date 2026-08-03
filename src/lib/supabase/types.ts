@@ -12,6 +12,7 @@ export interface Database {
       products: {
         Row: {
           id: string;
+          client_id: string;
           title: string;
           description: string | null;
           price: number;
@@ -23,11 +24,19 @@ export interface Database {
           status: 'active' | 'inactive';
           badge: string | null;
           installments: number;
+          sort_order: number;
+          condition: string | null;
+          storage_gb: number | null;
+          battery_health_pct: number | null;
+          color: string | null;
+          warranty_days: number | null;
+          accessories_included: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
+          client_id: string;
           title: string;
           description?: string | null;
           price: number;
@@ -39,11 +48,19 @@ export interface Database {
           status?: 'active' | 'inactive';
           badge?: string | null;
           installments?: number;
+          sort_order?: number;
+          condition?: string | null;
+          storage_gb?: number | null;
+          battery_health_pct?: number | null;
+          color?: string | null;
+          warranty_days?: number | null;
+          accessories_included?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          client_id?: string;
           title?: string;
           description?: string | null;
           price?: number;
@@ -55,6 +72,13 @@ export interface Database {
           status?: 'active' | 'inactive';
           badge?: string | null;
           installments?: number;
+          sort_order?: number;
+          condition?: string | null;
+          storage_gb?: number | null;
+          battery_health_pct?: number | null;
+          color?: string | null;
+          warranty_days?: number | null;
+          accessories_included?: string | null;
           updated_at?: string;
         };
       };
@@ -69,7 +93,12 @@ export interface Database {
           cta_secondary_text: string | null;
           whatsapp_link: string | null;
           instagram_link: string | null;
+          instagram_enabled: boolean;
+          instagram_photo: string | null;
           support_text: string | null;
+          contact_phone: string | null;
+          contact_email: string | null;
+          contact_address: string | null;
           seo_title: string | null;
           seo_description: string | null;
           seo_keywords: string | null;
@@ -77,6 +106,8 @@ export interface Database {
           meta_pixel: string | null;
           tiktok_pixel: string | null;
           google_search_console_token: string | null;
+          hero_bg_1: string | null;
+          hero_bg_2: string | null;
           updated_at: string;
         };
         Insert: {
@@ -89,7 +120,12 @@ export interface Database {
           cta_secondary_text?: string | null;
           whatsapp_link?: string | null;
           instagram_link?: string | null;
+          instagram_enabled?: boolean;
+          instagram_photo?: string | null;
           support_text?: string | null;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          contact_address?: string | null;
           seo_title?: string | null;
           seo_description?: string | null;
           seo_keywords?: string | null;
@@ -97,6 +133,8 @@ export interface Database {
           meta_pixel?: string | null;
           tiktok_pixel?: string | null;
           google_search_console_token?: string | null;
+          hero_bg_1?: string | null;
+          hero_bg_2?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -107,7 +145,12 @@ export interface Database {
           cta_secondary_text?: string | null;
           whatsapp_link?: string | null;
           instagram_link?: string | null;
+          instagram_enabled?: boolean;
+          instagram_photo?: string | null;
           support_text?: string | null;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          contact_address?: string | null;
           seo_title?: string | null;
           seo_description?: string | null;
           seo_keywords?: string | null;
@@ -115,29 +158,37 @@ export interface Database {
           meta_pixel?: string | null;
           tiktok_pixel?: string | null;
           google_search_console_token?: string | null;
+          hero_bg_1?: string | null;
+          hero_bg_2?: string | null;
           updated_at?: string;
         };
       };
       banners: {
         Row: {
           id: string;
+          client_id: string;
           image_url: string;
           title: string | null;
+          link_url: string | null;
           active: boolean;
           sort_order: number;
           created_at: string;
         };
         Insert: {
           id?: string;
+          client_id?: string;
           image_url: string;
           title?: string | null;
+          link_url?: string | null;
           active?: boolean;
           sort_order?: number;
           created_at?: string;
         };
         Update: {
+          client_id?: string;
           image_url?: string;
           title?: string | null;
+          link_url?: string | null;
           active?: boolean;
           sort_order?: number;
         };
@@ -145,6 +196,7 @@ export interface Database {
       testimonials: {
         Row: {
           id: string;
+          client_id: string;
           name: string;
           text: string;
           avatar_url: string | null;
@@ -154,6 +206,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
+          client_id?: string;
           name: string;
           text: string;
           avatar_url?: string | null;
@@ -162,6 +215,7 @@ export interface Database {
           created_at?: string;
         };
         Update: {
+          client_id?: string;
           name?: string;
           text?: string;
           avatar_url?: string | null;
@@ -206,6 +260,36 @@ export interface Database {
           status?: 'pending_confirmation' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
           notes?: string | null;
           updated_at?: string;
+        };
+      };
+      instagram_posts: {
+        Row: {
+          id: string;
+          client_id: string;
+          img: string;
+          url: string | null;
+          caption: string | null;
+          active: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id?: string;
+          img: string;
+          url?: string | null;
+          caption?: string | null;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          client_id?: string;
+          img?: string;
+          url?: string | null;
+          caption?: string | null;
+          active?: boolean;
+          sort_order?: number;
         };
       };
     };

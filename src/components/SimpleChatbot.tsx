@@ -1,488 +1,195 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, Send, MessageCircle, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronRight, MessageCircle, Send, X } from 'lucide-react';
+import { BrandLogo } from '@/components/BrandLogo';
 import { clientConfig } from '@/config/client';
 import { useChatbotStore } from '@/lib/stores/chatbotStore';
-import { useProductStore } from '@/lib/stores/productStore';
-import { BrandLogo } from '@/components/BrandLogo';
-
-// Remove emojis do texto exibido — o site usa ícones reais (lucide), não emoji.
-// As strings originais (com emoji) continuam intactas por baixo, só a exibição muda,
-// pra não quebrar o switch/case que casa pelas opções literais.
-const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu;
-const stripEmoji = (text: string) => text.replace(EMOJI_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
 
 interface Message {
   id: string;
   text: string;
   sender: 'bot' | 'user';
-  timestamp: Date;
-  options?: string[];
 }
 
-/**
- * CHATBOT AUTOMÁTICO SIMPLES
- * 
- * Responde automaticamente perguntas comuns
- * Coleta nome, email e telefone
- * Envia lead direto pro WhatsApp
- * 
- * SEM CONFIGURAÇÃO EXTERNA!
- */
+const quickReplies = [
+  { label: 'iPhone', text: 'Quero ver iPhones disponiveis' },
+  { label: 'Xiaomi', text: 'Quero ver Xiaomi disponiveis' },
+  { label: 'Pagamento', text: 'Quais sao as formas de pagamento?' },
+  { label: 'WhatsApp', text: 'Falar no WhatsApp', whatsapp: true },
+];
 
 export function SimpleChatbot() {
   const { config } = useChatbotStore();
-  const { products } = useProductStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
   const [input, setInput] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [userPhone, setUserPhone] = useState('');
-  const [step, setStep] = useState<'greeting' | 'name' | 'email' | 'phone' | 'question' | 'done'>('greeting');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const addBotMessage = (text: string, options?: string[]) => {
-    const msg: Message = {
-      id: Date.now().toString(),
-      text,
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 'welcome',
       sender: 'bot',
-      timestamp: new Date(),
-      options
-    };
-    setMessages(prev => [...prev, msg]);
-  };
-
-  const addUserMessage = (text: string) => {
-    const msg: Message = {
-      id: Date.now().toString(),
-      text,
-      sender: 'user',
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, msg]);
-  };
+      text: 'Oi. Me diga o que voce procura e eu te levo direto ao atendimento certo.',
+    },
+  ]);
+  const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, isOpen]);
 
-  // Inicia conversa quando abre
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      const welcomeMsg = config.welcomeMessage
-        .replace('{COMPANY_NAME}', `${clientConfig.company.name} ${clientConfig.company.nameHighlight}`);
-      
-      const initialOptions = config.questions.map(q => `${q.emoji} ${q.label}`);
-      
-      addBotMessage(welcomeMsg, initialOptions);
-    }
-  }, [isOpen]);
-
-  // Não renderiza se desabilitado
   if (!config.enabled) return null;
 
-  const handleOptionClick = (option: string) => {
-    addUserMessage(option);
-    setIsTyping(true);
+  const waUrl = (text: string) =>
+    `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(text)}`;
 
-    setTimeout(() => {
-      setIsTyping(false);
-      switch (option) {
-        case '📱 Ver produtos':
-          addBotMessage(
-            '🔥 PRODUTOS MAIS VENDIDOS:\n\n📱 iPhone 15 Pro Max - Lançamento!\n⌚ Apple Watch Ultra 2 - Novidade\n🎧 AirPods Pro 2 - Som perfeito\n📱 Xiaomi 14 Ultra - Câmera top\n💻 MacBook Pro M3 - Performance\n\n✨ Todos ORIGINAIS com GARANTIA!\n💰 Parcelamento SEM JUROS!\n\nQual te interessa?',
-            ['iPhone 15', 'Apple Watch', 'AirPods', 'Xiaomi', 'MacBook', '💬 Falar no WhatsApp']
-          );
-          break;
-        
-        case '💳 Formas de pagamento':
-          addBotMessage(
-            '💰 CONDIÇÕES ESPECIAIS:\n\n💳 Cartão: até 18x SEM JUROS\n📱 Pix: 5% de DESCONTO à vista\n💵 Boleto: 3% de desconto\n\n🔒 Pagamento 100% SEGURO\n✅ Aprovação INSTANTÂNEA\n\nQuer fazer um pedido agora?',
-            ['Sim, quero comprar! 🛒', 'Ver produtos', 'Tenho dúvidas']
-          );
-          break;
-        
-        case '🎁 Promoções':
-          addBotMessage(
-            '🔥 PROMOÇÕES IMPERDÍVEIS:\n\n⚡ FRETE GRÁTIS acima de R$ 500\n🎁 BRINDE em compras acima de R$ 1.000\n💰 5% OFF no Pix (SEMPRE!)\n🎯 Cupom PRIMEIRA10 = 10% OFF\n\n⏰ Aproveite AGORA!\nEstoque LIMITADO!\n\nQuer garantir o seu?',
-            ['Sim! Quero aproveitar 🔥', 'Ver produtos', 'Qual o melhor iPhone?']
-          );
-          break;
-        
-        case '📦 Rastrear pedido':
-          addBotMessage(
-            '📦 Rastreamento de Pedido\n\nPara rastrear seu pedido, preciso do número do pedido ou CPF.\n\nOu posso te passar direto pro WhatsApp para consultar com nossa equipe!',
-            ['💬 Falar no WhatsApp', 'Ver produtos']
-          );
-          break;
-        
-        case '💬 Falar com atendente':
-        case '💬 Falar no WhatsApp':
-          if (!userName) {
-            setStep('name');
-            addBotMessage('Perfeito! Vou te conectar com um atendente AGORA! 🚀\n\nQual é o seu nome?');
-          } else {
-            sendToWhatsApp();
-          }
-          break;
+  const openWhatsApp = (text = clientConfig.company.contact.whatsappMessage) => {
+    window.open(waUrl(text), '_blank', 'noopener,noreferrer');
+  };
 
-        case 'iPhone 15':
-        case 'Apple Watch':
-        case 'AirPods':
-        case 'Xiaomi':
-        case 'MacBook':
-          addBotMessage(
-            `🔥 EXCELENTE ESCOLHA!\n\n${option} é um dos nossos MAIS VENDIDOS!\n\n✅ Produto ORIGINAL\n✅ Garantia de 12 meses\n✅ Nota fiscal\n✅ Entrega rápida\n\n💰 Parcelamos em até 18x SEM JUROS!\n📱 Ou 5% OFF no Pix!\n\nQuer que eu te passe pro WhatsApp para ver os modelos disponíveis e FECHAR NEGÓCIO?`,
-            ['SIM! Quero comprar agora! 🛒', 'Ver preços', 'Ver outros produtos']
-          );
-          break;
+  const addUser = (text: string) => {
+    setMessages(prev => [...prev, { id: `${Date.now()}-u`, sender: 'user', text }]);
+  };
 
-        case 'SIM! Quero comprar agora! 🛒':
-        case 'Sim! Quero aproveitar 🔥':
-        case 'Sim, quero comprar! 🛒':
-          if (!userName) {
-            setStep('name');
-            addBotMessage('🎉 PERFEITO! Você está a 1 passo de garantir o seu!\n\nQual é o seu nome?');
-          } else {
-            sendToWhatsApp();
-          }
-          break;
+  const addBot = (text: string) => {
+    window.setTimeout(() => {
+      setMessages(prev => [...prev, { id: `${Date.now()}-b`, sender: 'bot', text }]);
+    }, 260);
+  };
 
-        case 'Ver preços':
-          addBotMessage(
-            '💰 PREÇOS ESPECIAIS:\n\nOs valores variam de acordo com modelo e cor!\n\n🔥 MAS TEMOS CONDIÇÕES INCRÍVEIS:\n• Até 18x sem juros\n• 5% OFF no Pix\n• Frete grátis acima de R$ 500\n\nQuer que eu te passe os valores atualizados no WhatsApp?',
-            ['Sim, quero! 💬', 'Ver produtos']
-          );
-          break;
+  const answer = (text: string) => {
+    const normalized = text.toLowerCase();
+    addUser(text);
 
-        case 'Sim, quero! 💬':
-          if (!userName) {
-            setStep('name');
-            addBotMessage('Ótimo! Qual é o seu nome?');
-          } else {
-            sendToWhatsApp();
-          }
-          break;
+    if (normalized.includes('iphone')) {
+      addBot('Temos modelos iPhone novos, com nota fiscal, garantia e parcelamento em ate 18x. Posso te passar as opcoes no WhatsApp.');
+      return;
+    }
 
-        case 'Qual o melhor iPhone?':
-          addBotMessage(
-            '📱 IPHONES MAIS VENDIDOS:\n\n🔥 iPhone 15 Pro Max\n→ Melhor câmera, tela maior\n→ Ideal para fotos/vídeos\n\n⚡ iPhone 15 Pro\n→ Chip A17 Pro, super rápido\n→ Melhor custo-benefício PRO\n\n💎 iPhone 15\n→ Lançamento, preço acessível\n→ Perfeito para o dia a dia\n\nTODOS com garantia e parcelamento!\n\nQual combina mais com você?',
-            ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', '💬 Falar no WhatsApp']
-          );
-          break;
+    if (normalized.includes('xiaomi')) {
+      addBot('Xiaomi novo e original, com consulta de estoque por modelo e cor. Chamo voce no WhatsApp para confirmar disponibilidade.');
+      return;
+    }
 
-        case 'iPhone 15 Pro Max':
-        case 'iPhone 15 Pro':
-          addBotMessage(
-            `🎯 ESCOLHA PERFEITA!\n\n${option} é SENSACIONAL!\n\n🔥 CONDIÇÕES ESPECIAIS:\n💳 18x sem juros\n📱 5% OFF no Pix\n🎁 Capinha + película de BRINDE\n\n⏰ ÚLTIMAS UNIDADES!\n\nVou te passar pro WhatsApp para GARANTIR O SEU agora!`,
-            ['QUERO! Me passa pro WhatsApp 🚀', 'Ver outros produtos']
-          );
-          break;
+    if (normalized.includes('pagamento') || normalized.includes('parcela') || normalized.includes('cartao')) {
+      addBot('Cartao em ate 18x sem juros e Pix com condicao especial. O valor final depende do modelo disponivel.');
+      return;
+    }
 
-        case 'QUERO! Me passa pro WhatsApp 🚀':
-          if (!userName) {
-            setStep('name');
-            addBotMessage('🎉 SHOW! Qual é o seu nome?');
-          } else {
-            sendToWhatsApp();
-          }
-          break;
+    if (normalized.includes('whatsapp')) {
+      openWhatsApp('Ola! Vim pelo site da Andinho Import e quero consultar o estoque.');
+      addBot('Abrindo o WhatsApp para voce falar direto com a equipe.');
+      return;
+    }
 
-        case 'Tenho dúvidas':
-          addBotMessage(
-            '😊 Sem problemas! Estou aqui para ajudar!\n\nQual sua dúvida?',
-            [
-              'É original?',
-              'Tem garantia?',
-              'Quanto tempo entrega?',
-              'Posso parcelar?',
-              '💬 Falar no WhatsApp'
-            ]
-          );
-          break;
-
-        case 'É original?':
-          addBotMessage(
-            '✅ SIM! 100% ORIGINAL!\n\n🔒 Todos os produtos são:\n• Importados oficialmente\n• Com nota fiscal\n• Garantia do fabricante\n• Lacrados de fábrica\n\n❌ NÃO vendemos réplicas!\n\nPode confiar! 😊\n\nQuer fazer seu pedido?',
-            ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-          );
-          break;
-
-        case 'Tem garantia?':
-          addBotMessage(
-            '✅ GARANTIA COMPLETA!\n\n🛡️ 12 meses de garantia\n📱 Suporte técnico\n🔄 Troca em caso de defeito\n📄 Nota fiscal\n\nVocê está 100% PROTEGIDO!\n\nQuer garantir o seu agora?',
-            ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-          );
-          break;
-
-        case 'Quanto tempo entrega?':
-          addBotMessage(
-            '🚚 ENTREGA RÁPIDA!\n\n⚡ 3 a 7 dias úteis\n📦 Rastreamento em tempo real\n🎁 Embalagem segura\n🆓 FRETE GRÁTIS acima de R$ 500\n\nEntregamos para TODO BRASIL!\n\nQuer fazer seu pedido?',
-            ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-          );
-          break;
-
-        case 'Posso parcelar?':
-          addBotMessage(
-            '💳 CLARO! Parcelamento FACILITADO!\n\n✨ Até 18x SEM JUROS no cartão\n💰 Ou 5% OFF no Pix à vista\n\n🔒 Aprovação instantânea\n✅ Sem burocracia\n\nQuer fazer seu pedido agora?',
-            ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-          );
-          break;
-
-        case 'Ver outros produtos':
-        case 'Ver produtos':
-          addBotMessage(
-            '🔥 CATÁLOGO COMPLETO:\n\n📱 Smartphones (iPhone, Xiaomi, Samsung)\n⌚ Smartwatches (Apple Watch, Galaxy Watch)\n🎧 Fones (AirPods, Galaxy Buds)\n💻 Notebooks (MacBook, Dell, Lenovo)\n📷 Câmeras e acessórios\n\nTODOS com garantia e parcelamento!\n\nO que você procura?',
-            ['iPhone', 'Xiaomi', 'Apple Watch', 'AirPods', '💬 Falar no WhatsApp']
-          );
-          break;
-
-        default:
-          addBotMessage(
-            '😊 Entendi! Vou te conectar com um atendente humano agora!\n\nEle vai te ajudar com TUDO! 🚀',
-            ['💬 Ir pro WhatsApp']
-          );
-      }
-    }, 800);
+    addBot('Perfeito. Para te responder com preco e estoque atualizado, o melhor caminho e falar direto no WhatsApp.');
   };
 
   const handleSend = () => {
-    if (!input.trim()) return;
-
-    addUserMessage(input);
-    const userInput = input.toLowerCase();
+    const text = input.trim();
+    if (!text) return;
     setInput('');
-    setIsTyping(true);
-
-    setTimeout(() => {
-      setIsTyping(false);
-      // Coleta de dados
-      if (step === 'name') {
-        setUserName(input);
-        setStep('phone');
-        addBotMessage(`Prazer, ${input}! 😊\n\nQual é o seu WhatsApp?`);
-        return;
-      }
-
-      if (step === 'phone') {
-        setUserPhone(input);
-        setStep('done');
-        addBotMessage(
-          `Perfeito! Vou te passar pro WhatsApp agora. ✅\n\nEm instantes você será atendido!`
-        );
-        setTimeout(() => sendToWhatsApp(), 2000);
-        return;
-      }
-
-      // Respostas automáticas
-      if (userInput.includes('preço') || userInput.includes('quanto custa') || userInput.includes('valor')) {
-        addBotMessage(
-          '💰 PREÇOS ESPECIAIS!\n\nTemos condições INCRÍVEIS:\n\n💳 Até 18x SEM JUROS\n📱 5% OFF no Pix\n🎁 Brindes em compras acima de R$ 1.000\n\nOs valores variam por modelo!\n\nQuer que eu te passe os preços atualizados no WhatsApp?',
-          ['Sim! Quero ver preços 💬', 'Ver produtos']
-        );
-      } else if (userInput.includes('entrega') || userInput.includes('frete') || userInput.includes('prazo')) {
-        addBotMessage(
-          '🚚 ENTREGA RÁPIDA para TODO BRASIL!\n\n⚡ 3 a 7 dias úteis\n📦 Rastreamento em tempo real\n🆓 FRETE GRÁTIS acima de R$ 500\n🎁 Embalagem premium\n\nQuer fazer seu pedido agora?',
-          ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-        );
-      } else if (userInput.includes('garantia') || userInput.includes('original') || userInput.includes('verdadeiro')) {
-        addBotMessage(
-          '✅ 100% ORIGINAL com GARANTIA!\n\n🛡️ 12 meses de garantia\n📱 Suporte técnico completo\n🔄 Troca em caso de defeito\n📄 Nota fiscal\n🔒 Produtos lacrados de fábrica\n\n❌ NÃO vendemos réplicas!\n\nQuer garantir o seu?',
-          ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-        );
-      } else if (userInput.includes('parcelamento') || userInput.includes('parcela') || userInput.includes('cartão')) {
-        addBotMessage(
-          '💳 PARCELAMENTO FACILITADO!\n\n✨ Até 18x SEM JUROS no cartão\n💰 Ou 5% OFF no Pix à vista\n💵 Boleto com 3% de desconto\n\n🔒 Aprovação INSTANTÂNEA!\n✅ Sem burocracia!\n\nQuer fazer seu pedido?',
-          ['Sim! Quero comprar 🛒', 'Ver produtos', '💬 Falar no WhatsApp']
-        );
-      } else if (userInput.includes('iphone') || userInput.includes('apple')) {
-        addBotMessage(
-          '📱 IPHONES DISPONÍVEIS:\n\n🔥 iPhone 15 Pro Max - TOP!\n⚡ iPhone 15 Pro - Potente\n💎 iPhone 15 - Lançamento\n📱 iPhone 14 Pro - Custo-benefício\n\nTODOS originais com garantia!\n\n💰 Até 18x sem juros\n📱 5% OFF no Pix\n\nQual te interessa?',
-          ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', '💬 Falar no WhatsApp']
-        );
-      } else if (userInput.includes('xiaomi') || userInput.includes('redmi')) {
-        addBotMessage(
-          '📱 XIAOMI - MELHOR CUSTO-BENEFÍCIO!\n\n🔥 Xiaomi 14 Ultra - Câmera TOP\n⚡ Xiaomi 13T Pro - Performance\n💎 Redmi Note 13 Pro - Barato\n\nTODOS originais com garantia!\n\n💰 Parcelamento facilitado\n📱 Entrega rápida\n\nQuer saber mais?',
-          ['Sim! Me passa detalhes 💬', 'Ver outros produtos']
-        );
-      } else if (userInput.includes('watch') || userInput.includes('relógio') || userInput.includes('relogio')) {
-        addBotMessage(
-          '⌚ SMARTWATCHES DISPONÍVEIS:\n\n🔥 Apple Watch Ultra 2 - Premium\n⚡ Apple Watch Series 9 - Completo\n💎 Galaxy Watch 6 - Android\n\nTODOS originais com garantia!\n\n💰 Até 18x sem juros\n\nQual combina com você?',
-          ['Apple Watch', 'Galaxy Watch', 'Ver produtos', '💬 Falar no WhatsApp']
-        );
-      } else if (userInput.includes('airpods') || userInput.includes('fone') || userInput.includes('headphone')) {
-        addBotMessage(
-          '🎧 FONES PREMIUM:\n\n🔥 AirPods Pro 2 - Cancelamento de ruído\n⚡ AirPods 3 - Som espacial\n💎 Galaxy Buds 2 Pro - Android\n\nTODOS originais com garantia!\n\n💰 Parcelamento facilitado\n\nQual você prefere?',
-          ['AirPods Pro 2', 'AirPods 3', 'Ver produtos', '💬 Falar no WhatsApp']
-        );
-      } else if (userInput.includes('promoção') || userInput.includes('desconto') || userInput.includes('oferta')) {
-        addBotMessage(
-          '🔥 PROMOÇÕES IMPERDÍVEIS!\n\n⚡ FRETE GRÁTIS acima de R$ 500\n🎁 BRINDE em compras acima de R$ 1.000\n💰 5% OFF no Pix (SEMPRE!)\n🎯 Cupom PRIMEIRA10 = 10% OFF\n\n⏰ APROVEITE AGORA!\nEstoque LIMITADO!\n\nQuer garantir o seu?',
-          ['SIM! Quero aproveitar 🔥', 'Ver produtos']
-        );
-      } else if (userInput.includes('comprar') || userInput.includes('quero') || userInput.includes('pedido')) {
-        addBotMessage(
-          '🎉 PERFEITO! Você está fazendo uma ÓTIMA escolha!\n\n✅ Produto original\n✅ Garantia de 12 meses\n✅ Entrega rápida\n✅ Parcelamento facilitado\n\nVou te passar pro WhatsApp para FECHAR NEGÓCIO agora! 🚀',
-          ['Vamos lá! 💬']
-        );
-      } else {
-        addBotMessage(
-          '😊 Hmm, não entendi muito bem...\n\nMas posso te ajudar com:\n\n📱 Ver produtos\n💰 Preços e condições\n🚚 Entrega e frete\n✅ Garantia\n\nOu te passo direto pro WhatsApp! 💬',
-          ['Ver produtos', '💬 Ir pro WhatsApp']
-        );
-      }
-    }, 800);
-  };
-
-  const sendToWhatsApp = () => {
-    const message = `🔥 *LEAD QUENTE DO SITE!*\n\n` +
-      `👤 Nome: ${userName || 'Não informado'}\n` +
-      `📱 Telefone: ${userPhone || 'Não informado'}\n\n` +
-      `💬 Mensagem:\n"Olá! Vim pelo chatbot do site e estou interessado(a) em fazer uma compra. Pode me passar mais informações sobre os produtos e condições de pagamento?"\n\n` +
-      `⏰ Atender AGORA! Cliente pronto para comprar! 🚀`;
-    
-    const whatsappUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    
-    addBotMessage('✅ Abrindo WhatsApp...\n\n🎉 Você será atendido em instantes!\n\n💰 Prepare-se para CONDIÇÕES ESPECIAIS!\n\nObrigado! 😊');
+    answer(text);
   };
 
   return (
     <>
-      {/* Botão flutuante */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
+            initial={{ opacity: 0, scale: 0.9, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 8 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl flex items-center justify-center group"
-            style={{ 
-              background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))',
-              boxShadow: '0 0 30px hsla(43,96%,52%,0.5)'
+            className="fixed bottom-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-2xl sm:bottom-5 sm:right-5 sm:h-11 sm:w-11"
+            style={{
+              background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,45%))',
+              boxShadow: '0 14px 34px rgba(245,183,0,0.28)',
             }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            aria-label="Abrir atendimento"
           >
-            <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-black" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse" />
+            <MessageCircle className="h-4 w-4 text-black" />
+            <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-emerald-400 ring-1 ring-black" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-[90vw] sm:w-[380px] h-[85vh] sm:h-[600px] max-h-[600px] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ 
-              background: 'hsl(240,6%,15%)',
-              border: '1px solid hsla(43,96%,52%,0.2)'
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ duration: 0.22 }}
+            className="fixed bottom-4 right-3 z-50 flex h-[min(440px,calc(100svh-104px))] w-[min(312px,calc(100vw-24px))] flex-col overflow-hidden rounded-xl shadow-2xl sm:bottom-5 sm:right-5"
+            style={{
+              background: 'rgba(14,14,17,0.96)',
+              border: '1px solid rgba(245,183,0,0.16)',
+              backdropFilter: 'blur(18px)',
             }}
           >
-            {/* Header — estilo app de mensagens: avatar + status online */}
-            <div className="p-4 flex items-center justify-between flex-shrink-0"
-              style={{
-                background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))',
-                borderBottom: '1px solid hsla(0,0%,0%,0.1)'
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="relative flex-shrink-0">
-                  <BrandLogo size={38} className="ring-2 ring-black/10" />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full ring-2"
-                    style={{ background: 'hsl(142,71%,45%)', borderColor: 'transparent', boxShadow: '0 0 0 2px hsl(43,96%,52%)' }} />
-                </div>
+            <div className="flex items-center justify-between border-b border-white/10 px-3.5 py-3">
+              <div className="flex items-center gap-2.5">
+                <BrandLogo size={30} />
                 <div>
-                  <p className="font-bold text-black text-sm">{clientConfig.company.name} {clientConfig.company.nameHighlight}</p>
-                  <p className="text-xs text-black/70 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-black/60 inline-block" />
-                    Online agora
-                  </p>
+                  <p className="text-sm font-black text-white">Andinho Import</p>
+                  <p className="text-[11px] font-medium text-white/46">Atendimento humano</p>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} aria-label="Fechar chat"
-                className="p-1.5 rounded-lg hover:bg-black/10 transition-colors">
-                <X className="w-4 h-4 text-black" />
+              <button
+                onClick={() => setIsOpen(false)}
+                className="rounded-full p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Fechar atendimento"
+              >
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: 'hsl(240,6%,12%)' }}>
-              {messages.map(msg => (
-                <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${msg.sender === 'user' ? 'rounded-br-md' : 'rounded-bl-md'}`}
-                    style={msg.sender === 'user'
-                      ? { background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))', color: '#0a0a0a' }
-                      : { background: 'hsl(240,6%,18%)', border: '1px solid hsla(255,255%,255%,0.06)', color: '#f0f0f0' }}>
-                    <p className="text-sm whitespace-pre-line leading-relaxed">{stripEmoji(msg.text)}</p>
-                    {msg.options && (
-                      <div className="mt-3 space-y-1.5">
-                        {msg.options.map(opt => (
-                          <button key={opt}
-                            onClick={() => handleOptionClick(opt)}
-                            className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all"
-                            style={{
-                              background: 'hsla(43,96%,52%,0.1)',
-                              border: '1px solid hsla(43,96%,52%,0.3)',
-                              color: 'hsl(43,96%,52%)'
-                            }}
-                            onMouseEnter={e => (e.currentTarget.style.background = 'hsla(43,96%,52%,0.2)')}
-                            onMouseLeave={e => (e.currentTarget.style.background = 'hsla(43,96%,52%,0.1)')}
-                          >
-                            <span>{stripEmoji(opt)}</span>
-                            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
+            <div className="flex-1 space-y-2.5 overflow-y-auto px-3.5 py-3">
+              {messages.map(message => (
+                <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-relaxed"
+                    style={
+                      message.sender === 'user'
+                        ? { background: 'hsl(43,96%,52%)', color: '#08080a' }
+                        : { background: 'rgba(255,255,255,0.055)', color: 'rgba(255,255,255,0.82)', border: '1px solid rgba(255,255,255,0.06)' }
+                    }
+                  >
+                    {message.text}
                   </div>
                 </div>
               ))}
-
-              {/* Indicador de digitação — 3 pontos pulsando, estilo apps de mensagem reais */}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1"
-                    style={{ background: 'hsl(240,6%,18%)', border: '1px solid hsla(255,255%,255%,0.06)' }}>
-                    {[0, 1, 2].map(i => (
-                      <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce"
-                        style={{ background: 'hsla(45,20%,96%,0.5)', animationDelay: `${i * 0.15}s`, animationDuration: '0.9s' }} />
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+              <div ref={endRef} />
             </div>
 
-            {/* Input */}
-            <div className="p-4 border-t border-border/30">
+            <div className="border-t border-white/10 p-3">
+              <div className="mb-2 grid grid-cols-2 gap-1.5">
+                {quickReplies.map(reply => (
+                  <button
+                    key={reply.label}
+                    onClick={() => reply.whatsapp ? openWhatsApp('Ola! Vim pelo site da Andinho Import e quero consultar o estoque.') : answer(reply.text)}
+                    className="flex items-center justify-between rounded-lg border border-white/10 px-2.5 py-2 text-left text-[11px] font-bold text-white/76 transition-colors hover:border-primary/40 hover:text-white"
+                  >
+                    {reply.label}
+                    <ChevronRight className="h-3.5 w-3.5 text-primary" />
+                  </button>
+                ))}
+              </div>
+
               <div className="flex gap-2">
                 <input
-                  type="text"
                   value={input}
                   onChange={e => setInput(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && handleSend()}
-                  placeholder="Digite sua mensagem..."
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-border/30 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-primary/50"
+                  onKeyDown={e => e.key === 'Enter' && handleSend()}
+                  placeholder="Digite aqui..."
+                  className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 focus:border-primary/45"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="px-4 py-2.5 rounded-xl disabled:opacity-50 transition-all"
-                  style={{ background: 'linear-gradient(135deg, hsl(43,96%,52%), hsl(38,92%,44%))' }}
+                  className="rounded-lg px-3 transition-opacity disabled:opacity-40"
+                  style={{ background: 'hsl(43,96%,52%)' }}
+                  aria-label="Enviar mensagem"
                 >
-                  <Send className="w-4 h-4 text-black" />
+                  <Send className="h-4 w-4 text-black" />
                 </button>
               </div>
             </div>
