@@ -55,13 +55,14 @@ function RouteFallback() {
   );
 }
 
-// Fade simples ao trocar de página — sem AnimatePresence/exit (que brigam
-// com o Suspense das rotas lazy), só um fade-in leve a cada troca de rota.
+// Transição ao trocar de página — desliza + esmaece, perceptível de verdade
+// (o fade puro de antes era sutil demais pra notar, principalmente no
+// celular). Sem AnimatePresence/exit, que briga com o Suspense das rotas lazy.
 function PageFade({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   return (
     <motion.div key={location.pathname}
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.22, ease: 'easeOut' }}>
+      initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}>
       {children}
     </motion.div>
   );

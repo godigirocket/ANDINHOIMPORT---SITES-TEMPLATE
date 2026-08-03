@@ -169,10 +169,11 @@ export default function Products() {
             </div>
           ) : filtered.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {filtered.map((product) => (
+              {filtered.map((product, i) => (
                 <SimpleProductCard
                   key={product.id}
                   product={product}
+                  index={i}
                   compareChecked={compareIds.includes(product.id)}
                   onCompareToggle={() => toggleCompare(product.id)}
                   compareDisabled={compareIds.length >= 3}

@@ -31,8 +31,8 @@ export function SimpleCatalogSection() {
           <p className="text-sm py-10" style={{ color: '#888' }}>Nenhum produto cadastrado.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {products.slice(0, 10).map(product => (
-              <SimpleProductCard key={product.id} product={product} />
+            {products.slice(0, 10).map((product, i) => (
+              <SimpleProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
         )}
