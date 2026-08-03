@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Star, Quote as QuoteIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { clientConfig } from '@/config/client';
+import { ElectricBorder } from '@/components/effects/ElectricBorder';
 
 interface Testimonial {
   id: string; name: string; text: string; avatar_url: string | null; rating: number;
@@ -22,31 +23,33 @@ function ReviewCard({ t, index }: { t: Testimonial; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px', amount: 0.2 }}
       transition={{ duration: 0.45, delay: (index % 4) * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl p-6 flex flex-col"
-      style={{ background: '#fff', border: '1px solid #eee', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex gap-0.5">
-          {Array.from({ length: t.rating }).map((_, i) => (
-            <Star key={i} className="w-3.5 h-3.5 fill-current" style={{ color: 'hsl(43,96%,45%)' }} />
-          ))}
-        </div>
-        <QuoteIcon className="w-5 h-5" style={{ color: '#eee' }} strokeWidth={2.5} />
-      </div>
-      <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: '#333' }}>
-        "{t.text}"
-      </p>
-      <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid #f2f2f2' }}>
-        {t.avatar_url ? (
-          <img src={t.avatar_url} alt={t.name} className="w-9 h-9 rounded-full object-cover" />
-        ) : (
-          <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-            style={{ background: '#f2f2f2', color: '#555' }}>
-            {t.name.charAt(0)}
+      <ElectricBorder color="#FAB70F" speed={0.6} chaos={0.15} borderRadius={16}>
+        <div className="rounded-2xl p-6 flex flex-col" style={{ background: '#fff' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex gap-0.5">
+              {Array.from({ length: t.rating }).map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-current" style={{ color: 'hsl(43,96%,45%)' }} />
+              ))}
+            </div>
+            <QuoteIcon className="w-5 h-5" style={{ color: '#eee' }} strokeWidth={2.5} />
           </div>
-        )}
-        <p className="text-sm font-semibold" style={{ color: '#111' }}>{t.name}</p>
-      </div>
+          <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: '#333' }}>
+            "{t.text}"
+          </p>
+          <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid #f2f2f2' }}>
+            {t.avatar_url ? (
+              <img src={t.avatar_url} alt={t.name} className="w-9 h-9 rounded-full object-cover" />
+            ) : (
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                style={{ background: '#f2f2f2', color: '#555' }}>
+                {t.name.charAt(0)}
+              </div>
+            )}
+            <p className="text-sm font-semibold" style={{ color: '#111' }}>{t.name}</p>
+          </div>
+        </div>
+      </ElectricBorder>
     </motion.div>
   );
 }

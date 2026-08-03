@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Product } from '@/lib/stores/productStore';
 import { slugify } from '@/lib/utils/slugify';
 import { safeImageUrl, priceLabel, conditionLabel, storageLabel } from '@/lib/utils/productFallbacks';
+import { ElectricBorder } from '@/components/effects/ElectricBorder';
 
 interface SimpleProductCardProps {
   product: Product;
@@ -13,24 +15,16 @@ interface SimpleProductCardProps {
 }
 
 /**
- * Cartão de produto — foto domina, sombra suave em vez de borda, sobe e
- * ganha zoom na foto ao passar o mouse. Usado no catálogo, na vitrine da
- * home e em relacionados.
+ * Cartão de produto — foto domina, sobe ao passar o mouse e ganha uma borda
+ * elétrica animada (canvas) enquanto hover — só monta o canvas nesse momento
+ * pra não rodar dezenas de animações simultâneas no catálogo inteiro.
  */
 export function SimpleProductCard({ product, index = 0, compareChecked, onCompareToggle, compareDisabled }: SimpleProductCardProps) {
+  const [hovered, setHovered] = useState(false);
   const specs = [conditionLabel(product), storageLabel(product)].filter(s => s !== 'Não informado');
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px', amount: 0.2 }}
-      transition={{ duration: 0.45, delay: Math.min(index, 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5"
-      style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 32px -8px rgba(0,0,0,0.14), 0 4px 8px rgba(0,0,0,0.06)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)'; }}
-    >
+  const cardBody = (
+    <div className="rounded-2xl overflow-hidden" style={{ background: '#fff' }}>
       <Link to={`/produtos/${slugify(product.title)}`} className="block">
         <div className="aspect-[4/5] relative overflow-hidden" style={{ background: '#f4f4f4' }}>
           <img src={safeImageUrl(product.image_url)} alt={product.title}
@@ -69,6 +63,27 @@ export function SimpleProductCard({ product, index = 0, compareChecked, onCompar
             Comparar
           </label>
         </div>
+      )}
+    </div>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px', amount: 0.2 }}
+      transition={{ duration: 0.45, delay: Math.min(index, 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative rounded-2xl transition-all duration-300 hover:-translate-y-1.5"
+      style={{ boxShadow: hovered ? '0 20px 32px -8px rgba(0,0,0,0.14), 0 4px 8px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {hovered ? (
+        <ElectricBorder color="#FAB70F" speed={1.3} chaos={0.4} borderRadius={16}>
+          {cardBody}
+        </ElectricBorder>
+      ) : (
+        <div style={{ borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)' }}>{cardBody}</div>
       )}
     </motion.div>
   );
