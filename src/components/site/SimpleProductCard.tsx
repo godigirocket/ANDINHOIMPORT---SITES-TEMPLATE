@@ -30,11 +30,11 @@ export function SimpleProductCard({ product, index = 0, compareChecked, onCompar
       }}
     >
       <Link to={`/produtos/${slugify(product.title)}`} className="block min-w-0">
-        <div className="relative aspect-[4/3] overflow-hidden bg-[#08080a] sm:aspect-[4/5]">
+        <div className="relative aspect-[4/3.35] overflow-hidden bg-[#08080a] sm:aspect-[4/4.35]">
           <img
             src={safeImageUrl(product.image_url)}
             alt={product.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.065]"
+            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.035]"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/76" />

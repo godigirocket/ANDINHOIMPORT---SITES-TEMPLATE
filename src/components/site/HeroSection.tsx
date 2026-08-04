@@ -3,12 +3,20 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MessageCircle, ShieldCheck, Truck, BadgeCheck } from 'lucide-react';
 import { clientConfig } from '@/config/client';
+import { useContentStore } from '@/lib/stores/contentStore';
 
 export function HeroSection() {
-  const heroImages = clientConfig.brand.heroBgImages.slice(0, 2);
+  const { content } = useContentStore();
+  const heroImages = [
+    content.hero_bg_1 || clientConfig.brand.heroBgImages[0],
+    content.hero_bg_2 || clientConfig.brand.heroBgImages[1],
+  ].filter(Boolean);
   const [imageIndex, setImageIndex] = useState(0);
+  const currentHeroImage = heroImages[imageIndex % heroImages.length];
   const whatsappUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
   const msg = clientConfig.company.contact.whatsappMessage;
+  const title = content.hero_title || clientConfig.company.name;
+  const subtitle = content.hero_subtitle || clientConfig.initialContent.hero.subheadline;
 
   useEffect(() => {
     if (heroImages.length < 2) return;
@@ -28,15 +36,15 @@ export function HeroSection() {
     <section id="hero" className="section-blur-end relative min-h-screen overflow-hidden bg-[#090a0f]">
       <AnimatePresence mode="sync">
         <motion.img
-          key={heroImages[imageIndex] || 'hero-bg'}
-          src={heroImages[imageIndex]}
+          key={currentHeroImage || 'hero-bg'}
+          src={currentHeroImage}
           alt=""
           aria-hidden="true"
-          initial={{ scale: 1.06, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.56 }}
-          exit={{ scale: 1.02, opacity: 0 }}
+          initial={{ scale: 0.99, opacity: 0 }}
+          animate={{ scale: 0.95, opacity: 0.56 }}
+          exit={{ scale: 0.97, opacity: 0 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0 h-full w-full object-cover object-[68%_50%]"
+          className="absolute inset-0 h-full w-full object-cover object-[72%_50%]"
         />
       </AnimatePresence>
       <div
@@ -57,14 +65,14 @@ export function HeroSection() {
             className="max-w-2xl"
           >
             <p className="mb-6 text-[11px] font-black uppercase tracking-[0.32em] text-primary sm:text-xs">
-              Novos modelos disponiveis
+              {content.hero_badge || 'Novos modelos disponiveis'}
             </p>
             <h1 className="font-display text-[clamp(4rem,11vw,8.8rem)] font-black uppercase leading-[0.78] tracking-tight">
-              <span className="block text-[#f2eee2] drop-shadow-[0_10px_30px_rgba(0,0,0,0.38)]">Andinho</span>
+              <span className="block text-[#f2eee2] drop-shadow-[0_10px_30px_rgba(0,0,0,0.38)]">{title}</span>
               <span className="block text-primary drop-shadow-[0_14px_34px_rgba(250,183,15,0.2)]">Import</span>
             </h1>
             <p className="mt-8 max-w-xl border-l-2 border-primary pl-5 text-base font-medium leading-relaxed text-white/78 sm:text-xl">
-              Apple, Xiaomi e Smartwatches com garantia, parcelamento em ate 18x e entrega rapida para toda regiao Sul
+              {subtitle}
             </p>
 
             <motion.div
@@ -102,14 +110,14 @@ export function HeroSection() {
                 style={{ background: '#FAB70F', color: '#050505' }}
               >
                 <MessageCircle className="h-5 w-5" />
-                Garanta Agora
+                {content.cta_primary_text || 'Garanta Agora'}
               </a>
               <Link
                 to="/produtos"
                 className="animated-container inline-flex items-center gap-3 rounded-full px-7 py-4 text-sm font-black text-white transition-transform hover:-translate-y-1"
                 style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.16)', backdropFilter: 'blur(14px)' }}
               >
-                Explorar Catalogo
+                {content.cta_secondary_text || 'Explorar Catalogo'}
                 <ChevronDown className="h-4 w-4" />
               </Link>
             </motion.div>

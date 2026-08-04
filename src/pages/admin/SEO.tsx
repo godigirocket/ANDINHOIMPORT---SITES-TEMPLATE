@@ -178,6 +178,32 @@ Sitemap: ${siteUrl}/sitemap.xml`;
               placeholder="iphone, xiaomi, importados, sua-cidade" />
           </div>
 
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">URL canonica</Label>
+              <Input value={form.seo_canonical_url} onChange={e => set('seo_canonical_url', e.target.value)}
+                placeholder="https://andinhoimports.vercel.app" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Robots</Label>
+              <Input value={form.seo_robots} onChange={e => set('seo_robots', e.target.value)}
+                placeholder="index, follow" />
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Imagem social (OG/Twitter)</Label>
+              <Input value={form.seo_og_image} onChange={e => set('seo_og_image', e.target.value)}
+                placeholder="https://.../banner.jpg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Favicon</Label>
+              <Input value={form.favicon_url} onChange={e => set('favicon_url', e.target.value)}
+                placeholder="/favicon.svg ou https://.../icon.png" />
+            </div>
+          </div>
+
           {/* Preview Google */}
           <div className="p-4 rounded-xl space-y-1"
             style={{ background: 'hsla(0,0%,100%,0.04)', border: '1px solid hsla(255,255%,255%,0.08)' }}>

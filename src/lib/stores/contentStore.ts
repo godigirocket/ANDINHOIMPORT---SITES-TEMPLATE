@@ -18,6 +18,10 @@ export interface SiteContentData {
   seo_title: string;
   seo_description: string;
   seo_keywords: string;
+  seo_canonical_url: string;
+  seo_robots: string;
+  seo_og_image: string;
+  favicon_url: string;
   ga_id: string;
   meta_pixel: string;
   tiktok_pixel: string;
@@ -28,7 +32,7 @@ export interface SiteContentData {
 }
 
 const defaultContent: SiteContentData = {
-  hero_title:         clientConfig.initialContent.hero.headline,
+  hero_title:         clientConfig.company.name,
   hero_subtitle:      clientConfig.initialContent.hero.subheadline,
   hero_badge:         clientConfig.initialContent.hero.badge,
   cta_primary_text:   clientConfig.initialContent.hero.ctaPrimary,
@@ -43,6 +47,10 @@ const defaultContent: SiteContentData = {
   seo_title:          clientConfig.seo.title,
   seo_description:    clientConfig.seo.description,
   seo_keywords:       clientConfig.seo.keywords.join(', '),
+  seo_canonical_url:  '',
+  seo_robots:         'index, follow',
+  seo_og_image:       '',
+  favicon_url:        '/favicon.svg',
   ga_id:              '',
   meta_pixel:         '',
   tiktok_pixel:       '',
@@ -117,6 +125,10 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         seo_title:          d.seo_title            ?? defaultContent.seo_title,
         seo_description:    d.seo_description      ?? defaultContent.seo_description,
         seo_keywords:       d.seo_keywords         ?? defaultContent.seo_keywords,
+        seo_canonical_url:  d.seo_canonical_url    ?? defaultContent.seo_canonical_url,
+        seo_robots:         d.seo_robots           ?? defaultContent.seo_robots,
+        seo_og_image:       d.seo_og_image         ?? defaultContent.seo_og_image,
+        favicon_url:        d.favicon_url          ?? defaultContent.favicon_url,
         ga_id:              d.ga_id                ?? '',
         meta_pixel:         d.meta_pixel           ?? '',
         tiktok_pixel:       d.tiktok_pixel         ?? '',

@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Header } from '@/components/site/Header';
 import { HeroSection } from '@/components/site/HeroSection';
 import { CategoryNav } from '@/components/site/CategoryNav';
@@ -27,6 +28,7 @@ const SimpleChatbot     = lazy(() => import('@/components/SimpleChatbot').then(m
 const Index = () => {
   const { fetchContent, content } = useContentStore();
   const { products } = useProductStore();
+  const location = useLocation();
 
   useEffect(() => {
     fetchContent();
@@ -49,13 +51,27 @@ const Index = () => {
     } catch {}
   }, [fetchContent]);
 
+  useEffect(() => {
+    if (!location.hash) return;
+    const jump = () => {
+      const target = document.querySelector(location.hash);
+      if (!target) return;
+      window.__lenis?.stop?.();
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      window.requestAnimationFrame(() => window.__lenis?.start?.());
+    };
+    const id = window.requestAnimationFrame(jump);
+    return () => window.cancelAnimationFrame(id);
+  }, [location.hash]);
+
   // SEO dinâmico — meta tags, OG, Twitter Card
   useEffect(() => {
     const title = content.seo_title || clientConfig.seo.title;
     const desc  = content.seo_description || clientConfig.seo.description;
     const kw    = content.seo_keywords || clientConfig.seo.keywords.join(', ');
-    const ogImage = content.hero_bg_1 || clientConfig.brand.heroBgImages[0];
+    const ogImage = content.seo_og_image || content.hero_bg_1 || clientConfig.brand.heroBgImages[0];
     const siteUrl = window.location.origin;
+    const canonicalUrl = content.seo_canonical_url || siteUrl;
 
     document.title = title;
 
@@ -72,7 +88,7 @@ const Index = () => {
 
     sm('description', desc);
     sm('keywords', kw);
-    sm('robots', 'index, follow');
+    sm('robots', content.seo_robots || 'index, follow');
     sm('author', clientConfig.company.legalName);
 
     og('og:title', title);
@@ -95,8 +111,22 @@ const Index = () => {
       canonical.rel = 'canonical';
       document.head.appendChild(canonical);
     }
-    canonical.href = siteUrl;
-  }, [content.seo_title, content.seo_description, content.seo_keywords, content.hero_bg_1]);
+    canonical.href = canonicalUrl;
+
+    const iconUrl = content.favicon_url || '/favicon.svg';
+    document.querySelectorAll<HTMLLinkElement>('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(link => {
+      link.href = iconUrl;
+    });
+  }, [
+    content.seo_title,
+    content.seo_description,
+    content.seo_keywords,
+    content.seo_robots,
+    content.seo_canonical_url,
+    content.seo_og_image,
+    content.hero_bg_1,
+    content.favicon_url,
+  ]);
 
   // Google Search Console verification
   useEffect(() => {

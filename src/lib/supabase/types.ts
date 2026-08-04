@@ -102,6 +102,10 @@ export interface Database {
           seo_title: string | null;
           seo_description: string | null;
           seo_keywords: string | null;
+          seo_canonical_url: string | null;
+          seo_robots: string | null;
+          seo_og_image: string | null;
+          favicon_url: string | null;
           ga_id: string | null;
           meta_pixel: string | null;
           tiktok_pixel: string | null;
@@ -129,6 +133,10 @@ export interface Database {
           seo_title?: string | null;
           seo_description?: string | null;
           seo_keywords?: string | null;
+          seo_canonical_url?: string | null;
+          seo_robots?: string | null;
+          seo_og_image?: string | null;
+          favicon_url?: string | null;
           ga_id?: string | null;
           meta_pixel?: string | null;
           tiktok_pixel?: string | null;
@@ -154,6 +162,10 @@ export interface Database {
           seo_title?: string | null;
           seo_description?: string | null;
           seo_keywords?: string | null;
+          seo_canonical_url?: string | null;
+          seo_robots?: string | null;
+          seo_og_image?: string | null;
+          favicon_url?: string | null;
           ga_id?: string | null;
           meta_pixel?: string | null;
           tiktok_pixel?: string | null;

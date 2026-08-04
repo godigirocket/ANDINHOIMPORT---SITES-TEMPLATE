@@ -37,7 +37,7 @@ export function ImageUploadField({ label, value, onChange, bucket, subfolder = '
       toast.success('Imagem enviada');
     } catch {
       onChange(URL.createObjectURL(file));
-      toast.warning('Preview local — configure Supabase Storage pra salvar de verdade');
+      toast.info('Preview aplicado. Salve uma URL publica ou configure o Storage para persistir o upload.');
     } finally {
       setUploading(false);
     }

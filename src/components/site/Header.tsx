@@ -1,12 +1,15 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { clientConfig } from '@/config/client';
 import { BrandLogo } from '@/components/BrandLogo';
 
 export function Header() {
   const [isHidden, setIsHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let ticking = false;
@@ -30,11 +33,27 @@ export function Header() {
   }, []);
 
   const navLinks = [
-    { label: 'Inicio', href: '/#hero' },
-    { label: 'Produtos', href: '/#products' },
-    { label: 'Beneficios', href: '/#features' },
-    { label: 'Depoimentos', href: '/#testimonials' },
+    { label: 'Inicio', hash: '#hero' },
+    { label: 'Produtos', hash: '#products' },
+    { label: 'Beneficios', hash: '#features' },
+    { label: 'Depoimentos', hash: '#testimonials' },
   ];
+
+  const jumpToSection = (hash: string) => {
+    setIsMobileMenuOpen(false);
+
+    if (location.pathname !== '/') {
+      navigate(`/${hash}`);
+      return;
+    }
+
+    const target = document.querySelector(hash);
+    if (!target) return;
+    window.history.replaceState(null, '', hash);
+    window.__lenis?.stop?.();
+    target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    window.requestAnimationFrame(() => window.__lenis?.start?.());
+  };
 
   return (
     <>
@@ -42,7 +61,7 @@ export function Header() {
         initial={{ y: -36, opacity: 0 }}
         animate={{ y: isHidden ? -92 : 0, opacity: isHidden ? 0 : 1, pointerEvents: isHidden ? 'none' : 'auto' }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 pointer-events-none"
+        className="fixed left-0 right-0 top-0 z-50 pointer-events-none"
       >
         <motion.div
           className="mx-auto mt-4 flex w-[calc(100%_-_24px)] max-w-[1220px] items-center justify-between rounded-full px-4 py-3 md:px-5"
@@ -55,6 +74,10 @@ export function Header() {
         >
           <motion.a
             href="/#hero"
+            onClick={(e) => {
+              e.preventDefault();
+              jumpToSection('#hero');
+            }}
             aria-label="Andinho Import"
             className="pointer-events-auto flex items-center gap-3"
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
@@ -71,14 +94,18 @@ export function Header() {
           </motion.a>
 
           <motion.nav
-            className="pointer-events-auto hidden items-center gap-9 lg:gap-12 md:flex"
+            className="pointer-events-auto hidden items-center gap-9 md:flex lg:gap-12"
             animate={{ opacity: 1, y: 0, pointerEvents: 'auto' }}
             transition={{ duration: 0.22 }}
           >
             {navLinks.map(link => (
               <a
-                key={link.href}
-                href={link.href}
+                key={link.hash}
+                href={`/${link.hash}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  jumpToSection(link.hash);
+                }}
                 className="relative px-1 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-white/76 transition-all hover:text-primary"
               >
                 {link.label}
@@ -120,12 +147,15 @@ export function Header() {
             <div className="px-6 pt-8">
               {navLinks.map((link, i) => (
                 <motion.a
-                  key={link.href}
-                  href={link.href}
+                  key={link.hash}
+                  href={`/${link.hash}`}
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.06 }}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    jumpToSection(link.hash);
+                  }}
                   className="block border-b border-white/10 py-5 text-2xl font-black text-white"
                 >
                   {link.label}
@@ -138,4 +168,3 @@ export function Header() {
     </>
   );
 }
-

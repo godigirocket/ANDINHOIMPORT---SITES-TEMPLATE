@@ -16,8 +16,8 @@ interface Panel {
 }
 
 const sequenceFrames = Array.from(
-  { length: 16 },
-  (_, i) => `/media/ezgif-frame-${String(i + 1).padStart(3, '0')}.png`
+  { length: 12 },
+  (_, i) => `/media/ezgif-frame-${String(i + 5).padStart(3, '0')}.png`
 );
 
 const panels: Panel[] = [
@@ -58,7 +58,7 @@ export function ProcessShowcase() {
         <ScrollSequence
           frames={sequenceFrames}
           poster={poster}
-          scrollHeight={260}
+          scrollHeight={220}
           className="bg-[#08080a] [&>canvas]:h-[100svh]"
         />
       </div>

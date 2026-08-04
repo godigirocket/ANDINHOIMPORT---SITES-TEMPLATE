@@ -105,6 +105,12 @@ export default function AdminContent() {
                 />
 
                 <ImageUploadField
+                  label="Favicon / icone do site" bucket="banners" subfolder="brand" aspect="square"
+                  value={form.favicon_url}
+                  onChange={url => setForm(prev => ({ ...prev, favicon_url: url }))}
+                />
+
+                <ImageUploadField
                   label="Foto do Instagram (seção 'Siga no Instagram')" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.instagram_photo}
                   onChange={url => setForm(prev => ({ ...prev, instagram_photo: url }))}
@@ -280,6 +286,21 @@ export default function AdminContent() {
                   <Label>Keywords (separadas por vírgula)</Label>
                   <Input placeholder="iphone, xiaomi, celular importado..." value={form.seo_keywords} onChange={set('seo_keywords')} />
                 </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>URL canonica</Label>
+                    <Input placeholder="https://andinhoimports.vercel.app" value={form.seo_canonical_url} onChange={set('seo_canonical_url')} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Robots</Label>
+                    <Input placeholder="index, follow" value={form.seo_robots} onChange={set('seo_robots')} />
+                  </div>
+                </div>
+                <ImageUploadField
+                  label="Imagem de compartilhamento (Google/WhatsApp)" bucket="banners" subfolder="seo" aspect="wide"
+                  value={form.seo_og_image}
+                  onChange={url => setForm(prev => ({ ...prev, seo_og_image: url }))}
+                />
                 {/* Preview */}
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
                   <p className="text-xs text-muted-foreground font-medium mb-2">Preview Google</p>
