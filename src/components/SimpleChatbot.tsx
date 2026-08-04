@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, MessageCircle, Send, X } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
@@ -15,8 +15,25 @@ const quickReplies = [
   { label: 'iPhone', text: 'Quero ver iPhones disponiveis' },
   { label: 'Xiaomi', text: 'Quero ver Xiaomi disponiveis' },
   { label: 'Pagamento', text: 'Quais sao as formas de pagamento?' },
-  { label: 'WhatsApp', text: 'Falar no WhatsApp', whatsapp: true },
+  { label: 'Garantia', text: 'Como funciona a garantia?' },
 ];
+
+const clean = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const decodeResponse = (text: string) =>
+  text
+    .replaceAll('{COMPANY_NAME}', `${clientConfig.company.name} ${clientConfig.company.nameHighlight}`)
+    .replaceAll('{PRODUCT_LIST}', 'iPhone, Xiaomi, Smartwatches e acessorios originais')
+    .replace(/[🔥✨💰🚚📱💳✅🛡️🔒🎁⚡🎯⏰📦💬🛒]/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
 export function SimpleChatbot() {
   const { config } = useChatbotStore();
@@ -26,10 +43,12 @@ export function SimpleChatbot() {
     {
       id: 'welcome',
       sender: 'bot',
-      text: 'Oi. Me diga o que voce procura e eu te levo direto ao atendimento certo.',
+      text: 'Oi. Me diga o modelo que voce procura ou escolha uma opcao abaixo.',
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
+
+  const trainedQuestions = useMemo(() => config.questions || [], [config.questions]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -51,35 +70,72 @@ export function SimpleChatbot() {
   const addBot = (text: string) => {
     window.setTimeout(() => {
       setMessages(prev => [...prev, { id: `${Date.now()}-b`, sender: 'bot', text }]);
-    }, 260);
+    }, 220);
+  };
+
+  const fromPanel = (normalized: string) => {
+    const found = trainedQuestions.find(question => {
+      const label = clean(question.label);
+      return label && (normalized.includes(label) || label.includes(normalized));
+    });
+    if (!found) return false;
+    if (found.response === 'REDIRECT_WHATSAPP') {
+      addBot('Claro. Vou abrir o WhatsApp para voce falar direto com a equipe.');
+      openWhatsApp('Ola! Vim pelo site da Andinho Import e quero atendimento.');
+      return true;
+    }
+    addBot(decodeResponse(found.response));
+    return true;
   };
 
   const answer = (text: string) => {
-    const normalized = text.toLowerCase();
+    const normalized = clean(text);
     addUser(text);
 
-    if (normalized.includes('iphone')) {
-      addBot('Temos modelos iPhone novos, com nota fiscal, garantia e parcelamento em ate 18x. Posso te passar as opcoes no WhatsApp.');
+    if (fromPanel(normalized)) return;
+
+    if (normalized.includes('iphone') || normalized.includes('apple') || normalized.includes('ios')) {
+      addBot('Temos iPhones originais, novos, com nota fiscal e garantia. Me diga o modelo ou capacidade que voce quer, tipo 128GB ou 256GB.');
       return;
     }
 
-    if (normalized.includes('xiaomi')) {
-      addBot('Xiaomi novo e original, com consulta de estoque por modelo e cor. Chamo voce no WhatsApp para confirmar disponibilidade.');
+    if (normalized.includes('xiaomi') || normalized.includes('redmi') || normalized.includes('poco')) {
+      addBot('Temos Xiaomi originais com estoque consultado por modelo e cor. Se voce me disser o modelo, eu te oriento o proximo passo.');
       return;
     }
 
-    if (normalized.includes('pagamento') || normalized.includes('parcela') || normalized.includes('cartao')) {
-      addBot('Cartao em ate 18x sem juros e Pix com condicao especial. O valor final depende do modelo disponivel.');
+    if (normalized.includes('watch') || normalized.includes('relogio') || normalized.includes('smartwatch')) {
+      addBot('Smartwatches e Apple Watch entram conforme disponibilidade. Posso te ajudar a escolher por tamanho, cor e faixa de preco.');
       return;
     }
 
-    if (normalized.includes('whatsapp')) {
+    if (normalized.includes('pagamento') || normalized.includes('parcela') || normalized.includes('cartao') || normalized.includes('pix')) {
+      addBot(decodeResponse(config.autoResponses?.payment || 'Cartao em ate 18x sem juros e Pix com condicao especial.'));
+      return;
+    }
+
+    if (normalized.includes('entrega') || normalized.includes('envio') || normalized.includes('frete') || normalized.includes('prazo')) {
+      addBot(decodeResponse(config.autoResponses?.delivery || 'A entrega e combinada no atendimento, com envio rastreado e opcao de pronta entrega conforme estoque.'));
+      return;
+    }
+
+    if (normalized.includes('garantia') || normalized.includes('nota') || normalized.includes('original')) {
+      addBot(decodeResponse(config.autoResponses?.warranty || 'Produtos originais, com nota fiscal e garantia conforme o aparelho escolhido.'));
+      return;
+    }
+
+    if (normalized.includes('preco') || normalized.includes('valor') || normalized.includes('quanto') || normalized.includes('catalogo')) {
+      addBot(decodeResponse(config.autoResponses?.price || 'Os valores variam por modelo, cor e capacidade. Me diga qual aparelho voce quer consultar.'));
+      return;
+    }
+
+    if (normalized.includes('whatsapp') || normalized.includes('atendente') || normalized.includes('humano')) {
+      addBot('Perfeito. Vou abrir o WhatsApp para voce falar com quem conhece o estoque.');
       openWhatsApp('Ola! Vim pelo site da Andinho Import e quero consultar o estoque.');
-      addBot('Abrindo o WhatsApp para voce falar direto com a equipe.');
       return;
     }
 
-    addBot('Perfeito. Para te responder com preco e estoque atualizado, o melhor caminho e falar direto no WhatsApp.');
+    addBot('Consigo te ajudar com iPhone, Xiaomi, Smartwatch, pagamento, garantia, entrega e disponibilidade. Me diga o modelo ou escolha uma opcao abaixo.');
   };
 
   const handleSend = () => {
@@ -130,7 +186,7 @@ export function SimpleChatbot() {
                 <BrandLogo size={30} />
                 <div>
                   <p className="text-sm font-black text-white">Andinho Import</p>
-                  <p className="text-[11px] font-medium text-white/46">Atendimento humano</p>
+                  <p className="text-[11px] font-medium text-white/46">Responde na hora</p>
                 </div>
               </div>
               <button
@@ -146,7 +202,7 @@ export function SimpleChatbot() {
               {messages.map(message => (
                 <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-relaxed"
+                    className="max-w-[84%] whitespace-pre-line rounded-2xl px-3 py-2 text-[13px] leading-relaxed"
                     style={
                       message.sender === 'user'
                         ? { background: 'hsl(43,96%,52%)', color: '#08080a' }
@@ -165,7 +221,7 @@ export function SimpleChatbot() {
                 {quickReplies.map(reply => (
                   <button
                     key={reply.label}
-                    onClick={() => reply.whatsapp ? openWhatsApp('Ola! Vim pelo site da Andinho Import e quero consultar o estoque.') : answer(reply.text)}
+                    onClick={() => answer(reply.text)}
                     className="flex items-center justify-between rounded-lg border border-white/10 px-2.5 py-2 text-left text-[11px] font-bold text-white/76 transition-colors hover:border-primary/40 hover:text-white"
                   >
                     {reply.label}

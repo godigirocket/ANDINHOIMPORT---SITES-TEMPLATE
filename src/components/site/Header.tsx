@@ -1,103 +1,85 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { clientConfig } from '@/config/client';
 import { BrandLogo } from '@/components/BrandLogo';
 
 export function Header() {
-  const [scrollY, setScrollY] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
+    let ticking = false;
+    let rafId = 0;
+    const update = () => {
+      ticking = false;
+      const next = window.scrollY > 84;
+      setIsHidden(prev => (prev === next ? prev : next));
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      rafId = requestAnimationFrame(update);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 767px)');
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-
-  const isCollapsed = scrollY > 96;
-  const showDesktopDock = isCollapsed && !isMobile;
-  const hideMobileHeader = isCollapsed && isMobile;
   const navLinks = [
-    { label: 'Inicio', href: '#hero' },
-    { label: 'Produtos', href: '#products' },
-    { label: 'Beneficios', href: '#features' },
-    { label: 'Depoimentos', href: '#testimonials' },
+    { label: 'Inicio', href: '/#hero' },
+    { label: 'Produtos', href: '/#products' },
+    { label: 'Beneficios', href: '/#features' },
+    { label: 'Depoimentos', href: '/#testimonials' },
   ];
 
   return (
     <>
       <motion.header
         initial={{ y: -36, opacity: 0 }}
-        animate={{ y: hideMobileHeader ? -28 : 0, opacity: hideMobileHeader ? 0 : 1, pointerEvents: hideMobileHeader ? 'none' : 'auto' }}
+        animate={{ y: isHidden ? -92 : 0, opacity: isHidden ? 0 : 1, pointerEvents: isHidden ? 'none' : 'auto' }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         className="fixed top-0 left-0 right-0 z-50 pointer-events-none"
       >
         <motion.div
-          className="mx-auto mt-3 flex items-center justify-between"
-          animate={{
-            width: showDesktopDock ? 'calc(100% - 24px)' : '100%',
-            maxWidth: showDesktopDock ? 680 : 1220,
-            paddingLeft: showDesktopDock ? 10 : 20,
-            paddingRight: showDesktopDock ? 10 : 20,
-            paddingTop: showDesktopDock ? 8 : 12,
-            paddingBottom: showDesktopDock ? 8 : 12,
-            borderRadius: showDesktopDock ? 999 : 0,
-            backgroundColor: showDesktopDock ? 'rgba(12,12,15,0.72)' : 'rgba(0,0,0,0)',
-            backdropFilter: showDesktopDock ? 'blur(20px) saturate(1.35)' : 'blur(0px)',
-          }}
+          className="mx-auto mt-4 flex w-[calc(100%_-_24px)] max-w-[1220px] items-center justify-between rounded-full px-4 py-3 md:px-5"
+          animate={{ backgroundColor: 'rgba(7,7,9,0.86)', backdropFilter: 'blur(18px) saturate(1.25)' }}
           transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            border: showDesktopDock ? '1px solid rgba(255,255,255,0.13)' : '1px solid transparent',
-            boxShadow: showDesktopDock
-              ? '0 18px 54px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 34px rgba(245,183,0,0.12)'
-              : 'none',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 18px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.1)',
           }}
         >
           <motion.a
-            href="#hero"
+            href="/#hero"
             aria-label="Andinho Import"
             className="pointer-events-auto flex items-center gap-3"
-            animate={{
-              width: showDesktopDock ? 44 : 'auto',
-              padding: 0,
-            }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           >
-            <BrandLogo size={showDesktopDock ? 38 : 48} glow={!showDesktopDock} />
-            <motion.div
-              className="overflow-hidden leading-none"
-              animate={{ opacity: showDesktopDock ? 0 : 1, width: showDesktopDock ? 0 : 'auto' }}
-              transition={{ duration: 0.24 }}
-            >
+            <BrandLogo size={46} glow />
+            <div className="overflow-hidden leading-none">
               <p className="site-shimmer-text whitespace-nowrap text-[17px] font-black tracking-tight text-white">
                 {clientConfig.company.name} {clientConfig.company.nameHighlight}
               </p>
               <p className="mt-1 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.34em] text-white/48">
                 {clientConfig.company.slogan}
               </p>
-            </motion.div>
+            </div>
           </motion.a>
 
           <motion.nav
-            className="pointer-events-auto hidden items-center md:flex"
-            animate={{ opacity: 1, y: 0, gap: showDesktopDock ? 8 : 40, pointerEvents: 'auto' }}
+            className="pointer-events-auto hidden items-center gap-9 lg:gap-12 md:flex"
+            animate={{ opacity: 1, y: 0, pointerEvents: 'auto' }}
             transition={{ duration: 0.22 }}
           >
             {navLinks.map(link => (
               <a
                 key={link.href}
                 href={link.href}
-                className={`text-[11px] font-black uppercase transition-all hover:text-primary ${showDesktopDock ? 'rounded-full border border-white/10 bg-white/[0.045] px-3 py-2 tracking-[0.14em] text-white/72' : 'tracking-[0.26em] text-white/76'}`}
+                className="relative px-1 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-white/76 transition-all hover:text-primary"
               >
                 {link.label}
               </a>
@@ -107,7 +89,7 @@ export function Header() {
           <motion.button
             onClick={() => setIsMobileMenuOpen(true)}
             className="pointer-events-auto rounded-full p-2 text-white md:hidden"
-            animate={{ opacity: hideMobileHeader ? 0 : 1, scale: hideMobileHeader ? 0.9 : 1, pointerEvents: hideMobileHeader ? 'none' : 'auto' }}
+            animate={{ opacity: isHidden ? 0 : 1, scale: isHidden ? 0.9 : 1, pointerEvents: isHidden ? 'none' : 'auto' }}
             transition={{ duration: 0.2 }}
             style={{ background: 'rgba(8,8,10,0.44)', border: '1px solid rgba(255,255,255,0.1)' }}
             aria-label="Abrir menu"
@@ -156,3 +138,4 @@ export function Header() {
     </>
   );
 }
+

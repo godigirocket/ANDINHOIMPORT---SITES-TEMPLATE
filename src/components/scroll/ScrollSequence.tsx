@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 
 interface ScrollSequenceProps {
   frames?: string[];
@@ -23,6 +23,9 @@ export function ScrollSequence({
   const smoothProgressRef = useRef(0);
   const rafRef = useRef<number>();
   const pinnedRef = useRef(false);
+  const activeRef = useRef(false);
+  const drawnFrameRef = useRef(-1);
+  const lastVideoTimeRef = useRef(-1);
   const [isPinned, setIsPinned] = useState(false);
 
   const hasFrames = !!frames?.length;
@@ -43,11 +46,18 @@ export function ScrollSequence({
       setIsPinned(next);
     };
 
+    const ensureTick = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
     const updateProgress = () => {
       const rect = container.getBoundingClientRect();
       const scrollable = Math.max(1, rect.height - window.innerHeight);
       targetProgressRef.current = Math.min(1, Math.max(0, -rect.top / scrollable));
+      activeRef.current = rect.top < window.innerHeight * 1.15 && rect.bottom > -window.innerHeight * 0.15;
       setPinned(rect.top < window.innerHeight * 0.5 && rect.bottom > window.innerHeight * 0.5);
+      if (activeRef.current) ensureTick();
     };
 
     const drawImage = (image: HTMLImageElement) => {
@@ -88,30 +98,45 @@ export function ScrollSequence({
       });
       const firstImage = imagesRef.current[0];
       if (firstImage) {
-        firstImage.onload = () => drawImage(firstImage);
-        if (firstImage.complete && firstImage.naturalWidth > 0) drawImage(firstImage);
+        firstImage.onload = () => {
+          drawImage(firstImage);
+          drawnFrameRef.current = 0;
+        };
+        if (firstImage.complete && firstImage.naturalWidth > 0) {
+          drawImage(firstImage);
+          drawnFrameRef.current = 0;
+        }
       }
     }
 
-    const tick = () => {
+    function tick() {
+      rafRef.current = undefined;
       smoothProgressRef.current += (targetProgressRef.current - smoothProgressRef.current) * 0.12;
 
       if (hasFrames) {
         const images = imagesRef.current;
         const index = Math.min(images.length - 1, Math.round(smoothProgressRef.current * (images.length - 1)));
         const image = images[index];
-        if (image?.complete && image.naturalWidth > 0) drawImage(image);
+        if (index !== drawnFrameRef.current && image?.complete && image.naturalWidth > 0) {
+          drawImage(image);
+          drawnFrameRef.current = index;
+        }
       } else if (hasVideo && video?.duration) {
-        video.currentTime = smoothProgressRef.current * video.duration;
+        const nextTime = smoothProgressRef.current * video.duration;
+        if (Math.abs(nextTime - lastVideoTimeRef.current) > 0.02) {
+          video.currentTime = nextTime;
+          lastVideoTimeRef.current = nextTime;
+        }
       }
 
-      rafRef.current = requestAnimationFrame(tick);
-    };
+      const stillSettling = Math.abs(targetProgressRef.current - smoothProgressRef.current) > 0.001;
+      if (activeRef.current && stillSettling) ensureTick();
+    }
 
     updateProgress();
     window.addEventListener('scroll', updateProgress, { passive: true });
     window.addEventListener('resize', updateProgress);
-    rafRef.current = requestAnimationFrame(tick);
+    ensureTick();
 
     return () => {
       window.removeEventListener('scroll', updateProgress);
@@ -142,13 +167,22 @@ export function ScrollSequence({
           />
           <div
             aria-hidden="true"
-            className={`${isPinned ? 'fixed' : 'absolute'} bottom-0 left-0 z-[3] h-28 w-screen pointer-events-none`}
+            className={`${isPinned ? 'fixed' : 'absolute'} top-0 left-0 z-[3] h-32 w-screen pointer-events-none`}
             style={{
-              background: 'linear-gradient(180deg, transparent, rgba(8,8,10,0.82))',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              maskImage: 'linear-gradient(180deg, transparent, black 55%)',
-              WebkitMaskImage: 'linear-gradient(180deg, transparent, black 55%)',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.76), rgba(8,8,10,0.34) 48%, transparent)',
+              boxShadow: 'inset 0 34px 56px rgba(0,0,0,0.48)',
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className={`${isPinned ? 'fixed' : 'absolute'} bottom-0 left-0 z-[3] h-36 w-screen pointer-events-none`}
+            style={{
+              background: 'linear-gradient(180deg, transparent, rgba(8,8,10,0.44) 42%, rgba(8,8,10,0.9))',
+              boxShadow: 'inset 0 -38px 70px rgba(0,0,0,0.58)',
+              backdropFilter: 'blur(5px)',
+              WebkitBackdropFilter: 'blur(5px)',
+              maskImage: 'linear-gradient(180deg, transparent, black 52%)',
+              WebkitMaskImage: 'linear-gradient(180deg, transparent, black 52%)',
             }}
           />
         </>
@@ -162,7 +196,7 @@ export function ScrollSequence({
           muted
           playsInline
           preload="auto"
-          className="sticky top-0 block w-full h-screen object-cover"
+          className="sticky top-0 block w-full h-screen object-cover shadow-[inset_0_34px_56px_rgba(0,0,0,0.48),inset_0_-38px_70px_rgba(0,0,0,0.58)]"
         />
       )}
 
@@ -176,3 +210,4 @@ export function ScrollSequence({
     </div>
   );
 }
+

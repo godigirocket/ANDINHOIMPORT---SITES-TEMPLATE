@@ -1,23 +1,22 @@
-import { useEffect } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MessageCircle, ShieldCheck, Truck, BadgeCheck } from 'lucide-react';
 import { clientConfig } from '@/config/client';
-import { useProductStore } from '@/lib/stores/productStore';
-import { safeImageUrl } from '@/lib/utils/productFallbacks';
 
 export function HeroSection() {
-  const { products, fetchProducts } = useProductStore();
-
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
-
-  const active = products.filter(p => p.status === 'active');
-  const product = active.find(p => p.featured) || active[0];
-  const heroImage = safeImageUrl(product?.image_url);
+  const heroImages = clientConfig.brand.heroBgImages.slice(0, 2);
+  const [imageIndex, setImageIndex] = useState(0);
   const whatsappUrl = `https://wa.me/${clientConfig.company.contact.whatsappNumber}`;
-  const msg = product
-    ? `Ola! Tenho interesse no ${product.title}. Pode me passar mais informacoes?`
-    : clientConfig.company.contact.whatsappMessage;
+  const msg = clientConfig.company.contact.whatsappMessage;
+
+  useEffect(() => {
+    if (heroImages.length < 2) return;
+    const interval = window.setInterval(() => {
+      setImageIndex(current => (current + 1) % heroImages.length);
+    }, 15000);
+    return () => window.clearInterval(interval);
+  }, [heroImages.length]);
 
   const badges = [
     { icon: ShieldCheck, label: 'Produtos originais', sub: 'garantido' },
@@ -27,26 +26,30 @@ export function HeroSection() {
 
   return (
     <section id="hero" className="section-blur-end relative min-h-screen overflow-hidden bg-[#090a0f]">
-      <motion.img
-        src={heroImage}
-        alt=""
-        aria-hidden="true"
-        initial={{ scale: 1.08, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.52 }}
-        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-0 h-full w-full object-cover object-[68%_50%]"
-      />
+      <AnimatePresence mode="sync">
+        <motion.img
+          key={heroImages[imageIndex] || 'hero-bg'}
+          src={heroImages[imageIndex]}
+          alt=""
+          aria-hidden="true"
+          initial={{ scale: 1.06, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.56 }}
+          exit={{ scale: 1.02, opacity: 0 }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0 h-full w-full object-cover object-[68%_50%]"
+        />
+      </AnimatePresence>
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(90deg, rgba(6,8,14,0.96) 0%, rgba(8,10,18,0.74) 38%, rgba(10,12,20,0.44) 70%, rgba(8,8,12,0.74) 100%)',
+            'linear-gradient(90deg, rgba(6,8,14,0.96) 0%, rgba(8,10,18,0.74) 38%, rgba(10,12,20,0.44) 70%, rgba(8,8,12,0.76) 100%)',
         }}
       />
       <div className="absolute inset-0 opacity-40" style={{ background: 'radial-gradient(circle at 18% 62%, rgba(250,183,15,0.16), transparent 34%)' }} />
 
       <div className="relative z-10 flex min-h-screen items-center px-5 pb-20 pt-28 sm:px-8 lg:px-12">
-        <div className="w-full max-w-[1220px] mx-auto">
+        <div className="mx-auto w-full max-w-[1220px]">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
