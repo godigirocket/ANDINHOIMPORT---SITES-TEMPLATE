@@ -18,19 +18,22 @@ function InfoBox({ text }: { text: string }) {
 }
 
 export default function AdminPayments() {
-  const { config, saveConfig } = usePaymentStore();
+  const { config, fetchConfig, saveConfig } = usePaymentStore();
   const [form, setForm] = useState<PaymentConfig>(config);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => { fetchConfig(); }, [fetchConfig]);
   useEffect(() => { setForm(config); }, [config]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    saveConfig(form);
-    setTimeout(() => {
-      setSaving(false);
-      toast.success('Configurações de pagamento salvas');
-    }, 300);
+    const result = await saveConfig(form);
+    setSaving(false);
+    if (result.error) {
+      toast.error('Nao foi possivel salvar', { description: result.error });
+      return;
+    }
+    toast.success('Configuracoes de pagamento salvas');
   };
 
   const set = <K extends keyof PaymentConfig>(key: K, value: PaymentConfig[K]) => {

@@ -6,7 +6,6 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
-import { generateUUID } from '@/lib/utils/uuid';
 import { clientConfig } from '@/config/client';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
@@ -15,14 +14,15 @@ interface Banner {
   active: boolean; sort_order: number; created_at: string;
 }
 
-const LOCAL_KEY = `${clientConfig.id}_banners_v2`;
-const load = (): Banner[] => { try { const r = localStorage.getItem(LOCAL_KEY); return r ? JSON.parse(r) : []; } catch { return []; } };
-const save = (b: Banner[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(b)); } catch {} };
-const isOk = () => { const u = import.meta.env.VITE_SUPABASE_URL as string; return !!u && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co'); };
+const isOk = () => {
+  const u = import.meta.env.VITE_SUPABASE_URL as string;
+  const k = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!u && !!k && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co');
+};
 const emptyForm = () => ({ image_url: '', title: '', link_url: '', active: true });
 
 export function BannersManager() {
-  const [banners, setBanners] = useState<Banner[]>(load());
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -35,7 +35,7 @@ export function BannersManager() {
     supabase.from('banners').select('*').eq('client_id', clientConfig.id).order('sort_order')
       .then(({ data, error }) => {
         setLoading(false);
-        if (!error && data) { setBanners(data as Banner[]); save(data as Banner[]); }
+        if (!error && data) { setBanners(data as Banner[]); }
         else if (error) { toast.error('Erro ao carregar banners', { description: error.message }); }
       });
   }, []);
@@ -45,6 +45,7 @@ export function BannersManager() {
 
   const handleSave = async () => {
     if (!form.image_url) { toast.error('Adicione uma imagem'); return; }
+    if (!isOk()) { toast.error('Supabase nao configurado', { description: 'Configure o banco do cliente para salvar banners.' }); return; }
     setSaving(true);
     if (editId) {
       if (isOk()) {
@@ -53,9 +54,9 @@ export function BannersManager() {
           .eq('id', editId).eq('client_id', clientConfig.id);
         setSaving(false);
         if (error) { toast.error('Erro ao salvar', { description: error.message }); return; }
-      } else setSaving(false);
+      }
       const updated = banners.map(b => b.id === editId ? { ...b, image_url: form.image_url, title: form.title || null, link_url: form.link_url || null, active: form.active } : b);
-      setBanners(updated); save(updated);
+      setBanners(updated);
       toast.success('Banner atualizado');
     } else {
       if (isOk()) {
@@ -65,10 +66,7 @@ export function BannersManager() {
         setSaving(false);
         if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
         const updated = [...banners, data![0] as Banner];
-        setBanners(updated); save(updated);
-      } else {
-        const updated = [...banners, { id: generateUUID(), image_url: form.image_url, title: form.title || null, link_url: form.link_url || null, active: form.active, sort_order: banners.length, created_at: new Date().toISOString() }];
-        setBanners(updated); save(updated); setSaving(false);
+        setBanners(updated);
       }
       toast.success('Banner criado');
     }
@@ -76,15 +74,17 @@ export function BannersManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (isOk()) { const { error } = await supabase.from('banners').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; } }
+    if (!isOk()) { toast.error('Supabase nao configurado'); return; }
+    const { error } = await supabase.from('banners').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; }
     const updated = banners.filter(b => b.id !== id);
-    setBanners(updated); save(updated); toast.success('Banner removido');
+    setBanners(updated); toast.success('Banner removido');
   };
 
   const handleToggle = async (banner: Banner) => {
-    if (isOk()) { const { error } = await supabase.from('banners').update({ active: !banner.active }).eq('id', banner.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; } }
+    if (!isOk()) { toast.error('Supabase nao configurado'); return; }
+    const { error } = await supabase.from('banners').update({ active: !banner.active }).eq('id', banner.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; }
     const updated = banners.map(b => b.id === banner.id ? { ...b, active: !b.active } : b);
-    setBanners(updated); save(updated);
+    setBanners(updated);
   };
 
   return (

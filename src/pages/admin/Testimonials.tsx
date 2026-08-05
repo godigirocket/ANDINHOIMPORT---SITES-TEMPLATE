@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { generateUUID } from '@/lib/utils/uuid';
 import { clientConfig } from '@/config/client';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
@@ -17,22 +16,22 @@ interface Testimonial {
   avatar_url: string | null; rating: number; active: boolean; created_at: string;
 }
 
-const LOCAL_KEY = 'andinho-import_testimonials_v2';
-const DEFAULT_TESTIMONIALS: Testimonial[] = [
-  { id: '1', name: 'Carlos M.', text: 'iPhone 15 Pro Max chegou em 2 dias, lacrado e com nota. Atendimento impecável pelo WhatsApp.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
-  { id: '2', name: 'Ana Paula', text: 'Parcelei em 18x sem juros. Xiaomi 14 Ultra perfeito, exatamente como descrito.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
-  { id: '3', name: 'Rafael T.', text: 'Terceira compra aqui. Sempre original, preço justo e entrega rápida. Confiança total.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
-  { id: '4', name: 'Juliana K.', text: 'Apple Watch lacrado com nota fiscal. Pix com 5% de desconto, super tranquilo.', avatar_url: null, rating: 5, active: true, created_at: '2024-01-01T00:00:00Z' },
-];
-const load = (): Testimonial[] => { try { const r = localStorage.getItem(LOCAL_KEY); const p = r ? JSON.parse(r) : []; return p.length > 0 ? p : DEFAULT_TESTIMONIALS; } catch { return DEFAULT_TESTIMONIALS; } };
-const save = (t: Testimonial[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(t)); } catch {} };
-const isOk = () => { const u = import.meta.env.VITE_SUPABASE_URL as string; return !!u && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co'); };
+const isOk = () => {
+  const u = import.meta.env.VITE_SUPABASE_URL as string;
+  const k = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!u && !!k && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co');
+};
+const requireSupabase = () => {
+  if (isOk()) return true;
+  toast.error('Supabase nao configurado', { description: 'Configure o banco deste cliente para salvar depoimentos.' });
+  return false;
+};
 const emptyForm = () => ({ name: '', text: '', avatar_url: null as string | null, rating: 5, active: true });
 
 const avatarColors = ['hsl(43,96%,52%)', 'hsl(200,100%,55%)', 'hsl(280,80%,65%)', 'hsl(142,71%,45%)', 'hsl(0,84%,60%)', 'hsl(330,80%,60%)'];
 
 export default function AdminTestimonials() {
-  const [items, setItems] = useState<Testimonial[]>(load());
+  const [items, setItems] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -45,7 +44,7 @@ export default function AdminTestimonials() {
     supabase.from('testimonials').select('*').eq('client_id', clientConfig.id).order('created_at', { ascending: false })
       .then(({ data, error }) => {
         setLoading(false);
-        if (!error && data) { setItems(data as Testimonial[]); save(data as Testimonial[]); }
+        if (!error && data) { setItems(data as Testimonial[]); }
         else if (error) { toast.error('Erro ao carregar depoimentos', { description: error.message }); }
       });
   }, []);
@@ -55,46 +54,41 @@ export default function AdminTestimonials() {
 
   const handleSave = async () => {
     if (!form.name || !form.text) { toast.error('Nome e depoimento são obrigatórios'); return; }
-    setSaving(true);
+    setSaving(true);    if (!requireSupabase()) { setSaving(false); return; }
+
     if (editId) {
-      if (isOk()) {
-        const { error } = await supabase.from('testimonials')
-          .update({ name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
-          .eq('id', editId).eq('client_id', clientConfig.id);
-        setSaving(false);
-        if (error) { toast.error('Erro ao salvar', { description: error.message }); return; }
-      } else setSaving(false);
-      const updated = items.map(t => t.id === editId ? { ...t, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active } : t);
-      setItems(updated); save(updated);
+      const { error } = await supabase.from('testimonials')
+        .update({ name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
+        .eq('id', editId).eq('client_id', clientConfig.id);
+      setSaving(false);
+      if (error) { toast.error('Erro ao salvar', { description: error.message }); return; }
+      setItems(items.map(t => t.id === editId ? { ...t, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active } : t));
       toast.success('Depoimento atualizado');
     } else {
-      if (isOk()) {
-        const { data, error } = await supabase.from('testimonials')
-          .insert({ client_id: clientConfig.id, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
-          .select();
-        setSaving(false);
-        if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
-        const updated = [data![0] as Testimonial, ...items];
-        setItems(updated); save(updated);
-      } else {
-        const updated = [{ id: generateUUID(), ...form, created_at: new Date().toISOString() }, ...items];
-        setItems(updated); save(updated); setSaving(false);
-      }
+      const { data, error } = await supabase.from('testimonials')
+        .insert({ client_id: clientConfig.id, name: form.name, text: form.text, avatar_url: form.avatar_url, rating: form.rating, active: form.active })
+        .select();
+      setSaving(false);
+      if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
+      setItems([data![0] as Testimonial, ...items]);
       toast.success('Depoimento criado');
     }
     setOpen(false); setForm(emptyForm()); setEditId(null);
   };
 
-  const handleDelete = async (id: string) => {
-    if (isOk()) { const { error } = await supabase.from('testimonials').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; } }
-    const updated = items.filter(t => t.id !== id);
-    setItems(updated); save(updated); toast.success('Removido');
+    const handleDelete = async (id: string) => {
+    if (!requireSupabase()) return;
+    const { error } = await supabase.from('testimonials').delete().eq('id', id).eq('client_id', clientConfig.id);
+    if (error) { toast.error('Erro ao excluir', { description: error.message }); return; }
+    setItems(items.filter(t => t.id !== id));
+    toast.success('Removido');
   };
 
   const handleToggle = async (t: Testimonial) => {
-    if (isOk()) { const { error } = await supabase.from('testimonials').update({ active: !t.active }).eq('id', t.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; } }
-    const updated = items.map(x => x.id === t.id ? { ...x, active: !x.active } : x);
-    setItems(updated); save(updated);
+    if (!requireSupabase()) return;
+    const { error } = await supabase.from('testimonials').update({ active: !t.active }).eq('id', t.id).eq('client_id', clientConfig.id);
+    if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; }
+    setItems(items.map(x => x.id === t.id ? { ...x, active: !x.active } : x));
   };
 
   return (

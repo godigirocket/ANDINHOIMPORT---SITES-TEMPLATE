@@ -26,7 +26,7 @@ const empty = {
 };
 
 export default function AdminLeads() {
-  const { leads, fetchLeads, createLead, updateLead, deleteLead } = useLeadStore();
+  const { leads, error, fetchLeads, createLead, updateLead, deleteLead } = useLeadStore();
   const [form, setForm] = useState(empty);
   const [query, setQuery] = useState('');
 
@@ -45,7 +45,11 @@ export default function AdminLeads() {
       toast.error('Informe o nome do lead');
       return;
     }
-    await createLead(form);
+    const result = await createLead(form);
+    if (result.error) {
+      toast.error('Lead nao salvo', { description: result.error });
+      return;
+    }
     setForm(empty);
     toast.success('Lead adicionado');
   };
@@ -83,6 +87,11 @@ export default function AdminLeads() {
             <Download className="h-3.5 w-3.5" /> Exportar CSV
           </button>
         </div>
+        {error && (
+          <div className="rounded-xl p-4 text-sm text-orange-300" style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.28)' }}>
+            {error} Rode a migration de leads e configure as variaveis VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no projeto do cliente.
+          </div>
+        )}
 
         <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
           <div className="rounded-xl p-4" style={{ background: 'hsla(220,20%,7%,0.82)', border: '1px solid hsla(43,96%,52%,0.12)' }}>
@@ -140,13 +149,19 @@ export default function AdminLeads() {
                         {lead.notes && <p className="mt-1 text-xs text-white/52">{lead.notes}</p>}
                       </div>
                       <div className="flex items-center gap-2">
-                        <select value={lead.status} onChange={e => updateLead(lead.id, { status: e.target.value as LeadStatus })} className="h-9 rounded-md border border-input bg-background px-2 text-xs">
+                        <select value={lead.status} onChange={async e => {
+                          const result = await updateLead(lead.id, { status: e.target.value as LeadStatus });
+                          if (result.error) toast.error('Status nao salvo', { description: result.error });
+                        }} className="h-9 rounded-md border border-input bg-background px-2 text-xs">
                           {statuses.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
                         </select>
                         <button onClick={() => openWhatsApp(lead.phone, lead.interest)} className="rounded-lg p-2 text-green-400 transition-colors hover:bg-green-500/10" aria-label="Abrir WhatsApp">
                           <MessageCircle className="h-4 w-4" />
                         </button>
-                        <button onClick={() => deleteLead(lead.id)} className="rounded-lg p-2 text-red-400 transition-colors hover:bg-red-500/10" aria-label="Excluir lead">
+                        <button onClick={async () => {
+                          const result = await deleteLead(lead.id);
+                          if (result.error) toast.error('Lead nao excluido', { description: result.error });
+                        }} className="rounded-lg p-2 text-red-400 transition-colors hover:bg-red-500/10" aria-label="Excluir lead">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

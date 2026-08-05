@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { clientConfig } from '@/config/client';
+import { supabase } from '@/lib/supabase/client';
 
 export type PaymentMode = 'whatsapp' | 'checkout';
 
@@ -33,35 +34,56 @@ const defaultConfig: PaymentConfig = {
   redirect_whatsapp_message: 'Olá! Acabei de realizar o pagamento do pedido #{orderId}. Segue comprovante.',
 };
 
-const LOCAL_KEY = `${clientConfig.id}_payment_config_v1`;
-
-function loadLocal(): PaymentConfig {
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return defaultConfig;
-    return { ...defaultConfig, ...JSON.parse(raw) };
-  } catch { return defaultConfig; }
-}
-function saveLocal(c: PaymentConfig) {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(c)); } catch {}
-}
+const isSupabaseConfigured = () => {
+  const url = import.meta.env.VITE_SUPABASE_URL as string;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!url && !!key && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
+};
 
 interface PaymentStore {
   config: PaymentConfig;
-  fetchConfig: () => void;
-  saveConfig: (data: Partial<PaymentConfig>) => void;
+  error: string | null;
+  fetchConfig: () => Promise<void>;
+  saveConfig: (data: Partial<PaymentConfig>) => Promise<{ error: string | null }>;
 }
 
 export const usePaymentStore = create<PaymentStore>((set, get) => ({
-  config: loadLocal(),
+  config: defaultConfig,
+  error: null,
 
-  fetchConfig: () => {
-    set({ config: loadLocal() });
+  fetchConfig: async () => {
+    if (!isSupabaseConfigured()) {
+      set({ config: defaultConfig, error: 'Supabase nao configurado para este cliente.' });
+      return;
+    }
+    const { data, error } = await supabase
+      .from('site_content')
+      .select('payment_config')
+      .eq('client_id', clientConfig.id)
+      .maybeSingle();
+    if (error) {
+      set({ error: error.message });
+      return;
+    }
+    set({ config: { ...defaultConfig, ...((data as any)?.payment_config ?? {}) }, error: null });
   },
 
-  saveConfig: (data) => {
+  saveConfig: async (data) => {
     const merged = { ...get().config, ...data };
-    saveLocal(merged);
+    if (!isSupabaseConfigured()) {
+      const error = 'Supabase nao configurado para este cliente.';
+      set({ error });
+      return { error };
+    }
+    const { error } = await supabase.from('site_content').upsert(
+      { client_id: clientConfig.id, payment_config: merged, updated_at: new Date().toISOString() } as any,
+      { onConflict: 'client_id' }
+    );
+    if (error) {
+      set({ error: error.message });
+      return { error: error.message };
+    }
     set({ config: merged });
+    return { error: null };
   },
 }));

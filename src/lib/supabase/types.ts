@@ -152,6 +152,9 @@ export interface Database {
           hero_bg_1: string | null;
           hero_bg_2: string | null;
           hero_image_position: string | null;
+          payment_config: Json | null;
+          taxonomy_config: Json | null;
+          theme_config: Json | null;
           updated_at: string;
         };
         Insert: {
@@ -185,6 +188,9 @@ export interface Database {
           hero_bg_1?: string | null;
           hero_bg_2?: string | null;
           hero_image_position?: string | null;
+          payment_config?: Json | null;
+          taxonomy_config?: Json | null;
+          theme_config?: Json | null;
           updated_at?: string;
         };
         Update: {
@@ -216,6 +222,9 @@ export interface Database {
           hero_bg_1?: string | null;
           hero_bg_2?: string | null;
           hero_image_position?: string | null;
+          payment_config?: Json | null;
+          taxonomy_config?: Json | null;
+          theme_config?: Json | null;
           updated_at?: string;
         };
       };

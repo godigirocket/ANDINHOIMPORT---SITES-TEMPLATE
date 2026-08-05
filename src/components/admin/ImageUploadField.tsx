@@ -38,13 +38,6 @@ export function ImageUploadField({
   const [uploading, setUploading] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
-  const readLocalPreview = (file: File) => new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) { toast.error('Apenas imagens'); return; }
     setUploading(true);
@@ -53,10 +46,10 @@ export function ImageUploadField({
       const url = await uploadImage(bucket, compressed, subfolder);
       onChange(url);
       toast.success('Imagem enviada');
-    } catch {
-      const localPreview = await readLocalPreview(file);
-      onChange(localPreview);
-      toast.success('Imagem aplicada no preview local');
+    } catch (error) {
+      toast.error('Upload nao configurado', {
+        description: error instanceof Error ? error.message : 'Configure o Supabase Storage deste cliente para salvar imagens.',
+      });
     } finally {
       setUploading(false);
     }

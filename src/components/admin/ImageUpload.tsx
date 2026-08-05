@@ -41,10 +41,7 @@ export function ImageUpload({ value, onChange, bucket, label = 'Imagem', classNa
         const url = await uploadImage(bucket, compressed);
         onChange(url);
       } catch (err: any) {
-        // Fallback: usa URL de objeto local para preview (sem Supabase)
-        const localUrl = URL.createObjectURL(file);
-        onChange(localUrl);
-        setUploadError('Supabase não configurado — usando preview local (não persistido).');
+        setUploadError(err?.message || 'Upload nao configurado para este cliente.');
       } finally {
         setIsUploading(false);
       }

@@ -6,7 +6,6 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
-import { generateUUID } from '@/lib/utils/uuid';
 import { clientConfig } from '@/config/client';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
@@ -15,14 +14,15 @@ interface InstagramPost {
   active: boolean; sort_order: number; created_at: string;
 }
 
-const LOCAL_KEY = `${clientConfig.id}_instagram_posts_v2`;
-const load = (): InstagramPost[] => { try { const r = localStorage.getItem(LOCAL_KEY); return r ? JSON.parse(r) : []; } catch { return []; } };
-const save = (p: InstagramPost[]) => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(p)); } catch {} };
-const isOk = () => { const u = import.meta.env.VITE_SUPABASE_URL as string; return !!u && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co'); };
+const isOk = () => {
+  const u = import.meta.env.VITE_SUPABASE_URL as string;
+  const k = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!u && !!k && u !== 'https://placeholder.supabase.co' && u.includes('supabase.co');
+};
 const emptyForm = () => ({ img: '', url: '', caption: '', active: true });
 
 export function InstagramGalleryManager() {
-  const [posts, setPosts] = useState<InstagramPost[]>(load());
+  const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -35,7 +35,7 @@ export function InstagramGalleryManager() {
     supabase.from('instagram_posts').select('*').eq('client_id', clientConfig.id).order('sort_order')
       .then(({ data, error }) => {
         setLoading(false);
-        if (!error && data) { setPosts(data as InstagramPost[]); save(data as InstagramPost[]); }
+        if (!error && data) { setPosts(data as InstagramPost[]); }
         else if (error) { toast.error('Erro ao carregar posts', { description: error.message }); }
       });
   }, []);
@@ -45,6 +45,7 @@ export function InstagramGalleryManager() {
 
   const handleSave = async () => {
     if (!form.img) { toast.error('Adicione a URL da imagem'); return; }
+    if (!isOk()) { toast.error('Supabase nao configurado', { description: 'Configure o banco do cliente para salvar posts do Instagram.' }); return; }
     setSaving(true);
     if (editId) {
       if (isOk()) {
@@ -53,9 +54,9 @@ export function InstagramGalleryManager() {
           .eq('id', editId).eq('client_id', clientConfig.id);
         setSaving(false);
         if (error) { toast.error('Erro ao salvar', { description: error.message }); return; }
-      } else setSaving(false);
+      }
       const updated = posts.map(p => p.id === editId ? { ...p, img: form.img, url: form.url || null, caption: form.caption || null, active: form.active } : p);
-      setPosts(updated); save(updated);
+      setPosts(updated);
       toast.success('Post atualizado');
     } else {
       if (isOk()) {
@@ -65,10 +66,7 @@ export function InstagramGalleryManager() {
         setSaving(false);
         if (error) { toast.error('Erro ao criar', { description: error.message }); return; }
         const updated = [...posts, data![0] as InstagramPost];
-        setPosts(updated); save(updated);
-      } else {
-        const updated = [...posts, { id: generateUUID(), img: form.img, url: form.url || null, caption: form.caption || null, active: form.active, sort_order: posts.length, created_at: new Date().toISOString() }];
-        setPosts(updated); save(updated); setSaving(false);
+        setPosts(updated);
       }
       toast.success('Post adicionado');
     }
@@ -76,15 +74,17 @@ export function InstagramGalleryManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (isOk()) { const { error } = await supabase.from('instagram_posts').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; } }
+    if (!isOk()) { toast.error('Supabase nao configurado'); return; }
+    const { error } = await supabase.from('instagram_posts').delete().eq('id', id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao excluir'); return; }
     const updated = posts.filter(p => p.id !== id);
-    setPosts(updated); save(updated); toast.success('Post removido');
+    setPosts(updated); toast.success('Post removido');
   };
 
   const handleToggle = async (post: InstagramPost) => {
-    if (isOk()) { const { error } = await supabase.from('instagram_posts').update({ active: !post.active }).eq('id', post.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; } }
+    if (!isOk()) { toast.error('Supabase nao configurado'); return; }
+    const { error } = await supabase.from('instagram_posts').update({ active: !post.active }).eq('id', post.id).eq('client_id', clientConfig.id); if (error) { toast.error('Erro ao atualizar', { description: error.message }); return; }
     const updated = posts.map(p => p.id === post.id ? { ...p, active: !p.active } : p);
-    setPosts(updated); save(updated);
+    setPosts(updated);
   };
 
   return (

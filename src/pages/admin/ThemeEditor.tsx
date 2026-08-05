@@ -3,7 +3,8 @@ import { Palette, Save, RotateCcw, Eye, Code, Sparkles, Check } from 'lucide-rea
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { clientConfig } from '@/config/client';
-import { applyTheme, saveCustomTheme, clearCustomTheme, loadCustomTheme } from '@/lib/utils/applyTheme';
+import { supabase } from '@/lib/supabase/client';
+import { applyTheme } from '@/lib/utils/applyTheme';
 
 const THEME_PRESETS = [
   { name: 'Gold (Andinho Import)', primary: '43 96% 52%', bg: '220 20% 4%', preview: '#f5a623' },
@@ -17,33 +18,62 @@ const THEME_PRESETS = [
 ];
 
 export default function ThemeEditor() {
-  const savedTheme = loadCustomTheme();
-  const [primary, setPrimary] = useState(savedTheme?.primary || clientConfig.brand.colorPrimary);
-  const [bg, setBg] = useState(savedTheme?.background || clientConfig.brand.colorBackground);
-  const [isSaved, setIsSaved] = useState(!!savedTheme);
+  const [primary, setPrimary] = useState(clientConfig.brand.colorPrimary);
+  const [bg, setBg] = useState(clientConfig.brand.colorBackground);
+  const [isSaved, setIsSaved] = useState(false);
 
-  const handleApply = () => {
-    // Salva permanentemente no localStorage
-    saveCustomTheme(primary, bg);
-    
-    // Aplica no site inteiro
+  const isSupabaseConfigured = () => {
+    const url = import.meta.env.VITE_SUPABASE_URL as string;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+    return !!url && !!key && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
+  };
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    supabase.from('site_content').select('theme_config').eq('client_id', clientConfig.id).maybeSingle()
+      .then(({ data }) => {
+        const theme = (data as any)?.theme_config;
+        if (!theme?.primary || !theme?.background) return;
+        setPrimary(theme.primary);
+        setBg(theme.background);
+        applyTheme(theme.primary, theme.background);
+        setIsSaved(true);
+      });
+  }, []);
+
+    const handleApply = async () => {
+    if (!isSupabaseConfigured()) {
+      toast.error('Supabase nao configurado', { description: 'Configure o banco deste cliente para salvar o tema.' });
+      return;
+    }
+    const { error } = await supabase.from('site_content').upsert(
+      { client_id: clientConfig.id, theme_config: { primary, background: bg }, updated_at: new Date().toISOString() } as any,
+      { onConflict: 'client_id' }
+    );
+    if (error) {
+      toast.error('Nao foi possivel salvar', { description: error.message });
+      return;
+    }
     applyTheme(primary, bg);
-    
-    toast.success('✅ Tema salvo e aplicado no site inteiro!');
+    toast.success('Tema salvo no cliente');
     setIsSaved(true);
   };
 
-  const handleReset = () => {
-    // Remove tema customizado
-    clearCustomTheme();
-    
-    // Volta pro padrão
-    setPrimary(clientConfig.brand.colorPrimary);
-    setBg(clientConfig.brand.colorBackground);
-    applyTheme();
-    
-    toast.info('Tema restaurado para o padrão');
+  const handleReset = async () => {
+    const nextPrimary = clientConfig.brand.colorPrimary;
+    const nextBg = clientConfig.brand.colorBackground;
+    setPrimary(nextPrimary);
+    setBg(nextBg);
+    applyTheme(nextPrimary, nextBg);
     setIsSaved(false);
+
+    if (!isSupabaseConfigured()) return;
+    const { error } = await supabase.from('site_content').upsert(
+      { client_id: clientConfig.id, theme_config: {}, updated_at: new Date().toISOString() } as any,
+      { onConflict: 'client_id' }
+    );
+    if (error) toast.error('Nao foi possivel restaurar no cliente', { description: error.message });
+    else toast.info('Tema restaurado para o padrao');
   };
 
   const handleSave = () => {

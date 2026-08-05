@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase/client';
 import { clientConfig } from '@/config/client';
+import { applyTheme } from '@/lib/utils/applyTheme';
 
 export interface SiteContentData {
   hero_title: string;
@@ -66,22 +67,10 @@ const defaultContent: SiteContentData = {
   instagram_image_position: 'center',
 };
 
-const LOCAL_KEY = `${clientConfig.id}_content_v4`;
-
-function loadLocal(): SiteContentData {
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return defaultContent;
-    return { ...defaultContent, ...JSON.parse(raw) };
-  } catch { return defaultContent; }
-}
-function saveLocal(d: SiteContentData) {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(d)); } catch {}
-}
-
 const isSupabaseConfigured = () => {
   const url = import.meta.env.VITE_SUPABASE_URL as string;
-  return !!url && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!url && !!key && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
 };
 
 interface ContentStore {
@@ -95,7 +84,7 @@ interface ContentStore {
 }
 
 export const useContentStore = create<ContentStore>((set, get) => ({
-  content: loadLocal(),
+  content: defaultContent,
   isLoading: false,
   isSaving: false,
   error: null,
@@ -103,16 +92,20 @@ export const useContentStore = create<ContentStore>((set, get) => ({
   fetchContent: async () => {
     set({ isLoading: true, error: null });
     if (!isSupabaseConfigured()) {
-      set({ content: loadLocal(), isLoading: false });
+      set({ content: defaultContent, isLoading: false, error: 'Supabase nao configurado para este cliente.' });
       return;
     }
     const { data, error } = await supabase
       .from('site_content').select('*')
       .eq('client_id', clientConfig.id).maybeSingle();
 
-    if (error) { set({ content: loadLocal(), isLoading: false, error: error.message }); return; }
+    if (error) { set({ content: defaultContent, isLoading: false, error: error.message }); return; }
     if (data) {
       const d = data as any;
+      const runtimeTheme = d.theme_config;
+      if (runtimeTheme?.primary && runtimeTheme?.background) {
+        applyTheme(runtimeTheme.primary, runtimeTheme.background);
+      }
       const content: SiteContentData = {
         hero_title:         d.hero_title         ?? defaultContent.hero_title,
         hero_subtitle:      d.hero_subtitle       ?? defaultContent.hero_subtitle,
@@ -143,10 +136,9 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         instagram_photo:    d.instagram_photo      ?? defaultContent.instagram_photo,
         instagram_image_position: d.instagram_image_position ?? defaultContent.instagram_image_position,
       };
-      saveLocal(content);
       set({ content, isLoading: false });
     } else {
-      set({ content: loadLocal(), isLoading: false });
+      set({ content: defaultContent, isLoading: false });
     }
   },
 
@@ -154,19 +146,17 @@ export const useContentStore = create<ContentStore>((set, get) => ({
     set({ isSaving: true, error: null });
     const merged = { ...get().content, ...data };
     if (!isSupabaseConfigured()) {
-      saveLocal(merged);
-      set({ content: merged, isSaving: false });
-      return { error: null };
+      set({ isSaving: false, error: 'Supabase nao configurado para este cliente.' });
+      return { error: 'Supabase nao configurado para este cliente.' };
     }
     const { error } = await supabase.from('site_content').upsert(
       { client_id: clientConfig.id, ...merged, updated_at: new Date().toISOString() },
       { onConflict: 'client_id' }
     );
     if (error) { set({ isSaving: false, error: error.message }); return { error: error.message }; }
-    saveLocal(merged);
     set({ content: merged, isSaving: false });
     return { error: null };
   },
 
-  resetToDefaults: () => { saveLocal(defaultContent); set({ content: defaultContent }); },
+  resetToDefaults: () => { set({ content: defaultContent }); },
 }));

@@ -54,13 +54,15 @@ const emptyForm = (): ProductFormState => ({
 
 /** Gerencia as opções de "condição" (novo, seminovo, usado, recondicionado...) — editável aqui, sem mexer em código. */
 function ConditionOptionsManager() {
-  const { conditionOptions, addCondition, removeCondition } = useTaxonomyStore();
+  const { conditionOptions, fetchTaxonomy, addCondition, removeCondition } = useTaxonomyStore();
   const [open, setOpen] = useState(false);
   const [newLabel, setNewLabel] = useState('');
 
-  const handleAdd = () => {
+  useEffect(() => { fetchTaxonomy(); }, [fetchTaxonomy]);
+
+  const handleAdd = async () => {
     if (!newLabel.trim()) return;
-    addCondition(newLabel);
+    await addCondition(newLabel);
     setNewLabel('');
   };
 
@@ -174,17 +176,14 @@ function ProductImageUpload({
     if (!file.type.startsWith('image/')) { toast.error('Apenas imagens'); return; }
     setUploading(true);
     try {
-      // Converte direto pra base64 — funciona sempre, sem depender de servidor
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+      const compressed = await compressImage(file, 1600, 0.9);
+      const url = value ? await replaceImage('products', compressed, value, 'catalog') : await uploadImage('products', compressed, 'catalog');
+      onChange(url);
+      toast.success('Imagem enviada');
+    } catch (error) {
+      toast.error('Upload nao configurado', {
+        description: error instanceof Error ? error.message : 'Configure o Supabase Storage deste cliente para salvar produtos.',
       });
-      onChange(base64);
-      toast.success('Imagem adicionada');
-    } catch {
-      toast.error('Erro ao processar imagem');
     } finally { setUploading(false); }
   };
 
@@ -323,7 +322,7 @@ function useDragSort(items: Product[], onReorder: (ids: string[]) => void) {
 
 export default function AdminProducts() {
   const { products, fetchProducts, createProduct, updateProduct, deleteProduct, toggleStatus, searchProducts, reorderProducts } = useProductStore();
-  const { conditionOptions } = useTaxonomyStore();
+  const { conditionOptions, fetchTaxonomy } = useTaxonomyStore();
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -336,6 +335,7 @@ export default function AdminProducts() {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  useEffect(() => { fetchTaxonomy(); }, [fetchTaxonomy]);
   useEffect(() => { setLocalOrder(products); }, [products]);
 
   const handleReorder = useCallback(async (orderedIds: string[]) => {

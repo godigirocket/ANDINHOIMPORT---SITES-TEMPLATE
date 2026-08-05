@@ -22,41 +22,28 @@ type LeadInput = Omit<Lead, 'id' | 'created_at' | 'updated_at'>;
 interface LeadStore {
   leads: Lead[];
   isLoading: boolean;
+  error: string | null;
   fetchLeads: () => Promise<void>;
-  createLead: (data: LeadInput) => Promise<void>;
-  updateLead: (id: string, data: Partial<LeadInput>) => Promise<void>;
-  deleteLead: (id: string) => Promise<void>;
+  createLead: (data: LeadInput) => Promise<{ error: string | null }>;
+  updateLead: (id: string, data: Partial<LeadInput>) => Promise<{ error: string | null }>;
+  deleteLead: (id: string) => Promise<{ error: string | null }>;
 }
-
-const LOCAL_KEY = `${clientConfig.id}_leads_v1`;
 
 const isSupabaseConfigured = () => {
   const url = import.meta.env.VITE_SUPABASE_URL as string;
-  return !!url && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!url && !!key && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
 };
 
-function loadLocal(): Lead[] {
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveLocal(leads: Lead[]) {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(leads)); } catch {}
-}
-
 export const useLeadStore = create<LeadStore>((set, get) => ({
-  leads: loadLocal(),
+  leads: [],
   isLoading: false,
+  error: null,
 
   fetchLeads: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     if (!isSupabaseConfigured()) {
-      set({ leads: loadLocal(), isLoading: false });
+      set({ leads: [], isLoading: false, error: 'Supabase nao configurado para este cliente.' });
       return;
     }
     const { data, error } = await supabase
@@ -65,46 +52,45 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       .eq('client_id', clientConfig.id)
       .order('created_at', { ascending: false });
     if (error || !data) {
-      set({ leads: loadLocal(), isLoading: false });
+      set({ leads: [], isLoading: false, error: error?.message ?? 'Erro ao carregar leads.' });
       return;
     }
     const leads = data as Lead[];
-    saveLocal(leads);
     set({ leads, isLoading: false });
   },
 
   createLead: async (data) => {
+    if (!isSupabaseConfigured()) return { error: 'Supabase nao configurado para este cliente.' };
     const lead: Lead = {
       id: generateUUID(),
       ...data,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    const leads = [lead, ...get().leads];
-    saveLocal(leads);
-    set({ leads });
-    if (isSupabaseConfigured()) {
-      await supabase.from('leads').insert({ client_id: clientConfig.id, ...lead });
-    }
+    const { error } = await supabase.from('leads').insert({ client_id: clientConfig.id, ...lead });
+    if (error) return { error: error.message };
+    set({ leads: [lead, ...get().leads] });
+    return { error: null };
   },
 
   updateLead: async (id, data) => {
+    if (!isSupabaseConfigured()) return { error: 'Supabase nao configurado para este cliente.' };
+    const updated_at = new Date().toISOString();
+    const { error } = await supabase.from('leads').update({ ...data, updated_at }).eq('id', id).eq('client_id', clientConfig.id);
+    if (error) return { error: error.message };
     const leads = get().leads.map(lead =>
-      lead.id === id ? { ...lead, ...data, updated_at: new Date().toISOString() } : lead
+      lead.id === id ? { ...lead, ...data, updated_at } : lead
     );
-    saveLocal(leads);
     set({ leads });
-    if (isSupabaseConfigured()) {
-      await supabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).eq('client_id', clientConfig.id);
-    }
+    return { error: null };
   },
 
   deleteLead: async (id) => {
+    if (!isSupabaseConfigured()) return { error: 'Supabase nao configurado para este cliente.' };
+    const { error } = await supabase.from('leads').delete().eq('id', id).eq('client_id', clientConfig.id);
+    if (error) return { error: error.message };
     const leads = get().leads.filter(lead => lead.id !== id);
-    saveLocal(leads);
     set({ leads });
-    if (isSupabaseConfigured()) {
-      await supabase.from('leads').delete().eq('id', id).eq('client_id', clientConfig.id);
-    }
+    return { error: null };
   },
 }));

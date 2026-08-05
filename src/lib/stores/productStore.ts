@@ -94,8 +94,6 @@ interface ProductStore {
   searchProducts: (query: string) => Product[];
 }
 
-const LOCAL_KEY = `${clientConfig.id}_products_v3`;
-
 const mk = (overrides: Partial<Product> & { title: string; price: number }): Product => ({
   id: generateUUID(), description: null, old_price: null, image_url: null,
   affiliate_link: null, category: null, featured: false, status: 'active',
@@ -163,21 +161,10 @@ const initialProducts: Product[] = [
   }),
 ];
 
-function loadCache(): Product[] {
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return [];
-    const p = JSON.parse(raw);
-    return Array.isArray(p) ? p : [];
-  } catch { return []; }
-}
-function saveCache(p: Product[]) {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(p)); } catch {}
-}
-
 const isSupabaseConfigured = () => {
   const url = import.meta.env.VITE_SUPABASE_URL as string;
-  return !!url && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!url && !!key && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
 };
 
 export const useProductStore = create<ProductStore>((set, get) => ({
@@ -191,8 +178,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     if (!isSupabaseConfigured()) {
-      console.warn('[Products] ⚠️ Supabase NÃO configurado. Usando dados locais (não persistentes entre dispositivos).');
-      set({ products: initialProducts, isLoading: false, hasSupabase: false });
+      set({ products: initialProducts, isLoading: false, hasSupabase: false, error: 'Supabase nao configurado para este cliente.' });
       return;
     }
 
@@ -205,10 +191,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     if (error) {
       console.error('[Products] ❌ Erro ao buscar do Supabase:', error.message);
       console.error('[Products] Possíveis causas: projeto pausado, RLS bloqueando, env vars incorretas.');
-      // Mantém cache se tiver, mas mostra o erro
-      const cached = loadCache();
       set({ 
-        products: cached.length > 0 ? cached : initialProducts, 
+        products: initialProducts, 
         isLoading: false, 
         error: `Falha ao conectar com banco de dados: ${error.message}`,
         hasSupabase: true 
@@ -218,7 +202,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     const products = (data ?? []) as Product[];
 
-    saveCache(products);
     set({ products, isLoading: false, hasSupabase: true, error: null });
   },
 
@@ -242,6 +225,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       condition: data.condition ?? null, storage_gb: data.storage_gb ?? null,
       battery_health_pct: data.battery_health_pct ?? null, color: data.color ?? null,
       warranty_days: data.warranty_days ?? null, accessories_included: data.accessories_included ?? null,
+      image_position: data.image_position ?? null,
     }).select();
 
     if (error) {
@@ -251,7 +235,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     if (!rows?.length) return { error: 'Produto não criado — resposta vazia do banco.' };
 
     const updated = [...get().products, rows[0] as Product];
-    saveCache(updated);
     set({ products: updated });
     return { error: null };
   },
@@ -262,7 +245,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     // Filtrar apenas colunas que existem na tabela
-    const allowedKeys = ['title', 'description', 'price', 'old_price', 'image_url', 'affiliate_link', 'category', 'featured', 'status', 'badge', 'installments', 'sort_order', 'condition', 'storage_gb', 'battery_health_pct', 'color', 'warranty_days', 'accessories_included'];
+    const allowedKeys = ['title', 'description', 'price', 'old_price', 'image_url', 'image_position', 'affiliate_link', 'category', 'featured', 'status', 'badge', 'installments', 'sort_order', 'condition', 'storage_gb', 'battery_health_pct', 'color', 'warranty_days', 'accessories_included'];
     const filtered: Record<string, unknown> = { updated_at: new Date().toISOString() };
     for (const key of allowedKeys) {
       if (key in data) filtered[key] = (data as Record<string, unknown>)[key];
@@ -282,7 +265,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     const row = rows[0] as Product;
     const updated = get().products.map(p => p.id === id ? row : p);
-    saveCache(updated);
     set({ products: updated });
     return { error: null };
   },
@@ -299,7 +281,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     const updated = get().products.filter(p => p.id !== id);
-    saveCache(updated);
     set({ products: updated });
     return { error: null };
   },
@@ -319,10 +300,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       })
       .filter(Boolean) as Product[];
 
-    saveCache(reordered);
-    set({ products: reordered });
-
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      set({ error: 'Supabase nao configurado para este cliente.' });
+      return;
+    }
 
     const results = await Promise.all(
       reordered.map(p =>
@@ -331,8 +312,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     );
     const failed = results.filter(r => r.error);
     if (failed.length > 0) {
-      console.error('[Products] ❌ Erro ao reordenar:', failed[0].error?.message);
+      const message = failed[0].error?.message ?? 'Erro ao reordenar produtos.';
+      console.error('[Products] Erro ao reordenar:', message);
+      set({ error: message });
+      return;
     }
+    set({ products: reordered, error: null });
   },
 
   getActiveProducts: () => {

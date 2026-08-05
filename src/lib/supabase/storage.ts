@@ -2,6 +2,12 @@ import { supabase } from './client';
 
 export type StorageBucket = 'products' | 'banners' | 'testimonials';
 
+const isStorageConfigured = () => {
+  const url = import.meta.env.VITE_SUPABASE_URL as string;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return !!url && !!key && url !== 'https://placeholder.supabase.co' && url.includes('supabase.co');
+};
+
 /**
  * Faz upload de um arquivo para o Supabase Storage.
  * Retorna a URL pública do arquivo.
@@ -11,6 +17,10 @@ export async function uploadImage(
   file: File,
   folder = ''
 ): Promise<string> {
+  if (!isStorageConfigured()) {
+    throw new Error('Supabase Storage nao configurado para este cliente.');
+  }
+
   const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
   const safeName = `${folder ? folder + '/' : ''}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
