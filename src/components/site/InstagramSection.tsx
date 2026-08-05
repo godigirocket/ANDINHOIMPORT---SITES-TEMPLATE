@@ -113,6 +113,7 @@ export function InstagramSection() {
                 transition={{ duration: 0.6 }}
                 onError={() => setBrokenCount(n => Math.min(n + 1, photoCandidates.length - 1))}
                 className="absolute inset-0 w-full h-full object-cover animate-kenburns"
+                style={{ objectPosition: content.instagram_image_position || 'center' }}
               />
             </AnimatePresence>
           </div>

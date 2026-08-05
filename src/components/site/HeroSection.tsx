@@ -17,6 +17,7 @@ export function HeroSection() {
   const msg = clientConfig.company.contact.whatsappMessage;
   const title = content.hero_title || clientConfig.company.name;
   const subtitle = content.hero_subtitle || clientConfig.initialContent.hero.subheadline;
+  const badge = content.hero_badge || 'Qualidade e Confiança';
 
   useEffect(() => {
     if (heroImages.length < 2) return;
@@ -34,18 +35,34 @@ export function HeroSection() {
 
   return (
     <section id="hero" className="section-blur-end relative min-h-screen overflow-hidden bg-[#090a0f]">
-      <AnimatePresence mode="sync">
-        <motion.img
+      <AnimatePresence mode="wait">
+        <motion.div
           key={currentHeroImage || 'hero-bg'}
-          src={currentHeroImage}
-          alt=""
-          aria-hidden="true"
-          initial={{ scale: 0.99, opacity: 0 }}
-          animate={{ scale: 0.95, opacity: 0.56 }}
-          exit={{ scale: 0.97, opacity: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0 h-full w-full object-cover object-[72%_50%]"
-        />
+          className="absolute left-1/2 top-0 h-full w-screen -translate-x-1/2 overflow-hidden"
+        >
+          <img
+            src={currentHeroImage}
+            alt=""
+            aria-hidden="true"
+            className="hero-bg-soft absolute inset-0 h-full w-full object-cover opacity-55"
+            style={{ objectPosition: content.hero_image_position || '64% 50%' }}
+          />
+          <motion.img
+            src={currentHeroImage}
+            alt=""
+            aria-hidden="true"
+            initial={{ scale: 0.985, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.76 }}
+            exit={{ scale: 0.99, opacity: 0 }}
+            transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
+            className="hero-bg-main absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: content.hero_image_position || '64% 50%' }}
+          />
+        </motion.div>
       </AnimatePresence>
       <div
         className="absolute inset-0"
@@ -64,14 +81,14 @@ export function HeroSection() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-2xl"
           >
-            <p className="mb-6 text-[11px] font-black uppercase tracking-[0.32em] text-primary sm:text-xs">
-              {content.hero_badge || 'Novos modelos disponiveis'}
+            <p className="hero-kicker-motion mb-6 text-[11px] font-black uppercase tracking-[0.32em] text-primary sm:text-xs">
+              {badge}
             </p>
             <h1 className="font-display text-[clamp(4rem,11vw,8.8rem)] font-black uppercase leading-[0.78] tracking-tight">
-              <span className="block text-[#f2eee2] drop-shadow-[0_10px_30px_rgba(0,0,0,0.38)]">{title}</span>
-              <span className="block text-primary drop-shadow-[0_14px_34px_rgba(250,183,15,0.2)]">Import</span>
+              <span className="hero-title-motion hero-type-andinho block text-[#f2eee2] drop-shadow-[0_10px_30px_rgba(0,0,0,0.38)]">{title}</span>
+              <span className="hero-title-motion hero-title-motion-gold hero-type-import block text-primary drop-shadow-[0_14px_34px_rgba(250,183,15,0.2)]">Import</span>
             </h1>
-            <p className="mt-8 max-w-xl border-l-2 border-primary pl-5 text-base font-medium leading-relaxed text-white/78 sm:text-xl">
+            <p className="hero-copy-motion mt-8 max-w-xl border-l-2 border-primary pl-5 text-base font-medium leading-relaxed text-white/78 sm:text-xl">
               {subtitle}
             </p>
 

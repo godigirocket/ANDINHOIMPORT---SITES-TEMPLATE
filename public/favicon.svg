@@ -1,17 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="gold" x1="14" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ffd45a"/>
-      <stop offset="0.52" stop-color="#f5b700"/>
-      <stop offset="1" stop-color="#b87900"/>
+    <linearGradient id="gold" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff1a6"/>
+      <stop offset="0.48" stop-color="#fab70f"/>
+      <stop offset="1" stop-color="#a86f00"/>
     </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="42%" r="58%">
-      <stop stop-color="#2b2b32"/>
-      <stop offset="1" stop-color="#070709"/>
+    <linearGradient id="cyan" x1="18" y1="12" x2="48" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#74e7ff"/>
+      <stop offset="1" stop-color="#0b6b7a"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="48%" cy="36%" r="68%">
+      <stop stop-color="#30333a"/>
+      <stop offset="0.62" stop-color="#101116"/>
+      <stop offset="1" stop-color="#050507"/>
     </radialGradient>
   </defs>
-  <rect width="64" height="64" rx="18" fill="url(#glow)"/>
-  <rect x="4.5" y="4.5" width="55" height="55" rx="15" fill="none" stroke="url(#gold)" stroke-width="3"/>
-  <path d="M18 44 29.4 17.5c.9-2 4.3-2 5.2 0L46 44h-8.2l-2-5.2h-13L20.8 44H18Zm7.2-11.8h8.4L29.4 21.5 25.2 32.2Z" fill="url(#gold)"/>
-  <rect x="40" y="13" width="8" height="19" rx="2.5" fill="#f7f7f4" opacity=".92" transform="rotate(13 44 22.5)"/>
+  <rect width="64" height="64" rx="18" fill="url(#bg)"/>
+  <rect x="5" y="5" width="54" height="54" rx="16" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <path d="M18 43.5 29.1 18.3c1-2.2 4.7-2.2 5.7 0L46 43.5h-8.2l-1.8-4.7H28l2.2-5.9h3.5L32 28.1l-6.1 15.4H18Z" fill="url(#gold)"/>
+  <path d="M43 17.5h1.8c2.8 0 5 2.2 5 5v20.2c0 2.8-2.2 5-5 5H43c-2.8 0-5-2.2-5-5V22.5c0-2.8 2.2-5 5-5Z" fill="url(#cyan)" opacity=".92" transform="rotate(12 43.9 32.6)"/>
+  <circle cx="44" cy="22" r="1.2" fill="#eefcff" opacity=".9"/>
 </svg>

@@ -17,6 +17,7 @@ import {
   CreditCard,
   ShoppingBag,
   Search,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { clientConfig } from '@/config/client';
@@ -30,6 +31,7 @@ const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
   { label: 'Produtos', icon: Package, path: '/admin/products' },
   { label: 'Pedidos', icon: ShoppingBag, path: '/admin/orders' },
+  { label: 'CRM Leads', icon: Users, path: '/admin/leads' },
   { label: 'Conteúdo', icon: FileText, path: '/admin/content' },
   { label: 'Depoimentos', icon: MessageSquare, path: '/admin/testimonials' },
   { label: 'Chatbot', icon: MessageCircle, path: '/admin/chatbot' },

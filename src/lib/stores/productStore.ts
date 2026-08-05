@@ -23,6 +23,7 @@ export const productSchema = z.object({
   old_price:      z.number().positive().optional().nullable(),
   installments:   z.number().min(1).max(clientConfig.features.maxInstallments),
   image_url:      lenientUrl.optional().or(z.literal('')).nullable(),
+  image_position: z.string().optional().nullable(),
   affiliate_link: lenientUrl.optional().or(z.literal('')).nullable(),
   status:         z.enum(['active', 'inactive']),
   category:       z.string().optional(),
@@ -45,6 +46,7 @@ export interface Product {
   price:          number;
   old_price:      number | null;
   image_url:      string | null;
+  image_position?: string | null;
   affiliate_link: string | null;
   category:       string | null;
   featured:       boolean;

@@ -96,12 +96,16 @@ export default function AdminContent() {
                   label="Imagem 1 (principal)" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.hero_bg_1}
                   onChange={url => setForm(prev => ({ ...prev, hero_bg_1: url }))}
+                  objectPosition={form.hero_image_position}
+                  onObjectPositionChange={position => setForm(prev => ({ ...prev, hero_image_position: position }))}
                 />
 
                 <ImageUploadField
                   label="Imagem 2 (slideshow)" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.hero_bg_2}
                   onChange={url => setForm(prev => ({ ...prev, hero_bg_2: url }))}
+                  objectPosition={form.hero_image_position}
+                  onObjectPositionChange={position => setForm(prev => ({ ...prev, hero_image_position: position }))}
                 />
 
                 <ImageUploadField
@@ -114,6 +118,8 @@ export default function AdminContent() {
                   label="Foto do Instagram (seção 'Siga no Instagram')" bucket="banners" subfolder="hero" aspect="wide"
                   value={form.instagram_photo}
                   onChange={url => setForm(prev => ({ ...prev, instagram_photo: url }))}
+                  objectPosition={form.instagram_image_position}
+                  onObjectPositionChange={position => setForm(prev => ({ ...prev, instagram_image_position: position }))}
                 />
 
                 <div className="p-4 rounded-xl space-y-2"

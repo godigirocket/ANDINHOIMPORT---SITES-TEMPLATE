@@ -28,13 +28,15 @@ export interface SiteContentData {
   google_search_console_token: string;
   hero_bg_1: string;
   hero_bg_2: string;
+  hero_image_position: string;
   instagram_photo: string;
+  instagram_image_position: string;
 }
 
 const defaultContent: SiteContentData = {
   hero_title:         clientConfig.company.name,
-  hero_subtitle:      clientConfig.initialContent.hero.subheadline,
-  hero_badge:         clientConfig.initialContent.hero.badge,
+  hero_subtitle:      'Cada aparelho é revisado e testado antes de chegar até você. Procedência verificada, garantia real e parcelamento em até 18x — sem letra miúda.',
+  hero_badge:         'Qualidade e Confiança',
   cta_primary_text:   clientConfig.initialContent.hero.ctaPrimary,
   cta_secondary_text: clientConfig.initialContent.hero.ctaSecondary,
   whatsapp_link:      `https://wa.me/${clientConfig.company.contact.whatsappNumber}`,
@@ -58,8 +60,10 @@ const defaultContent: SiteContentData = {
   // Imagens padrão de alta qualidade (Unsplash — sem bloqueio)
   hero_bg_1: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=1920&q=95&auto=format&fit=crop',
   hero_bg_2: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1920&q=95&auto=format&fit=crop',
+  hero_image_position: '64% 50%',
   // Vazio por padrão — a seção Instagram usa a foto de um produto real como fallback
   instagram_photo: '',
+  instagram_image_position: 'center',
 };
 
 const LOCAL_KEY = `${clientConfig.id}_content_v4`;
@@ -135,7 +139,9 @@ export const useContentStore = create<ContentStore>((set, get) => ({
         google_search_console_token: d.google_search_console_token ?? '',
         hero_bg_1:          d.hero_bg_1            ?? defaultContent.hero_bg_1,
         hero_bg_2:          d.hero_bg_2            ?? defaultContent.hero_bg_2,
+        hero_image_position:d.hero_image_position  ?? defaultContent.hero_image_position,
         instagram_photo:    d.instagram_photo      ?? defaultContent.instagram_photo,
+        instagram_image_position: d.instagram_image_position ?? defaultContent.instagram_image_position,
       };
       saveLocal(content);
       set({ content, isLoading: false });

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, DollarSign, ExternalLink, Package, PackageCheck, Plus } from 'lucide-react';
+import { AlertCircle, ArrowRight, DollarSign, ExternalLink, Package, PackageCheck, Plus, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { clientConfig } from '@/config/client';
@@ -18,6 +18,7 @@ export default function AdminDashboard() {
 
   const actions = [
     { label: 'Novo produto', desc: 'Cadastrar item no catalogo', icon: Plus, action: () => navigate('/admin/products'), primary: true },
+    { label: 'CRM de leads', desc: 'Organizar contatos e vendas', icon: Users, action: () => navigate('/admin/leads') },
     { label: 'Conteudo do site', desc: 'Editar textos, banners e links', icon: ExternalLink, action: () => navigate('/admin/content') },
     { label: 'Abrir loja', desc: 'Ver a pagina publica', icon: ExternalLink, action: () => window.open('/', '_blank', 'noopener,noreferrer') },
   ];

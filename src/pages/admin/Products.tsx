@@ -48,7 +48,7 @@ type ProductFormState = ProductFormData & NicheFormFields;
 
 const emptyForm = (): ProductFormState => ({
   title:'', description:'', price:0, old_price:null,
-  installments:12, image_url:null, affiliate_link:null,
+  installments:12, image_url:null, image_position:'center', affiliate_link:null,
   status:'active', category:'', badge:'', featured:false,
 });
 
@@ -97,7 +97,7 @@ function ConditionOptionsManager() {
   );
 }
 
-function ImagePreview({ src }: { src: string }) {
+function ImagePreview({ src, position = 'center' }: { src: string; position?: string }) {
   const [error, setError] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const prevSrc = useRef(src);
@@ -148,6 +148,7 @@ function ImagePreview({ src }: { src: string }) {
         src={src}
         alt="Preview"
         className={`w-full h-full object-cover transition-opacity ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        style={{ objectPosition: position }}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
       />
@@ -155,7 +156,17 @@ function ImagePreview({ src }: { src: string }) {
   );
 }
 
-function ProductImageUpload({ value, onChange }: { value: string | null; onChange: (url: string | null) => void }) {
+function ProductImageUpload({
+  value,
+  position = 'center',
+  onChange,
+  onPositionChange,
+}: {
+  value: string | null;
+  position?: string;
+  onChange: (url: string | null) => void;
+  onPositionChange: (position: string) => void;
+}) {
   const [uploading, setUploading] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
@@ -190,7 +201,7 @@ function ProductImageUpload({ value, onChange }: { value: string | null; onChang
       {value ? (
         <div className="relative w-full aspect-video rounded-xl overflow-hidden group"
           style={{ border: '1px solid hsla(43,96%,52%,0.25)' }}>
-          <ImagePreview src={value} />
+          <ImagePreview src={value} position={position} />
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <button type="button"
               onClick={() => ref.current?.click()}
@@ -226,6 +237,25 @@ function ProductImageUpload({ value, onChange }: { value: string | null; onChang
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f, value); e.target.value = ''; }} />
       <Input placeholder="Ou cole uma URL de imagem..." value={value ?? ''}
         onChange={e => onChange(e.target.value || null)} className="text-xs" />
+      {value && (
+        <div className="grid grid-cols-5 gap-1.5">
+          {['center', 'top', 'bottom', 'left', 'right'].map(pos => (
+            <button
+              key={pos}
+              type="button"
+              onClick={() => onPositionChange(pos)}
+              className="rounded-lg px-2 py-1.5 text-[10px] font-bold transition-colors"
+              style={{
+                background: position === pos ? 'hsl(43,96%,52%)' : 'hsla(255,255%,255%,0.06)',
+                color: position === pos ? '#08080a' : 'rgba(255,255,255,0.62)',
+                border: `1px solid ${position === pos ? 'rgba(250,183,15,0.8)' : 'rgba(255,255,255,0.08)'}`,
+              }}
+            >
+              {pos === 'center' ? 'Centro' : pos === 'top' ? 'Topo' : pos === 'bottom' ? 'Base' : pos === 'left' ? 'Esq.' : 'Dir.'}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -329,6 +359,7 @@ export default function AdminProducts() {
         old_price: product.old_price ?? null, 
         installments: product.installments, 
         image_url: product.image_url ?? null, 
+        image_position: product.image_position ?? 'center',
         affiliate_link: product.affiliate_link ?? null, 
         status: product.status, 
         category: product.category ?? '', 
@@ -466,8 +497,27 @@ export default function AdminProducts() {
             <DialogDescription>{selected ? 'Atualize as informações' : 'Preencha os dados do produto'}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-            <ProductImageUpload value={form.image_url ?? null} onChange={url => setForm(p => ({ ...p, image_url: url }))} />
+            <ProductImageUpload
+              value={form.image_url ?? null}
+              position={form.image_position ?? 'center'}
+              onChange={url => setForm(p => ({ ...p, image_url: url }))}
+              onPositionChange={position => setForm(p => ({ ...p, image_position: position }))}
+            />
             {formErrors.image_url && <p className="text-xs text-destructive mt-1">{formErrors.image_url}</p>}
+            {form.image_url && (
+              <div className="rounded-xl p-3" style={{ background: 'hsla(255,255%,255%,0.035)', border: '1px solid hsla(255,255%,255%,0.08)' }}>
+                <p className="mb-2 text-[11px] font-bold text-white/55">Preview na grade</p>
+                <div className="max-w-[180px] overflow-hidden rounded-xl" style={{ background: '#09090b', border: '1px solid rgba(250,183,15,0.22)' }}>
+                  <div className="aspect-[4/3.45] overflow-hidden bg-black">
+                    <img src={form.image_url} alt="Preview na grade" className="h-full w-full scale-[1.12] object-cover" style={{ objectPosition: form.image_position ?? 'center' }} />
+                  </div>
+                  <div className="p-3">
+                    <p className="truncate text-xs font-black text-white">{form.title || 'Nome do produto'}</p>
+                    <p className="mt-1 text-sm font-black text-primary">{form.price ? fmt(form.price) : 'R$ 0,00'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label className="text-xs">Nome *</Label>
               <Input placeholder="iPhone 15 Pro Max 256GB" {...f('title')} />
@@ -677,7 +727,7 @@ export default function AdminProducts() {
   );
 }
 
-function AdminProductImage({ src, alt }: { src: string; alt: string }) {
+function AdminProductImage({ src, alt, position = 'center' }: { src: string; alt: string; position?: string }) {
   const [error, setError] = useState(false);
   if (error) {
     return (
@@ -690,6 +740,7 @@ function AdminProductImage({ src, alt }: { src: string; alt: string }) {
   return (
     <img src={src} alt={alt}
       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      style={{ objectPosition: position }}
       referrerPolicy="no-referrer"
       onError={() => setError(true)}
     />
@@ -716,7 +767,7 @@ function ProductCard({ product, fmt, showDrag, onEdit, onDelete, onToggle }: {
       <div className="relative aspect-square overflow-hidden"
         style={{ background: 'linear-gradient(135deg,hsla(220,20%,11%,1),hsla(220,20%,8%,1))' }}>
         {product.image_url ? (
-          <AdminProductImage src={product.image_url} alt={product.title} />
+          <AdminProductImage src={product.image_url} alt={product.title} position={product.image_position ?? 'center'} />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
             <ImageIcon className="w-10 h-10" style={{ color: 'hsla(43,96%,52%,0.2)' }} />

@@ -28,6 +28,7 @@ const AdminAnalytics    = lazy(() => import('./pages/admin/Analytics'));
 const AdminThemeEditor  = lazy(() => import('./pages/admin/ThemeEditor'));
 const AdminPayments     = lazy(() => import('./pages/admin/Payments'));
 const AdminOrders       = lazy(() => import('./pages/admin/Orders'));
+const AdminLeads        = lazy(() => import('./pages/admin/Leads'));
 const AdminSEO          = lazy(() => import('./pages/admin/SEO'));
 const AdminSettings     = lazy(() => import('./pages/admin/Settings'));
 
@@ -110,6 +111,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route path="/admin/leads" element={<AdminLeads />} />
             <Route path="/admin/content" element={<AdminContent />} />
             <Route path="/admin/banners" element={<Navigate to="/admin/content" replace />} />
             <Route path="/admin/testimonials" element={<AdminTestimonials />} />

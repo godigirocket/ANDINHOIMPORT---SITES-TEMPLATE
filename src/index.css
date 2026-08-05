@@ -137,6 +137,77 @@ main > section {
     animation: siteTextShimmer 5.8s ease-in-out infinite;
   }
 
+  .hero-bg-soft {
+    transform: scale(1.04);
+    filter: blur(14px) saturate(1.04);
+    will-change: opacity;
+  }
+
+  .hero-bg-main {
+    filter: saturate(1.05) contrast(1.02);
+    will-change: transform, opacity;
+  }
+
+  .hero-kicker-motion {
+    display: inline-block;
+    background: linear-gradient(90deg, #fab70f 0%, #fff1ae 30%, #58d8ff 52%, #ffffff 68%, #fab70f 100%);
+    background-size: 320% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: heroKickerShine 4.8s ease-in-out infinite, heroTextDrift 6.4s ease-in-out infinite;
+    filter: drop-shadow(0 0 14px rgba(250,183,15,0.25));
+  }
+
+  .hero-title-motion {
+    position: relative;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
+    background: linear-gradient(100deg, #efe8d6 0%, #fff 34%, #f7c84f 48%, #fff 62%, #dfe9ef 100%);
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation:
+      heroTitleEnter 0.9s cubic-bezier(0.16,1,0.3,1) var(--title-delay, 0s) both,
+      heroTitleShine 5.8s ease-in-out calc(var(--title-delay, 0s) + 0.75s) infinite,
+      heroTextDrift 7.2s ease-in-out calc(var(--title-delay, 0s) + 0.75s) infinite,
+      heroTitleGlow 4.8s ease-in-out calc(var(--title-delay, 0s) + 0.75s) infinite;
+    transform-origin: left center;
+    will-change: transform, filter, background-position;
+  }
+
+  .hero-title-motion::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent 12%, rgba(255,255,255,0.72) 42%, rgba(250,183,15,0.5) 52%, transparent 72%);
+    mix-blend-mode: screen;
+    transform: translateX(-120%) skewX(-12deg);
+    animation: heroTitleSweep 1.05s cubic-bezier(0.22,1,0.36,1) calc(var(--title-delay, 0s) + 0.18s) both;
+  }
+
+  .hero-type-andinho {
+    --title-delay: 0.12s;
+  }
+
+  .hero-title-motion-gold {
+    background-image: linear-gradient(100deg, #fab70f 0%, #fff0a3 34%, #ffbf1a 55%, #c88400 100%);
+    filter: drop-shadow(0 0 22px rgba(250,183,15,0.32)) drop-shadow(0 18px 44px rgba(0,0,0,0.38));
+  }
+
+  .hero-type-import {
+    --title-delay: 0.32s;
+  }
+
+  .hero-copy-motion {
+    animation: heroCopyLift 6.6s ease-in-out infinite;
+    will-change: transform;
+  }
+
   .neon-product-card::before,
   .neon-category-card::before {
     content: '';
@@ -237,6 +308,48 @@ main > section {
   0%, 58%, 100% { background-position: 0% 50%; }
   72% { background-position: 100% 50%; }
 }
+@keyframes heroKickerShine {
+  0%, 48%, 100% { background-position: 0% 50%; }
+  64% { background-position: 100% 50%; }
+}
+@keyframes heroTitleEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(-28px, 18px, 0) scale(0.96);
+    filter: blur(10px) drop-shadow(0 0 0 rgba(250,183,15,0));
+  }
+  68% {
+    opacity: 1;
+    transform: translate3d(3px, -2px, 0) scale(1.012);
+    filter: blur(0) drop-shadow(0 18px 34px rgba(250,183,15,0.16));
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0) drop-shadow(0 12px 28px rgba(0,0,0,0.28));
+  }
+}
+@keyframes heroTitleSweep {
+  0% { opacity: 0; transform: translateX(-120%) skewX(-12deg); }
+  18%, 70% { opacity: 0.78; }
+  100% { opacity: 0; transform: translateX(120%) skewX(-12deg); }
+}
+@keyframes heroTextDrift {
+  0%, 100% { transform: translate3d(0,0,0); }
+  50% { transform: translate3d(0,-5px,0); }
+}
+@keyframes heroTitleShine {
+  0%, 50%, 100% { background-position: 0% 50%; }
+  66% { background-position: 100% 50%; }
+}
+@keyframes heroTitleGlow {
+  0%, 100% { filter: drop-shadow(0 12px 28px rgba(0,0,0,0.28)); }
+  50% { filter: drop-shadow(0 18px 38px rgba(250,183,15,0.16)); }
+}
+@keyframes heroCopyLift {
+  0%, 100% { transform: translate3d(0,0,0); opacity: 0.78; }
+  50% { transform: translate3d(0,-3px,0); opacity: 0.9; }
+}
 @keyframes cardLightSweep {
   from { transform: translateX(-80%); }
   to { transform: translateX(120%); }
@@ -247,7 +360,14 @@ main > section {
 .animate-heroGlow      { animation: heroGlow 6s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-kenburns, .animate-heroGlow, .site-shimmer-text { animation: none !important; }
+  .animate-kenburns,
+  .animate-heroGlow,
+  .site-shimmer-text,
+  .hero-kicker-motion,
+  .hero-title-motion,
+  .hero-copy-motion {
+    animation: none !important;
+  }
 }
 
 /* ── Hover underline — traço que desenha da esquerda pra direita ── */

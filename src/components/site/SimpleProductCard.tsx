@@ -23,22 +23,22 @@ export function SimpleProductCard({ product, index = 0, compareChecked, onCompar
       transition={{ duration: 0.45, delay: Math.min(index, 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
       className="neon-product-card group relative min-w-0 overflow-hidden rounded-xl transition-transform duration-300 hover:-translate-y-1"
       style={{
-        background: 'linear-gradient(152deg, rgba(18,18,23,0.97), rgba(8,8,10,0.99))',
-        border: '1px solid rgba(245,183,0,0.18)',
-        boxShadow: '0 18px 46px rgba(0,0,0,0.34), 0 0 32px rgba(245,183,0,0.1)',
+        background: 'linear-gradient(152deg, rgba(18,18,23,0.98), rgba(8,8,10,0.99))',
+        border: '1px solid rgba(245,183,0,0.2)',
+        boxShadow: '0 18px 36px rgba(0,0,0,0.2), 0 0 24px rgba(245,183,0,0.08)',
         transformStyle: 'preserve-3d',
       }}
     >
       <Link to={`/produtos/${slugify(product.title)}`} className="block min-w-0">
-        <div className="relative aspect-[4/3.35] overflow-hidden bg-[#08080a] sm:aspect-[4/4.35]">
+        <div className="relative aspect-[4/3.05] overflow-hidden bg-[#08080a] sm:aspect-[4/3.45]">
           <img
             src={safeImageUrl(product.image_url)}
             alt={product.title}
-            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.035]"
+            className="h-full w-full scale-[1.12] object-cover object-center transition-transform duration-500 group-hover:scale-[1.16]"
+            style={{ objectPosition: product.image_position || 'center' }}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/76" />
-          <div className="absolute inset-x-3 bottom-3 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/58" />
 
           {product.badge && (
             <span

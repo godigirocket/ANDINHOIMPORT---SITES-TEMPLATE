@@ -18,6 +18,7 @@ export interface Database {
           price: number;
           old_price: number | null;
           image_url: string | null;
+          image_position: string | null;
           affiliate_link: string | null;
           category: string | null;
           featured: boolean;
@@ -42,6 +43,7 @@ export interface Database {
           price: number;
           old_price?: number | null;
           image_url?: string | null;
+          image_position?: string | null;
           affiliate_link?: string | null;
           category?: string | null;
           featured?: boolean;
@@ -66,6 +68,7 @@ export interface Database {
           price?: number;
           old_price?: number | null;
           image_url?: string | null;
+          image_position?: string | null;
           affiliate_link?: string | null;
           category?: string | null;
           featured?: boolean;
@@ -82,6 +85,41 @@ export interface Database {
           updated_at?: string;
         };
       };
+      leads: {
+        Row: {
+          id: string;
+          client_id: string;
+          name: string;
+          phone: string | null;
+          source: string | null;
+          interest: string | null;
+          status: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          name: string;
+          phone?: string | null;
+          source?: string | null;
+          interest?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          phone?: string | null;
+          source?: string | null;
+          interest?: string | null;
+          status?: string;
+          notes?: string | null;
+          updated_at?: string;
+        };
+      };
       site_content: {
         Row: {
           id: string;
@@ -95,6 +133,7 @@ export interface Database {
           instagram_link: string | null;
           instagram_enabled: boolean;
           instagram_photo: string | null;
+          instagram_image_position: string | null;
           support_text: string | null;
           contact_phone: string | null;
           contact_email: string | null;
@@ -112,6 +151,7 @@ export interface Database {
           google_search_console_token: string | null;
           hero_bg_1: string | null;
           hero_bg_2: string | null;
+          hero_image_position: string | null;
           updated_at: string;
         };
         Insert: {
@@ -126,6 +166,7 @@ export interface Database {
           instagram_link?: string | null;
           instagram_enabled?: boolean;
           instagram_photo?: string | null;
+          instagram_image_position?: string | null;
           support_text?: string | null;
           contact_phone?: string | null;
           contact_email?: string | null;
@@ -143,6 +184,7 @@ export interface Database {
           google_search_console_token?: string | null;
           hero_bg_1?: string | null;
           hero_bg_2?: string | null;
+          hero_image_position?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -155,6 +197,7 @@ export interface Database {
           instagram_link?: string | null;
           instagram_enabled?: boolean;
           instagram_photo?: string | null;
+          instagram_image_position?: string | null;
           support_text?: string | null;
           contact_phone?: string | null;
           contact_email?: string | null;
@@ -172,6 +215,7 @@ export interface Database {
           google_search_console_token?: string | null;
           hero_bg_1?: string | null;
           hero_bg_2?: string | null;
+          hero_image_position?: string | null;
           updated_at?: string;
         };
       };

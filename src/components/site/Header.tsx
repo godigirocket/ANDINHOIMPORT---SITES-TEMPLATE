@@ -10,6 +10,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isCatalogPage = location.pathname !== '/';
 
   useEffect(() => {
     let ticking = false;
@@ -64,12 +65,17 @@ export function Header() {
         className="fixed left-0 right-0 top-0 z-50 pointer-events-none"
       >
         <motion.div
-          className="mx-auto mt-4 flex w-[calc(100%_-_24px)] max-w-[1220px] items-center justify-between rounded-full px-4 py-3 md:px-5"
-          animate={{ backgroundColor: 'rgba(7,7,9,0.86)', backdropFilter: 'blur(18px) saturate(1.25)' }}
+          className="mx-auto mt-4 flex w-[calc(100%_-_24px)] max-w-[1120px] items-center justify-between rounded-[28px] px-4 py-2.5 md:px-5"
+          animate={{
+            backgroundColor: isCatalogPage ? 'rgba(255,255,255,0.82)' : 'rgba(7,7,9,0.86)',
+            backdropFilter: 'blur(18px) saturate(1.25)',
+          }}
           transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: '0 18px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.1)',
+            border: isCatalogPage ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)',
+            boxShadow: isCatalogPage
+              ? '0 18px 42px rgba(0,0,0,0.09), inset 0 1px 0 rgba(255,255,255,0.72)'
+              : '0 18px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.1)',
           }}
         >
           <motion.a
@@ -82,19 +88,25 @@ export function Header() {
             className="pointer-events-auto flex items-center gap-3"
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           >
-            <BrandLogo size={46} glow />
+            <BrandLogo size={40} glow={!isCatalogPage} />
             <div className="overflow-hidden leading-none">
-              <p className="site-shimmer-text whitespace-nowrap text-[17px] font-black tracking-tight text-white">
+              <p
+                className={`${isCatalogPage ? '' : 'site-shimmer-text'} whitespace-nowrap text-[15px] font-black tracking-tight`}
+                style={{ color: isCatalogPage ? '#111' : undefined }}
+              >
                 {clientConfig.company.name} {clientConfig.company.nameHighlight}
               </p>
-              <p className="mt-1 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.34em] text-white/48">
+              <p
+                className="mt-1 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.34em]"
+                style={{ color: isCatalogPage ? 'rgba(0,0,0,0.42)' : 'rgba(255,255,255,0.48)' }}
+              >
                 {clientConfig.company.slogan}
               </p>
             </div>
           </motion.a>
 
           <motion.nav
-            className="pointer-events-auto hidden items-center gap-9 md:flex lg:gap-12"
+            className="pointer-events-auto hidden items-center gap-8 md:flex lg:gap-10"
             animate={{ opacity: 1, y: 0, pointerEvents: 'auto' }}
             transition={{ duration: 0.22 }}
           >
@@ -106,7 +118,8 @@ export function Header() {
                   e.preventDefault();
                   jumpToSection(link.hash);
                 }}
-                className="relative px-1 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-white/76 transition-all hover:text-primary"
+                className="relative rounded-full px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] transition-all hover:text-primary"
+                style={{ color: isCatalogPage ? 'rgba(0,0,0,0.68)' : 'rgba(255,255,255,0.76)' }}
               >
                 {link.label}
               </a>
@@ -118,7 +131,11 @@ export function Header() {
             className="pointer-events-auto rounded-full p-2 text-white md:hidden"
             animate={{ opacity: isHidden ? 0 : 1, scale: isHidden ? 0.9 : 1, pointerEvents: isHidden ? 'none' : 'auto' }}
             transition={{ duration: 0.2 }}
-            style={{ background: 'rgba(8,8,10,0.44)', border: '1px solid rgba(255,255,255,0.1)' }}
+            style={{
+              background: isCatalogPage ? 'rgba(0,0,0,0.06)' : 'rgba(8,8,10,0.44)',
+              border: isCatalogPage ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)',
+              color: isCatalogPage ? '#111' : '#fff',
+            }}
             aria-label="Abrir menu"
           >
             <Menu className="h-5 w-5" />

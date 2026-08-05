@@ -27,6 +27,7 @@ export function ScrollSequence({
   const drawnFrameRef = useRef(-1);
   const lastVideoTimeRef = useRef(-1);
   const [isPinned, setIsPinned] = useState(false);
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
 
   const hasFrames = !!frames?.length;
   const hasVideo = !!videoSrc;
@@ -65,7 +66,7 @@ export function ScrollSequence({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.75);
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       const nextWidth = Math.round(width * dpr);
@@ -77,6 +78,8 @@ export function ScrollSequence({
       }
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.clearRect(0, 0, width, height);
 
       const imageRatio = image.naturalWidth / image.naturalHeight;
@@ -101,10 +104,12 @@ export function ScrollSequence({
         firstImage.onload = () => {
           drawImage(firstImage);
           drawnFrameRef.current = 0;
+          setIsCanvasReady(true);
         };
         if (firstImage.complete && firstImage.naturalWidth > 0) {
           drawImage(firstImage);
           drawnFrameRef.current = 0;
+          setIsCanvasReady(true);
         }
       }
     }
@@ -157,7 +162,7 @@ export function ScrollSequence({
             src={poster}
             alt=""
             aria-hidden="true"
-            className={`${isPinned ? 'fixed' : 'absolute'} top-0 left-0 z-[1] block h-screen w-screen object-cover`}
+            className={`${isPinned ? 'fixed' : 'absolute'} top-0 left-0 z-[1] block h-screen w-screen object-cover transition-opacity duration-300 ${isCanvasReady ? 'opacity-0' : 'opacity-100'}`}
             decoding="async"
           />
           <canvas
@@ -167,23 +172,27 @@ export function ScrollSequence({
           />
           <div
             aria-hidden="true"
-            className={`${isPinned ? 'fixed' : 'absolute'} top-0 left-0 z-[3] h-32 w-screen pointer-events-none`}
+            className={`${isPinned ? 'fixed' : 'absolute'} top-0 left-0 z-[3] h-40 w-screen pointer-events-none`}
             style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.76), rgba(8,8,10,0.34) 48%, transparent)',
-              boxShadow: 'inset 0 34px 56px rgba(0,0,0,0.48)',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.62), rgba(0,0,0,0.22) 46%, transparent 100%)',
             }}
           />
           <div
             aria-hidden="true"
-            className={`${isPinned ? 'fixed' : 'absolute'} bottom-0 left-0 z-[3] h-36 w-screen pointer-events-none`}
+            className={`${isPinned ? 'fixed' : 'absolute'} bottom-0 left-0 z-[3] h-44 w-screen pointer-events-none`}
             style={{
-              background: 'linear-gradient(180deg, transparent, rgba(8,8,10,0.44) 42%, rgba(8,8,10,0.9))',
-              boxShadow: 'inset 0 -38px 70px rgba(0,0,0,0.58)',
-              backdropFilter: 'blur(5px)',
-              WebkitBackdropFilter: 'blur(5px)',
-              maskImage: 'linear-gradient(180deg, transparent, black 52%)',
-              WebkitMaskImage: 'linear-gradient(180deg, transparent, black 52%)',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.24) 42%, rgba(0,0,0,0.78) 100%)',
             }}
+          />
+          <div
+            aria-hidden="true"
+            className={`${isPinned ? 'fixed' : 'absolute'} inset-y-0 left-0 z-[3] w-[22vw] pointer-events-none`}
+            style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.38), transparent)' }}
+          />
+          <div
+            aria-hidden="true"
+            className={`${isPinned ? 'fixed' : 'absolute'} inset-y-0 right-0 z-[3] w-[22vw] pointer-events-none`}
+            style={{ background: 'linear-gradient(270deg, rgba(0,0,0,0.42), transparent)' }}
           />
         </>
       )}
